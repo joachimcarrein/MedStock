@@ -179,4 +179,12 @@
   <data name="Settings_WhoAreYou_Help" xml:space="preserve"><value>Home Assistant did not tell MedStock who you are. Choose yourself to receive notifications.</value></data>
   <data name="Settings_ExistingUser" xml:space="preserve"><value>Existing user</value></data>
   <data name="Settings_OrNewName" xml:space="preserve"><value>Or type your name</value></data>
+  <data name="Doctor_ShareTitle" xml:space="preserve"><value>Prescription {0} – {1}</value></data>
+  <data name="Doctor_Ask" xml:space="preserve"><value>ask {0} {1}</value></data>
+  <data name="Doctor_None" xml:space="preserve"><value>none</value></data>
+  <data name="Doctor_Paused" xml:space="preserve"><value>(paused)</value></data>
+  <data name="Doctor_Others" xml:space="preserve"><value>Nothing needed ({0})</value></data>
+  <data name="Doctor_Text" xml:space="preserve"><value>Text for the doctor</value></data>
+  <data name="Doctor_Share" xml:space="preserve"><value>Share</value></data>
+  <data name="Doctor_Copied" xml:space="preserve"><value>Copied</value></data>
 </root>

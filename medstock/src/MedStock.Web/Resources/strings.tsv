@@ -174,3 +174,11 @@ Settings_WhoAreYou	Who are you?	Wie ben je?
 Settings_WhoAreYou_Help	Home Assistant did not tell MedStock who you are. Choose yourself to receive notifications.	Home Assistant gaf niet door wie je bent. Kies jezelf om meldingen te krijgen.
 Settings_ExistingUser	Existing user	Bestaande gebruiker
 Settings_OrNewName	Or type your name	Of typ je naam
+Doctor_ShareTitle	Prescription {0} – {1}	Voorschrift {0} – {1}
+Doctor_Ask	ask {0} {1}	vraag {0} {1}
+Doctor_None	none	geen
+Doctor_Paused	(paused)	(gepauzeerd)
+Doctor_Others	Nothing needed ({0})	Niets nodig ({0})
+Doctor_Text	Text for the doctor	Tekst voor de dokter
+Doctor_Share	Share	Delen
+Doctor_Copied	Copied	Gekopieerd

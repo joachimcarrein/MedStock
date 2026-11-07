@@ -29,6 +29,8 @@ To update: **App store › ⋮ › Check for updates**, then update (or **Rebuil
 - Profiles are lists, typically one per person ("Husband", "Wife"). They are not linked to
   Home Assistant users or persons.
 - Per user only notification preferences, language and the last chosen profile filter are stored.
+- Should Home Assistant ever not pass on who you are, MedStock uses a shared "household" user
+  (without notifications) and shows a banner; in **Settings › Who are you?** you can pick yourself.
 
 ## Usage
 
@@ -39,11 +41,21 @@ To update: **App store › ⋮ › Check for updates**, then update (or **Rebuil
   coverage period (medication › profile › global setting, default 90 days). Use **Share** to send
   or copy the list.
 - Days remaining are always rounded down. The dose of today is already counted as taken.
+- When you enter or recount the stock, tick **All of today's doses already taken** if that is the
+  case (it is ticked by default after 20:00); otherwise today's dose is subtracted.
+- A change in usage applies from tomorrow. If someone else changed the same medication in the
+  meantime, MedStock asks you to check and try again.
+- **Archived** medication (via Settings) can be restored or deleted permanently.
 
 ## Notifications
 
 - Each user chooses in **Settings** whether they want notifications, on which devices
   (`notify.*` services of Home Assistant, Companion app devices are suggested) and for which profiles.
+  **Open Settings and tap Save once**: until then you receive nothing.
+- The notification text uses your language setting, or the language of your last visit when it is
+  set to *Automatic*.
+- A device that Home Assistant no longer knows (renamed or removed phone) is skipped and marked
+  in Settings: "Device not found anymore; choose again".
 - Once a day, at the configured time (default 09:00), MedStock checks all medication.
   A notification is sent when the days remaining reach the threshold (default 14 days, configurable
   per medication), and again at half and a quarter of it and when it is empty

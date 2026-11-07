@@ -1,5 +1,68 @@
 @page
+@model DoctorModel
+@using System.Globalization
 @{
     ViewData["Tab"] = "doctor";
+    var ui = CultureInfo.CurrentUICulture;
 }
 <h1>@L["Tab_Prescription"]</h1>
+
+@if (Model.Profile is null)
+{
+    <div class="empty-state">
+        <p>@L["Empty_NoProfiles"]</p>
+        <a href="@Url.Page("/Settings/Profiles", new { next = "new" })" role="button">@L["Empty_NoProfiles_Button"]</a>
+    </div>
+}
+else
+{
+    @if (Model.Profiles.Count > 1)
+    {
+        <nav class="chips" aria-label="@L["Med_Profile"]">
+            @foreach (var p in Model.Profiles)
+            {
+                var active = p.Id == Model.Profile.Id;
+                <a href="@Url.Page("/Doctor", new { profile = p.Id })" class="@(active ? "active" : null)" aria-current="@(active ? "page" : null)"><span class="profile-dot" style="background:@p.Color"></span>@p.Name</a>
+            }
+        </nav>
+    }
+
+    var top = Model.Lines.Where(l => l.Expanded).ToList();
+    var rest = Model.Lines.Where(l => !l.Expanded).ToList();
+    @if (Model.Lines.Count == 0)
+    {
+        <p class="empty-state muted">@L["Empty_NoMedication"]</p>
+    }
+    <ul class="rx">
+        @foreach (var l in top)
+        {
+            var m = l.Medication;
+            <li class="state-@l.Row.ColorClass">
+                <div class="rx-name">@m.Name <span class="muted">@m.Strength</span></div>
+                <div class="rx-ask">@(l.Packages > 0 ? L["Doctor_Ask", l.Packages, Texts.Package(m.Type, l.Packages, ui)] : L["Doctor_None"])</div>
+                <div class="small"><span class="badge @l.Row.ColorClass"><partial name="_StateIcon" model="l.Row.Stock.State" />@l.Row.Badge(ui)</span> @l.Row.LastDose(ui)</div>
+            </li>
+        }
+    </ul>
+    @if (rest.Count > 0)
+    {
+        <details>
+            <summary>@L["Doctor_Others", rest.Count]</summary>
+            <ul class="rx rx-rest">
+                @foreach (var l in rest)
+                {
+                    var m = l.Medication;
+                    <li>@m.Name <span class="muted">@m.Strength</span> · @(m.Paused ? L["Doctor_Paused"] : L["Doctor_None"])</li>
+                }
+            </ul>
+        </details>
+    }
+
+    <h2>@L["Doctor_Text"]</h2>
+    <textarea id="share-text" readonly rows="@(Math.Max(3, Model.ShareText.Split('\n').Length + 1))">@Model.ShareText</textarea>
+    <button type="button" id="share" data-share-text="@Model.ShareText" data-copied="@L["Doctor_Copied"]">@L["Doctor_Share"]</button>
+}
+
+@section Scripts {
+    <script src="~/js/share.js" asp-append-version="true"></script>
+}

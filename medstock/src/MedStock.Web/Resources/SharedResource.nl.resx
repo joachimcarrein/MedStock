@@ -179,4 +179,12 @@
   <data name="Settings_WhoAreYou_Help" xml:space="preserve"><value>Home Assistant gaf niet door wie je bent. Kies jezelf om meldingen te krijgen.</value></data>
   <data name="Settings_ExistingUser" xml:space="preserve"><value>Bestaande gebruiker</value></data>
   <data name="Settings_OrNewName" xml:space="preserve"><value>Of typ je naam</value></data>
+  <data name="Doctor_ShareTitle" xml:space="preserve"><value>Voorschrift {0} – {1}</value></data>
+  <data name="Doctor_Ask" xml:space="preserve"><value>vraag {0} {1}</value></data>
+  <data name="Doctor_None" xml:space="preserve"><value>geen</value></data>
+  <data name="Doctor_Paused" xml:space="preserve"><value>(gepauzeerd)</value></data>
+  <data name="Doctor_Others" xml:space="preserve"><value>Niets nodig ({0})</value></data>
+  <data name="Doctor_Text" xml:space="preserve"><value>Tekst voor de dokter</value></data>
+  <data name="Doctor_Share" xml:space="preserve"><value>Delen</value></data>
+  <data name="Doctor_Copied" xml:space="preserve"><value>Gekopieerd</value></data>
 </root>

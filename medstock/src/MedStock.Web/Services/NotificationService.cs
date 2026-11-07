@@ -96,7 +96,7 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
                     var recipients = NotificationRules.Recipients(users, m.ProfileId).ToList();
                     if (recipients.Count == 0)
                     {
-                        lines.Add($"{m.Name} ({row.Profile.Name}): level {send.Level}, no recipients");
+                        lines.Add($"{m.Name} ({row.Profile.Name}): {LevelText(send.Level)}, no recipients (no one has saved notification settings for this profile)");
                         log.LogInformation("Medication {MedicationId}: level {Level} due but no recipients", m.Id, send.Level);
                         break;
                     }
@@ -137,7 +137,7 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
                         foreach (var level in send.ActiveLevels.Where(l => !logged.Contains(l)))
                             db.NotificationLogs.Add(new NotificationLog { MedicationId = m.Id, Level = level, SentAt = DateTime.UtcNow });
                     }
-                    lines.Add($"{m.Name} ({row.Profile.Name}): level {send.Level}, {ok}/{recipients.Count} delivered");
+                    lines.Add($"{m.Name} ({row.Profile.Name}): {LevelText(send.Level)}, {ok}/{recipients.Count} delivered");
                     log.LogInformation("Medication {MedicationId}: level {Level} sent to {Delivered}/{Devices} devices",
                         m.Id, send.Level, ok, recipients.Count);
                     break;
@@ -151,6 +151,8 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
         if (lines.Count == 0) lines.Add("Nothing to send.");
         return new RunReport(checkedCount, messages, deliveries, transportError, lines);
     }
+
+    private static string LevelText(int level) => level == NotificationRules.MinStockLevel ? "under minimum stock" : $"{level}-day level";
 
     /// <summary>The recipient's language: the explicit setting, else the culture of their last visit, else English.</summary>
     public static CultureInfo CultureFor(UserSettings u) =>

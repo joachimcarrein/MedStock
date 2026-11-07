@@ -23,10 +23,23 @@ public class WebTests : IClassFixture<AddonWebFactory>
     }
 
     [Fact]
-    public async Task Hx_attributes_carry_the_ingress_prefix()
+    public async Task Script_urls_and_form_actions_carry_the_ingress_prefix()
     {
-        var html = await _f.Client(ingressPath: "/api/hassio_ingress/abc123").GetStringAsync("/Diag");
-        Assert.Contains("hx-get=\"/api/hassio_ingress/abc123/Diag?handler=Partial\"", html);
+        var id = _f.WithDb(db =>
+        {
+            var m = new MedStock.Web.Domain.Medication
+            {
+                Profile = new MedStock.Web.Domain.Profile { Name = "Prefix" }, Name = "X", UnitsPerPackage = 10, PerDay = 1,
+                Snapshots = [new MedStock.Web.Domain.Snapshot { Date = new DateOnly(2026, 11, 17), TotalUnits = 10 }],
+            };
+            db.Medications.Add(m);
+            db.SaveChanges();
+            return m.Id;
+        });
+        var html = await _f.Client(ingressPath: "/api/hassio_ingress/abc123").GetStringAsync($"/Medications/Details?id={id}");
+        Assert.Contains($"data-upload-url=\"/api/hassio_ingress/abc123/Medications/Photo?id={id}\"", html);
+        Assert.Contains($"action=\"/api/hassio_ingress/abc123/Medications/Details?id={id}&amp;handler=Purchase\"", html);
+        Assert.DoesNotContain("action=\"/Medications", html);
     }
 
     [Theory]
