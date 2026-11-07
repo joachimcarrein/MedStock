@@ -177,3 +177,4 @@ button.secondary, [role=button].secondary, summary[role=button].secondary { back
 button.outline, [role=button].outline, summary[role=button].outline { background: transparent; color: var(--pico-secondary, #525f7a); border: 1px solid var(--pico-secondary-border, #525f7a); }
 details.archive summary[role=button] { width: auto; }
 nav.chips { justify-content: flex-start; }
+.chips form { margin: 0; flex: none; }

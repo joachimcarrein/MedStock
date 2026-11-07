@@ -18,14 +18,22 @@ else
 {
     @if (Model.Profiles.Count > 1)
     {
-        <form method="post" asp-page-handler="Filter" class="chips" aria-label="@L["Med_Profile"]">
-            <button type="submit" name="profileId" value="" class="@(Model.Filter is null ? "active" : null)" aria-pressed="@(Model.Filter is null ? "true" : "false")">@L["Filter_All"]</button>
+        @* One small form per chip with a hidden field: iOS does not focus a tapped button, so a submit button's own
+           name/value is not reliably sent along with a boosted form. *@
+        <div class="chips" role="group" aria-label="@L["Med_Profile"]">
+            <form method="post" asp-page-handler="Filter">
+                <input type="hidden" name="profileId" value="" />
+                <button type="submit" class="@(Model.Filter is null ? "active" : null)" aria-pressed="@(Model.Filter is null ? "true" : "false")">@L["Filter_All"]</button>
+            </form>
             @foreach (var p in Model.Profiles)
             {
                 var active = Model.Filter == p.Id;
-                <button type="submit" name="profileId" value="@p.Id" class="@(active ? "active" : null)" aria-pressed="@(active ? "true" : "false")"><span class="profile-dot" style="background:@p.Color"></span>@p.Name</button>
+                <form method="post" asp-page-handler="Filter">
+                    <input type="hidden" name="profileId" value="@p.Id" />
+                    <button type="submit" class="@(active ? "active" : null)" aria-pressed="@(active ? "true" : "false")"><span class="profile-dot" style="background:@p.Color"></span>@p.Name</button>
+                </form>
             }
-        </form>
+        </div>
     }
 
     @if (Model.Rows.Count == 0)

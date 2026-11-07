@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Fix: the profile filter chips on the overview did not switch on iPhone.
+- Clearer injection icon.
+
 ## 0.1.0
 
 - First release: profiles, medications with per-day / weekly / as-needed usage,

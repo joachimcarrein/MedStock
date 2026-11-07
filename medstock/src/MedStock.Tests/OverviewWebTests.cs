@@ -70,6 +70,9 @@ public class OverviewWebTests : IClassFixture<AddonWebFactory>
     {
         var c = Nl("ov-2");
         var html = await c.GetStringAsync("/");
+        // Each chip is its own form with a hidden field (iOS does not send a tapped button's value reliably).
+        Assert.Contains($"<input type=\"hidden\" name=\"profileId\" value=\"{_wife}\" />", html);
+        Assert.DoesNotContain("name=\"profileId\" value=\"" + _wife + "\" class", html);
         var token = Regex.Match(html, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
         var resp = await c.PostAsync("/?handler=Filter", new FormUrlEncodedContent(
             [new("__RequestVerificationToken", token), new("profileId", _wife.ToString())]));
