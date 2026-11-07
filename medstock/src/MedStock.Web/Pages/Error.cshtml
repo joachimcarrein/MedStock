@@ -1,0 +1,9 @@
+@page
+@model ErrorModel
+@{
+    ViewData["HideHouseholdBanner"] = true;
+}
+<div class="empty-state">
+    <h1>@(Model.Code == 404 ? L["Error_NotFound"] : L["Error_Generic"])</h1>
+    <p><a href="~/">@L["Error_Home"]</a></p>
+</div>

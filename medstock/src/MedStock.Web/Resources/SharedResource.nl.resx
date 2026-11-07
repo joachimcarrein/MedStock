@@ -56,4 +56,14 @@
   <data name="Notify_LastDay" xml:space="preserve"><value>{0}: vandaag laatste dosis</value></data>
   <data name="Notify_Empty" xml:space="preserve"><value>{0}: is op</value></data>
   <data name="Notify_Test" xml:space="preserve"><value>Testmelding van MedStock</value></data>
+  <data name="Tab_Overview" xml:space="preserve"><value>Overzicht</value></data>
+  <data name="Tab_Prescription" xml:space="preserve"><value>Voorschrift</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>Instellingen</value></data>
+  <data name="Back" xml:space="preserve"><value>Terug</value></data>
+  <data name="Close" xml:space="preserve"><value>Sluiten</value></data>
+  <data name="Session_Expired" xml:space="preserve"><value>Sessie verlopen – tik om te herladen</value></data>
+  <data name="Household_Banner" xml:space="preserve"><value>Kies wie je bent om meldingen te krijgen</value></data>
+  <data name="Error_NotFound" xml:space="preserve"><value>Pagina niet gevonden</value></data>
+  <data name="Error_Generic" xml:space="preserve"><value>Er ging iets mis</value></data>
+  <data name="Error_Home" xml:space="preserve"><value>Terug naar het overzicht</value></data>
 </root>

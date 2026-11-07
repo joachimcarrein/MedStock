@@ -12,8 +12,11 @@ TestResults/
 *.swp
 
 # Local app data
-**/data/
+*.db
+*.db-wal
+*.db-shm
 
 # OS
 .DS_Store
 Thumbs.db
+.playwright-mcp/

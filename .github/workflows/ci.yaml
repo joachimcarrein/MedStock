@@ -19,3 +19,27 @@ jobs:
       - name: Test
         working-directory: medstock/src
         run: dotnet test MedStock.sln -c Release
+      - name: No pending model changes
+        working-directory: medstock/src
+        env:
+          MEDSTOCK_DATA_DIR: ${{ runner.temp }}/medstock-ef
+        run: dotnet ef migrations has-pending-model-changes --project MedStock.Web
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image (same context as the Supervisor)
+        run: docker build -t medstock medstock/
+      - name: Smoke test
+        run: |
+          docker run -d --name ms -e TZ=Europe/Brussels -e ASPNETCORE_ENVIRONMENT=Development -e MEDSTOCK_DATA_DIR=/data medstock
+          for i in $(seq 1 30); do
+            if docker exec ms bash -c 'exec 3<>/dev/tcp/127.0.0.1/8099 && printf "GET /healthz HTTP/1.0\r\n\r\n" >&3 && cat <&3' 2>/dev/null | grep -q ok; then break; fi
+            sleep 1
+          done
+          docker logs ms
+          docker logs ms 2>&1 | grep -q "Europe/Brussels"
+          docker exec ms bash -c 'exec 3<>/dev/tcp/127.0.0.1/8099 && printf "GET /api/hassio_ingress/dev/ HTTP/1.0\r\nAccept-Language: nl-BE\r\n\r\n" >&3 && cat <&3' | tee page.html | head -5
+          grep -q "Overzicht" page.html
+          docker exec ms ls -la /data

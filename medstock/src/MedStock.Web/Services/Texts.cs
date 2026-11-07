@@ -4,9 +4,6 @@ using MedStock.Web.Domain;
 
 namespace MedStock.Web.Services;
 
-/// <summary>Marker type for the shared resx (Resources/SharedResource*.resx).</summary>
-public sealed class SharedResource;
-
 /// <summary>Culture-explicit access to the shared resources (used outside of a request, e.g. notifications).</summary>
 public static class Texts
 {

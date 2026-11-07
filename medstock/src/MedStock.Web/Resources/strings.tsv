@@ -51,3 +51,13 @@ Notify_AsNeeded	{0}: {1} left (as needed)	{0}: nog {1} (zo nodig)
 Notify_LastDay	{0}: last dose today	{0}: vandaag laatste dosis
 Notify_Empty	{0}: out of stock	{0}: is op
 Notify_Test	Test notification from MedStock	Testmelding van MedStock
+Tab_Overview	Overview	Overzicht
+Tab_Prescription	Prescription	Voorschrift
+Tab_Settings	Settings	Instellingen
+Back	Back	Terug
+Close	Close	Sluiten
+Session_Expired	Session expired – tap to reload	Sessie verlopen – tik om te herladen
+Household_Banner	Choose who you are to receive notifications	Kies wie je bent om meldingen te krijgen
+Error_NotFound	Page not found	Pagina niet gevonden
+Error_Generic	Something went wrong	Er ging iets mis
+Error_Home	Back to the overview	Terug naar het overzicht

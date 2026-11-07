@@ -1,0 +1,114 @@
+/* MedStock – small additions on top of Pico classless. Mobile first (390 px). */
+:root {
+  --ms-red: #d32f2f;
+  --ms-orange: #ef6c00;
+  --ms-green: #2e7d32;
+  --ms-grey: #757575;
+  --ms-tabbar-h: 3.6rem;
+  --pico-font-size: 100%;
+}
+body { padding-bottom: calc(var(--ms-tabbar-h) + env(safe-area-inset-bottom) + 1rem); }
+main { padding: 0.75rem 1rem; max-width: 46rem; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin-bottom: 0.75rem; }
+h2 { font-size: 1.15rem; }
+svg { fill: currentColor; }
+
+/* Tab bar */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; justify-content: space-around;
+  padding: 0.25rem 0 calc(0.25rem + env(safe-area-inset-bottom));
+  background: var(--pico-background-color);
+  border-top: 1px solid var(--pico-muted-border-color);
+}
+.tabbar a {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  text-decoration: none; color: var(--pico-muted-color); font-size: 0.75rem; padding: 0.25rem 0;
+}
+.tabbar a svg { width: 1.6rem; height: 1.6rem; }
+.tabbar a.active { color: var(--pico-primary); font-weight: 600; }
+
+/* Sub screen header */
+.subheader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+.subheader h1 { margin: 0; font-size: 1.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subheader .back { display: inline-flex; padding: 0.4rem; margin-left: -0.4rem; }
+.subheader .back svg { width: 1.6rem; height: 1.6rem; }
+
+/* Banners */
+.banner {
+  position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center;
+  gap: 0.5rem; padding: 0.6rem 1rem; background: #fff3e0; color: #5d4037; font-size: 0.9rem;
+}
+.banner-error { background: var(--ms-red); color: #fff; }
+.banner-error button { color: #fff; width: 100%; text-align: center; }
+button.linklike {
+  background: none; border: 0; padding: 0; margin: 0; width: auto; color: inherit;
+  text-decoration: underline; font: inherit; cursor: pointer;
+}
+
+/* Medication cards */
+.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.cards li { list-style: none; margin: 0; }
+.card {
+  display: flex; gap: 0.75rem; align-items: center; padding: 0.6rem 0.75rem;
+  border: 1px solid var(--pico-muted-border-color); border-left: 6px solid var(--ms-grey);
+  border-radius: var(--pico-border-radius); text-decoration: none; color: inherit;
+  background: var(--pico-card-background-color, var(--pico-background-color));
+}
+.card .thumb { width: 64px; height: 64px; flex: none; border-radius: 8px; object-fit: cover; display: flex; align-items: center; justify-content: center; background: var(--pico-muted-border-color); }
+.card .thumb svg { width: 36px; height: 36px; opacity: 0.75; }
+.card .body { flex: 1; min-width: 0; }
+.card .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .meta { font-size: 0.85rem; color: var(--pico-muted-color); }
+.state-red { border-left-color: var(--ms-red); }
+.state-orange { border-left-color: var(--ms-orange); }
+.state-green { border-left-color: var(--ms-green); }
+.state-grey { border-left-color: var(--ms-grey); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.8rem; font-weight: 600;
+  padding: 0.1rem 0.5rem; border-radius: 999px; color: #fff; background: var(--ms-grey); white-space: nowrap;
+}
+.badge svg { width: 0.95rem; height: 0.95rem; }
+.badge.red { background: var(--ms-red); }
+.badge.orange { background: var(--ms-orange); }
+.badge.green { background: var(--ms-green); }
+
+.profile-dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; vertical-align: middle; margin-right: 0.25rem; }
+
+/* Chips */
+.chips { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.4rem; margin-bottom: 0.6rem; }
+.chips button, .chips a {
+  flex: none; width: auto; margin: 0; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.9rem;
+  border: 1px solid var(--pico-muted-border-color); background: transparent; color: inherit; text-decoration: none;
+}
+.chips .active { background: var(--pico-primary-background); color: var(--pico-primary-inverse); border-color: var(--pico-primary-background); }
+
+/* Big action buttons */
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.75rem 0; }
+.actions > *, .actions form button { width: 100%; margin: 0; }
+.actions form { margin: 0; }
+.inline-form { display: flex; gap: 0.5rem; align-items: stretch; }
+.inline-form input { margin: 0; }
+.inline-form button { width: auto; margin: 0; white-space: nowrap; }
+
+.fab {
+  position: fixed; right: 1rem; bottom: calc(var(--ms-tabbar-h) + env(safe-area-inset-bottom) + 1rem); z-index: 11;
+  width: 3.5rem; height: 3.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--pico-primary-background); color: var(--pico-primary-inverse); box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  font-size: 2rem; text-decoration: none; line-height: 1;
+}
+
+.muted { color: var(--pico-muted-color); }
+.small { font-size: 0.85rem; }
+.error { color: var(--ms-red); }
+.ok { color: var(--ms-green); }
+.empty-state { text-align: center; padding: 2rem 0; }
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline; }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 0.75rem; font-size: 0.9rem; }
+dl.kv dt { font-weight: 600; }
+dl.kv dd { margin: 0; word-break: break-all; }
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
+.week-grid label { font-size: 0.75rem; text-align: center; }
+.week-grid input { padding: 0.4rem 0.2rem; text-align: center; }

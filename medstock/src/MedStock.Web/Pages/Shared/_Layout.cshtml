@@ -1,0 +1,53 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject CurrentUser CurrentUser
+@inject AppMode Mode
+@{
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var tab = ViewData["Tab"] as string;
+    var lang = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}
+<!DOCTYPE html>
+<html lang="@lang">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="htmx-config" content='{"historyCacheSize":0,"refreshOnHistoryMiss":true,"scrollIntoViewOnBoost":false}' />
+    <title>MedStock</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="~/lib/pico.classless.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/lib/htmx.min.js" asp-append-version="true"></script>
+    <script src="~/js/session.js" asp-append-version="true" defer></script>
+</head>
+<body hx-boost="true" hx-headers='{"RequestVerificationToken":"@token"}'>
+    <div id="session-banner" class="banner banner-error" hidden>
+        <button type="button" class="linklike" onclick="window.top.location.reload()">@L["Session_Expired"]</button>
+    </div>
+    @if (Mode.AddonMode && CurrentUser.IsHousehold && ViewData["HideHouseholdBanner"] is null)
+    {
+        <div class="banner" id="household-banner">
+            <a href="~/Settings">@L["Household_Banner"]</a>
+            <button type="button" class="linklike" aria-label="@L["Close"]" onclick="this.parentElement.hidden=true">×</button>
+        </div>
+    }
+    <main id="main">
+        @RenderBody()
+    </main>
+    <nav class="tabbar" aria-label="MedStock">
+        <a href="~/" class="@(tab == "overview" ? "active" : null)" aria-current="@(tab == "overview" ? "page" : null)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <span>@L["Tab_Overview"]</span>
+        </a>
+        <a href="~/Doctor" class="@(tab == "doctor" ? "active" : null)" aria-current="@(tab == "doctor" ? "page" : null)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            <span>@L["Tab_Prescription"]</span>
+        </a>
+        <a href="~/Settings" class="@(tab == "settings" ? "active" : null)" aria-current="@(tab == "settings" ? "page" : null)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94 7.07 7.07 0 0 0-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.93 2h-3.86a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.71 8.47a.48.48 0 0 0 .12.61l2.03 1.58a7.3 7.3 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.25.41.48.41h3.86c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+            <span>@L["Tab_Settings"]</span>
+        </a>
+    </nav>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
