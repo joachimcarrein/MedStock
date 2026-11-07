@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Unit_Pill_One" xml:space="preserve"><value>pil</value></data>
+  <data name="Unit_Pill_Other" xml:space="preserve"><value>pillen</value></data>
+  <data name="Unit_Capsule_One" xml:space="preserve"><value>capsule</value></data>
+  <data name="Unit_Capsule_Other" xml:space="preserve"><value>capsules</value></data>
+  <data name="Unit_NasalSpray_One" xml:space="preserve"><value>dosis</value></data>
+  <data name="Unit_NasalSpray_Other" xml:space="preserve"><value>doses</value></data>
+  <data name="Unit_Inhaler_One" xml:space="preserve"><value>puff</value></data>
+  <data name="Unit_Inhaler_Other" xml:space="preserve"><value>puffs</value></data>
+  <data name="Unit_Drops_One" xml:space="preserve"><value>druppel</value></data>
+  <data name="Unit_Drops_Other" xml:space="preserve"><value>druppels</value></data>
+  <data name="Unit_Injection_One" xml:space="preserve"><value>spuit</value></data>
+  <data name="Unit_Injection_Other" xml:space="preserve"><value>spuiten</value></data>
+  <data name="Unit_Sachet_One" xml:space="preserve"><value>zakje</value></data>
+  <data name="Unit_Sachet_Other" xml:space="preserve"><value>zakjes</value></data>
+  <data name="Unit_Liquid_One" xml:space="preserve"><value>ml</value></data>
+  <data name="Unit_Liquid_Other" xml:space="preserve"><value>ml</value></data>
+  <data name="Unit_Other_One" xml:space="preserve"><value>stuk</value></data>
+  <data name="Unit_Other_Other" xml:space="preserve"><value>stuks</value></data>
+  <data name="Package_Pill_One" xml:space="preserve"><value>doos</value></data>
+  <data name="Package_Pill_Other" xml:space="preserve"><value>dozen</value></data>
+  <data name="Package_Capsule_One" xml:space="preserve"><value>doos</value></data>
+  <data name="Package_Capsule_Other" xml:space="preserve"><value>dozen</value></data>
+  <data name="Package_NasalSpray_One" xml:space="preserve"><value>flesje</value></data>
+  <data name="Package_NasalSpray_Other" xml:space="preserve"><value>flesjes</value></data>
+  <data name="Package_Inhaler_One" xml:space="preserve"><value>inhalator</value></data>
+  <data name="Package_Inhaler_Other" xml:space="preserve"><value>inhalators</value></data>
+  <data name="Package_Drops_One" xml:space="preserve"><value>flesje</value></data>
+  <data name="Package_Drops_Other" xml:space="preserve"><value>flesjes</value></data>
+  <data name="Package_Injection_One" xml:space="preserve"><value>verpakking</value></data>
+  <data name="Package_Injection_Other" xml:space="preserve"><value>verpakkingen</value></data>
+  <data name="Package_Sachet_One" xml:space="preserve"><value>doos</value></data>
+  <data name="Package_Sachet_Other" xml:space="preserve"><value>dozen</value></data>
+  <data name="Package_Liquid_One" xml:space="preserve"><value>fles</value></data>
+  <data name="Package_Liquid_Other" xml:space="preserve"><value>flessen</value></data>
+  <data name="Package_Other_One" xml:space="preserve"><value>verpakking</value></data>
+  <data name="Package_Other_Other" xml:space="preserve"><value>verpakkingen</value></data>
+  <data name="Type_Pill" xml:space="preserve"><value>Pil</value></data>
+  <data name="Type_Capsule" xml:space="preserve"><value>Capsule</value></data>
+  <data name="Type_NasalSpray" xml:space="preserve"><value>Neusspray</value></data>
+  <data name="Type_Inhaler" xml:space="preserve"><value>Inhalator</value></data>
+  <data name="Type_Drops" xml:space="preserve"><value>Druppels</value></data>
+  <data name="Type_Injection" xml:space="preserve"><value>Injectie</value></data>
+  <data name="Type_Sachet" xml:space="preserve"><value>Zakje</value></data>
+  <data name="Type_Liquid" xml:space="preserve"><value>Vloeistof</value></data>
+  <data name="Type_Other" xml:space="preserve"><value>Andere</value></data>
+  <data name="Notify_Title" xml:space="preserve"><value>MedStock</value></data>
+  <data name="Notify_Days" xml:space="preserve"><value>{0}: nog {1} dagen</value></data>
+  <data name="Notify_Weekly" xml:space="preserve"><value>{0}: nog {1}, laatste dosis {2}</value></data>
+  <data name="Notify_AsNeeded" xml:space="preserve"><value>{0}: nog {1} (zo nodig)</value></data>
+  <data name="Notify_LastDay" xml:space="preserve"><value>{0}: vandaag laatste dosis</value></data>
+  <data name="Notify_Empty" xml:space="preserve"><value>{0}: is op</value></data>
+  <data name="Notify_Test" xml:space="preserve"><value>Testmelding van MedStock</value></data>
+</root>

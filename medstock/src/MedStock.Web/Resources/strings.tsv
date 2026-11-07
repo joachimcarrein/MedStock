@@ -1,0 +1,53 @@
+# key	english	dutch  (generate resx: python tools/gen_resx.py)
+Unit_Pill_One	pill	pil
+Unit_Pill_Other	pills	pillen
+Unit_Capsule_One	capsule	capsule
+Unit_Capsule_Other	capsules	capsules
+Unit_NasalSpray_One	dose	dosis
+Unit_NasalSpray_Other	doses	doses
+Unit_Inhaler_One	puff	puff
+Unit_Inhaler_Other	puffs	puffs
+Unit_Drops_One	drop	druppel
+Unit_Drops_Other	drops	druppels
+Unit_Injection_One	injection	spuit
+Unit_Injection_Other	injections	spuiten
+Unit_Sachet_One	sachet	zakje
+Unit_Sachet_Other	sachets	zakjes
+Unit_Liquid_One	ml	ml
+Unit_Liquid_Other	ml	ml
+Unit_Other_One	unit	stuk
+Unit_Other_Other	units	stuks
+Package_Pill_One	box	doos
+Package_Pill_Other	boxes	dozen
+Package_Capsule_One	box	doos
+Package_Capsule_Other	boxes	dozen
+Package_NasalSpray_One	bottle	flesje
+Package_NasalSpray_Other	bottles	flesjes
+Package_Inhaler_One	inhaler	inhalator
+Package_Inhaler_Other	inhalers	inhalators
+Package_Drops_One	bottle	flesje
+Package_Drops_Other	bottles	flesjes
+Package_Injection_One	pack	verpakking
+Package_Injection_Other	packs	verpakkingen
+Package_Sachet_One	box	doos
+Package_Sachet_Other	boxes	dozen
+Package_Liquid_One	bottle	fles
+Package_Liquid_Other	bottles	flessen
+Package_Other_One	pack	verpakking
+Package_Other_Other	packs	verpakkingen
+Type_Pill	Pill	Pil
+Type_Capsule	Capsule	Capsule
+Type_NasalSpray	Nasal spray	Neusspray
+Type_Inhaler	Inhaler	Inhalator
+Type_Drops	Drops	Druppels
+Type_Injection	Injection	Injectie
+Type_Sachet	Sachet	Zakje
+Type_Liquid	Liquid	Vloeistof
+Type_Other	Other	Andere
+Notify_Title	MedStock	MedStock
+Notify_Days	{0}: {1} days left	{0}: nog {1} dagen
+Notify_Weekly	{0}: {1} left, last dose {2}	{0}: nog {1}, laatste dosis {2}
+Notify_AsNeeded	{0}: {1} left (as needed)	{0}: nog {1} (zo nodig)
+Notify_LastDay	{0}: last dose today	{0}: vandaag laatste dosis
+Notify_Empty	{0}: out of stock	{0}: is op
+Notify_Test	Test notification from MedStock	Testmelding van MedStock
