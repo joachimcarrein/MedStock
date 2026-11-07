@@ -1,0 +1,36 @@
+@page
+@model MedStock.Web.Pages.Medications.ArchivedModel
+@using System.Globalization
+@{
+    ViewData["Tab"] = "settings";
+    var ui = CultureInfo.CurrentUICulture;
+}
+<partial name="_SubHeader" model="@((L["Archived_Title"].Value, Url.Page("/Settings/Index")!))" />
+
+@if (Model.Groups.Count == 0)
+{
+    <p class="empty-state muted">@L["Archived_Empty"]</p>
+}
+@foreach (var g in Model.Groups)
+{
+    <h2><span class="profile-dot" style="background:@g.Key.Color"></span>@g.Key.Name</h2>
+    <ul class="profile-list">
+        @foreach (var r in g)
+        {
+            <li>
+                <div><strong>@r.Medication.Name</strong> @r.Medication.Strength <span class="small muted">· @Texts.Quantity(r.Medication.Type, r.Stock, ui)</span></div>
+                <div class="row-actions">
+                    <form method="post" asp-page-handler="Restore" asp-route-id="@r.Medication.Id">
+                        <button type="submit" class="secondary">@L["Restore"]</button>
+                    </form>
+                    <details class="confirm">
+                        <summary role="button" class="secondary outline">@L["DeleteForever"]</summary>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@r.Medication.Id">
+                            <button type="submit" class="danger">@L["DeleteForever_Confirm"]</button>
+                        </form>
+                    </details>
+                </div>
+            </li>
+        }
+    </ul>
+}

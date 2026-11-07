@@ -141,4 +141,22 @@
   <data name="CoverageDays" xml:space="preserve"><value>Dekkingsdagen</value></data>
   <data name="AlertDays" xml:space="preserve"><value>Meldingsdrempel</value></data>
   <data name="Filter_All" xml:space="preserve"><value>Alles</value></data>
+  <data name="Action_Packages" xml:space="preserve"><value>Aantal verpakkingen</value></data>
+  <data name="Action_Units" xml:space="preserve"><value>Aantal eenheden</value></data>
+  <data name="Action_Recount" xml:space="preserve"><value>Hertellen</value></data>
+  <data name="Action_Pause" xml:space="preserve"><value>Pauzeren</value></data>
+  <data name="Action_Resume" xml:space="preserve"><value>Hervatten</value></data>
+  <data name="Action_Archive" xml:space="preserve"><value>Archiveren</value></data>
+  <data name="Archive_Confirm" xml:space="preserve"><value>Zeker? Archiveren</value></data>
+  <data name="Paused_Info" xml:space="preserve"><value>Gepauzeerd: de voorraad daalt niet.</value></data>
+  <data name="Flash_Added" xml:space="preserve"><value>Toegevoegd: +{0} {1}</value></data>
+  <data name="Flash_Taken" xml:space="preserve"><value>Genomen: −{0} {1}</value></data>
+  <data name="Flash_Recounted" xml:space="preserve"><value>Voorraad hergeteld</value></data>
+  <data name="Flash_Resumed" xml:space="preserve"><value>Hervat</value></data>
+  <data name="Val_AtLeastOne" xml:space="preserve"><value>Minstens 1</value></data>
+  <data name="Archived_Title" xml:space="preserve"><value>Gearchiveerd</value></data>
+  <data name="Archived_Empty" xml:space="preserve"><value>Niets gearchiveerd</value></data>
+  <data name="Restore" xml:space="preserve"><value>Herstellen</value></data>
+  <data name="DeleteForever" xml:space="preserve"><value>Definitief verwijderen</value></data>
+  <data name="DeleteForever_Confirm" xml:space="preserve"><value>Zeker? Definitief verwijderen</value></data>
 </root>

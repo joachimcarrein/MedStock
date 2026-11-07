@@ -136,3 +136,21 @@ LastDose	last dose {0}	laatste dosis {0}
 CoverageDays	Coverage days	Dekkingsdagen
 AlertDays	Alert threshold	Meldingsdrempel
 Filter_All	All	Alles
+Action_Packages	Number of packages	Aantal verpakkingen
+Action_Units	Number of units	Aantal eenheden
+Action_Recount	Recount	Hertellen
+Action_Pause	Pause	Pauzeren
+Action_Resume	Resume	Hervatten
+Action_Archive	Archive	Archiveren
+Archive_Confirm	Sure? Archive	Zeker? Archiveren
+Paused_Info	Paused: the stock does not go down.	Gepauzeerd: de voorraad daalt niet.
+Flash_Added	Added: +{0} {1}	Toegevoegd: +{0} {1}
+Flash_Taken	Taken: −{0} {1}	Genomen: −{0} {1}
+Flash_Recounted	Stock recounted	Voorraad hergeteld
+Flash_Resumed	Resumed	Hervat
+Val_AtLeastOne	At least 1	Minstens 1
+Archived_Title	Archived	Gearchiveerd
+Archived_Empty	Nothing archived	Niets gearchiveerd
+Restore	Restore	Herstellen
+DeleteForever	Delete permanently	Definitief verwijderen
+DeleteForever_Confirm	Sure? Delete permanently	Zeker? Definitief verwijderen

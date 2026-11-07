@@ -141,4 +141,22 @@
   <data name="CoverageDays" xml:space="preserve"><value>Coverage days</value></data>
   <data name="AlertDays" xml:space="preserve"><value>Alert threshold</value></data>
   <data name="Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="Action_Packages" xml:space="preserve"><value>Number of packages</value></data>
+  <data name="Action_Units" xml:space="preserve"><value>Number of units</value></data>
+  <data name="Action_Recount" xml:space="preserve"><value>Recount</value></data>
+  <data name="Action_Pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="Action_Resume" xml:space="preserve"><value>Resume</value></data>
+  <data name="Action_Archive" xml:space="preserve"><value>Archive</value></data>
+  <data name="Archive_Confirm" xml:space="preserve"><value>Sure? Archive</value></data>
+  <data name="Paused_Info" xml:space="preserve"><value>Paused: the stock does not go down.</value></data>
+  <data name="Flash_Added" xml:space="preserve"><value>Added: +{0} {1}</value></data>
+  <data name="Flash_Taken" xml:space="preserve"><value>Taken: −{0} {1}</value></data>
+  <data name="Flash_Recounted" xml:space="preserve"><value>Stock recounted</value></data>
+  <data name="Flash_Resumed" xml:space="preserve"><value>Resumed</value></data>
+  <data name="Val_AtLeastOne" xml:space="preserve"><value>At least 1</value></data>
+  <data name="Archived_Title" xml:space="preserve"><value>Archived</value></data>
+  <data name="Archived_Empty" xml:space="preserve"><value>Nothing archived</value></data>
+  <data name="Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="DeleteForever" xml:space="preserve"><value>Delete permanently</value></data>
+  <data name="DeleteForever_Confirm" xml:space="preserve"><value>Sure? Delete permanently</value></data>
 </root>

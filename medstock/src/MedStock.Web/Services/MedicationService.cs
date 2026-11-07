@@ -116,6 +116,31 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
         finally { Gate.Release(); }
     }
 
+    /// <summary>Archive or restore; no snapshot (days are simply calculated from the last snapshot again).</summary>
+    public async Task SetArchivedAsync(int id, bool archived)
+    {
+        var m = await db.Medications.FindAsync(id) ?? throw new KeyNotFoundException();
+        m.Archived = archived;
+        await db.SaveChangesAsync();
+        log.LogInformation("Medication {MedicationId} archived: {Archived}", id, archived);
+    }
+
+    /// <summary>Deletes an archived medication with its snapshots, notification log rows and photo.</summary>
+    public async Task DeletePermanentlyAsync(int id)
+    {
+        await Gate.WaitAsync();
+        try
+        {
+            var m = await db.Medications.FirstOrDefaultAsync(x => x.Id == id && x.Archived) ?? throw new KeyNotFoundException();
+            db.NotificationLogs.RemoveRange(db.NotificationLogs.Where(n => n.MedicationId == id));
+            db.Medications.Remove(m); // snapshots cascade
+            await db.SaveChangesAsync();
+            File.Delete(paths.PhotoPath(id));
+            log.LogInformation("Medication {MedicationId} deleted permanently", id);
+        }
+        finally { Gate.Release(); }
+    }
+
     /// <summary>Stores a photo as /data/photos/&lt;id&gt;.jpg (atomic replace). Only JPEG and PNG signatures are accepted.</summary>
     public async Task SavePhotoAsync(int id, Stream content)
     {

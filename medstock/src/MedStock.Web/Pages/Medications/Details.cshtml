@@ -4,12 +4,24 @@
 @{
     ViewData["Tab"] = "overview";
     var ui = CultureInfo.CurrentUICulture;
+    var inv = CultureInfo.InvariantCulture;
     var r = Model.Row;
     var m = r.Medication;
+    var asNeeded = m.UsageMode == UsageMode.AsNeeded;
+    var done = Model.DoneMessage(ui);
 }
 <partial name="_SubHeader" model="@((m.Name, Url.Content("~/")))" />
 
 <div id="detail">
+    @if (done is not null)
+    {
+        <p class="flash ok" role="status">✓ @done</p>
+    }
+    @if (Model.Error is not null)
+    {
+        <p class="error" role="alert">@Model.Error</p>
+    }
+
     <div class="detail-head">
         @if (Model.PhotoVersion > 0)
         {
@@ -26,18 +38,68 @@
         </div>
     </div>
 
-    <dl class="kv">
-        <dt>@L["Detail_Remaining"]</dt>
-        <dd>@Texts.Quantity(m.Type, r.Stock, ui)</dd>
-        @if (r.LastDose(ui) is { } lastDose)
-        {
-            <dt></dt>
-            <dd>@lastDose</dd>
-        }
-    </dl>
-    <p class="small muted">@L["Detail_LastCount", Texts.LongDate(r.Snapshot.Date, ui)]</p>
+    <p class="big-quantity">@Texts.Quantity(m.Type, r.Stock, ui)</p>
+    @if (r.LastDose(ui) is { } lastDose)
+    {
+        <p class="muted">@lastDose</p>
+    }
+    @if (m.Paused)
+    {
+        <p class="muted small">@L["Paused_Info"]</p>
+    }
 
-    <p><a href="@Url.Page("/Medications/Edit", new { id = m.Id })" role="button" class="secondary">@L["Edit"]</a></p>
+    <div class="actions">
+        <form method="post" asp-page-handler="Purchase" asp-route-id="@m.Id" hx-disabled-elt="find button">
+            <input type="hidden" name="packages" value="1" />
+            <button type="submit">+1 @Texts.Package(m.Type, 1, ui)</button>
+        </form>
+        @if (asNeeded)
+        {
+            <form method="post" asp-page-handler="Intake" asp-route-id="@m.Id" hx-disabled-elt="find button">
+                <input type="hidden" name="units" value="1" />
+                <button type="submit" class="secondary">−1 @Texts.Unit(m.Type, 1, ui)</button>
+            </form>
+        }
+    </div>
+
+    <form method="post" asp-page-handler="Purchase" asp-route-id="@m.Id" class="inline-form" hx-disabled-elt="find button">
+        <input type="number" name="packages" min="1" max="1000" step="1" inputmode="numeric" placeholder="n" aria-label="@L["Action_Packages"]" required />
+        <button type="submit">+ @Texts.Package(m.Type, 2, ui)</button>
+    </form>
+    @if (asNeeded)
+    {
+        <form method="post" asp-page-handler="Intake" asp-route-id="@m.Id" class="inline-form" hx-disabled-elt="find button">
+            <input type="number" name="units" min="1" step="1" inputmode="numeric" placeholder="n" aria-label="@L["Action_Units"]" required />
+            <button type="submit" class="secondary">− @Texts.Unit(m.Type, 2, ui)</button>
+        </form>
+    }
+
+    <details class="recount" open="@(Model.Error is not null && Request.Query["handler"] == "Recount")">
+        <summary role="button" class="secondary">@L["Action_Recount"]</summary>
+        <form method="post" asp-page-handler="Recount" asp-route-id="@m.Id" hx-disabled-elt="find button">
+            <input type="hidden" name="expectedSnapshotId" value="@r.Snapshot.Id" />
+            <div class="grid-2">
+                <label>@L["Stock_OpenUnits"] <input type="number" name="openUnits" min="0" step="any" inputmode="decimal" /></label>
+                <label>@L["Stock_SealedPackages"] <input type="number" name="sealedPackages" min="0" step="1" inputmode="numeric" /></label>
+            </div>
+            @if (Model.UsageToday > 0)
+            {
+                <label class="inline"><input type="checkbox" name="takenToday" value="true" checked="@Model.DefaultTakenToday" /> @L["Stock_TakenToday"]</label>
+            }
+            <button type="submit">@L["Save"]</button>
+        </form>
+    </details>
+
+    <div class="actions">
+        <form method="post" asp-page-handler="Pause" asp-route-id="@m.Id" hx-disabled-elt="find button">
+            <input type="hidden" name="expectedSnapshotId" value="@r.Snapshot.Id" />
+            <input type="hidden" name="paused" value="@(m.Paused ? "false" : "true")" />
+            <button type="submit" class="secondary">@(m.Paused ? L["Action_Resume"] : L["Action_Pause"])</button>
+        </form>
+        <a href="@Url.Page("/Medications/Edit", new { id = m.Id })" role="button" class="secondary">@L["Edit"]</a>
+    </div>
+
+    <p class="small muted">@L["Detail_LastCount", Texts.LongDate(r.Snapshot.Date, ui)]</p>
 
     <section class="photo" data-upload-url="@Url.Page("/Medications/Photo", new { id = m.Id })" data-detail-url="@Url.Page("/Medications/Details", new { id = m.Id })">
         <h2>@L["Photo"]</h2>
@@ -56,6 +118,13 @@
             </form>
         }
     </section>
+
+    <details class="confirm archive">
+        <summary role="button" class="secondary outline">@L["Action_Archive"]</summary>
+        <form method="post" asp-page-handler="Archive" asp-route-id="@m.Id">
+            <button type="submit" class="danger">@L["Archive_Confirm"]</button>
+        </form>
+    </details>
 </div>
 
 @section Scripts {

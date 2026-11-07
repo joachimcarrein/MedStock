@@ -152,3 +152,8 @@ button.danger { background: var(--ms-red); border-color: var(--ms-red); color: #
 .card .status { margin-top: 0.15rem; }
 .chips { margin-top: 0; }
 .chips button { display: inline-flex; align-items: center; }
+.big-quantity { font-size: 1.3rem; font-weight: 600; margin: 0.75rem 0 0.1rem; }
+.flash { animation: ms-fade 0.4s ease 5s forwards; }
+@keyframes ms-fade { to { opacity: 0; height: 0; margin: 0; overflow: hidden; } }
+details.recount, details.archive { margin: 0.75rem 0; }
+.actions a[role=button] { display: flex; align-items: center; justify-content: center; }
