@@ -140,4 +140,5 @@
   <data name="LastDose" xml:space="preserve"><value>laatste dosis {0}</value></data>
   <data name="CoverageDays" xml:space="preserve"><value>Dekkingsdagen</value></data>
   <data name="AlertDays" xml:space="preserve"><value>Meldingsdrempel</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>Alles</value></data>
 </root>

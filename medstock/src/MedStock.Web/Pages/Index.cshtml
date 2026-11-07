@@ -7,37 +7,61 @@
 }
 <h1>@L["Tab_Overview"]</h1>
 
-@if (!Model.HasProfiles)
+@if (Model.Profiles.Count == 0)
 {
     <div class="empty-state">
         <p>@L["Empty_NoProfiles"]</p>
         <a href="@Url.Page("/Settings/Profiles", new { next = "new" })" role="button">@L["Empty_NoProfiles_Button"]</a>
     </div>
 }
-else if (Model.Rows.Count == 0)
-{
-    <p class="empty-state muted">@L["Empty_NoMedication"]</p>
-}
 else
 {
-    <ul class="cards">
-        @foreach (var r in Model.Rows)
-        {
-            var m = r.Medication;
-            <li>
-                <a class="card state-@r.ColorClass" href="@Url.Page("/Medications/Details", new { id = m.Id })">
-                    <span class="thumb"><partial name="_TypeIcon" model="m.Type" /></span>
-                    <span class="body">
-                        <span class="name">@m.Name @m.Strength</span>
-                        <span class="meta"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name · @Texts.Quantity(m.Type, r.Stock, ui)</span><br />
-                        <span class="badge @r.ColorClass">@r.Badge(ui)</span> <span class="meta">@r.LastDose(ui)</span>
-                    </span>
-                </a>
-            </li>
-        }
-    </ul>
-}
-@if (Model.HasProfiles)
-{
+    @if (Model.Profiles.Count > 1)
+    {
+        <form method="post" asp-page-handler="Filter" class="chips" aria-label="@L["Med_Profile"]">
+            <button type="submit" name="profileId" value="" class="@(Model.Filter is null ? "active" : null)" aria-pressed="@(Model.Filter is null ? "true" : "false")">@L["Filter_All"]</button>
+            @foreach (var p in Model.Profiles)
+            {
+                var active = Model.Filter == p.Id;
+                <button type="submit" name="profileId" value="@p.Id" class="@(active ? "active" : null)" aria-pressed="@(active ? "true" : "false")"><span class="profile-dot" style="background:@p.Color"></span>@p.Name</button>
+            }
+        </form>
+    }
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p class="empty-state muted">@L["Empty_NoMedication"]</p>
+    }
+    else
+    {
+        <ul class="cards">
+            @foreach (var r in Model.Rows)
+            {
+                var m = r.Medication;
+                <li>
+                    <a class="card state-@r.ColorClass" href="@Url.Page("/Medications/Details", new { id = m.Id })">
+                        @if (Model.PhotoVersions.TryGetValue(m.Id, out var v) && v > 0)
+                        {
+                            <img class="thumb" src="@Url.Page("/Medications/Photo", new { id = m.Id, v })" alt="" width="64" height="64" loading="lazy" />
+                        }
+                        else
+                        {
+                            <span class="thumb"><partial name="_TypeIcon" model="m.Type" /></span>
+                        }
+                        <span class="body">
+                            <span class="name">@m.Name @m.Strength</span>
+                            <span class="meta"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name · @Texts.Quantity(m.Type, r.Stock, ui)</span>
+                            <span class="status"><span class="badge @r.ColorClass"><partial name="_StateIcon" model="r.Stock.State" />@r.Badge(ui)</span>
+                                @if (r.LastDose(ui) is { } lastDose)
+                                {
+                                    <span class="meta">@lastDose</span>
+                                }
+                            </span>
+                        </span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
     <a class="fab" href="@Url.Page("/Medications/Edit")" aria-label="@L["Med_New"]">+</a>
 }

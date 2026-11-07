@@ -22,7 +22,7 @@
         <div>
             <div><strong>@m.Name</strong> @m.Strength</div>
             <div class="small"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name</div>
-            <span class="badge @r.ColorClass">@r.Badge(ui)</span>
+            <span class="badge @r.ColorClass"><partial name="_StateIcon" model="r.Stock.State" />@r.Badge(ui)</span>
         </div>
     </div>
 

@@ -148,3 +148,7 @@ button.danger { background: var(--ms-red); border-color: var(--ms-red); color: #
 .detail-head .thumb { width: 96px; height: 96px; flex: none; border-radius: 12px; object-fit: cover; display: flex; align-items: center; justify-content: center; background: var(--pico-muted-border-color); }
 .detail-head .thumb svg { width: 56px; height: 56px; opacity: 0.75; }
 .photo.busy { opacity: 0.5; pointer-events: none; }
+.card .name, .card .meta, .card .status { display: block; }
+.card .status { margin-top: 0.15rem; }
+.chips { margin-top: 0; }
+.chips button { display: inline-flex; align-items: center; }

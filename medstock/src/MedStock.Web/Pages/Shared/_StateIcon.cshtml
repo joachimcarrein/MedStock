@@ -1,0 +1,26 @@
+@model MedStock.Web.Services.StockState
+@using MedStock.Web.Services
+@* A shape per state so colour is never the only signal. *@
+<svg viewBox="0 0 24 24" aria-hidden="true">
+@switch (Model)
+{
+    case StockState.Empty:
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 13.6L15.6 17 12 13.4 8.4 17 7 15.6 10.6 12 7 8.4 8.4 7l3.6 3.6L15.6 7 17 8.4 13.4 12z" />
+        break;
+    case StockState.LastDay or StockState.Critical or StockState.AsNeededLow:
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+        break;
+    case StockState.Warning:
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+        break;
+    case StockState.Paused:
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+        break;
+    case StockState.AsNeededOk:
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+        break;
+    default:
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15-5-5 1.4-1.4L10 14.2l7.6-7.6L19 8l-9 9z" />
+        break;
+}
+</svg>
