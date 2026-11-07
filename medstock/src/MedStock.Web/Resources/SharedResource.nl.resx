@@ -159,4 +159,24 @@
   <data name="Restore" xml:space="preserve"><value>Herstellen</value></data>
   <data name="DeleteForever" xml:space="preserve"><value>Definitief verwijderen</value></data>
   <data name="DeleteForever_Confirm" xml:space="preserve"><value>Zeker? Definitief verwijderen</value></data>
+  <data name="Saved" xml:space="preserve"><value>Opgeslagen</value></data>
+  <data name="Ha_Unreachable" xml:space="preserve"><value>Home Assistant niet bereikbaar</value></data>
+  <data name="Settings_Mine" xml:space="preserve"><value>Mijn meldingen</value></data>
+  <data name="Settings_Notifications" xml:space="preserve"><value>Stuur mij meldingen</value></data>
+  <data name="Settings_Devices" xml:space="preserve"><value>Toestellen</value></data>
+  <data name="Settings_DeviceGone" xml:space="preserve"><value>Toestel niet meer gevonden; kies opnieuw</value></data>
+  <data name="Settings_NoDevices" xml:space="preserve"><value>Kies en bewaar eerst minstens één toestel.</value></data>
+  <data name="Settings_ForProfiles" xml:space="preserve"><value>Voor deze profielen</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Taal</value></data>
+  <data name="Settings_Language_Auto" xml:space="preserve"><value>Automatisch</value></data>
+  <data name="Settings_TestNotification" xml:space="preserve"><value>Test-melding sturen</value></data>
+  <data name="Settings_Global" xml:space="preserve"><value>Voor iedereen</value></data>
+  <data name="Settings_DefaultAlertDays" xml:space="preserve"><value>Standaard meldingsdrempel (dagen)</value></data>
+  <data name="Settings_NotificationTime" xml:space="preserve"><value>Uur van de dagelijkse controle</value></data>
+  <data name="Settings_RunNow" xml:space="preserve"><value>Dagelijkse controle nu uitvoeren</value></data>
+  <data name="Settings_LastRun" xml:space="preserve"><value>Laatste dagelijkse controle</value></data>
+  <data name="Settings_WhoAreYou" xml:space="preserve"><value>Wie ben je?</value></data>
+  <data name="Settings_WhoAreYou_Help" xml:space="preserve"><value>Home Assistant gaf niet door wie je bent. Kies jezelf om meldingen te krijgen.</value></data>
+  <data name="Settings_ExistingUser" xml:space="preserve"><value>Bestaande gebruiker</value></data>
+  <data name="Settings_OrNewName" xml:space="preserve"><value>Of typ je naam</value></data>
 </root>

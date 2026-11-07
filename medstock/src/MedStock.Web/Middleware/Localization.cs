@@ -45,6 +45,32 @@ public static class LocalizationSetup
     }
 }
 
+public static class LastCultureMiddleware
+{
+    /// <summary>
+    /// Remembers the UI culture of each user's requests (at most one write per user per change) so background notifications
+    /// use the language the user actually sees when their language setting is "automatic".
+    /// </summary>
+    public static IApplicationBuilder UseLastCulture(this IApplicationBuilder app) => app.Use(async (ctx, next) =>
+    {
+        var user = ctx.RequestServices.GetService<CurrentUser>();
+        if (user is not null && !string.IsNullOrEmpty(ctx.Request.Headers.AcceptLanguage) && ctx.Request.Method == "GET")
+        {
+            var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var cache = ctx.RequestServices.GetRequiredService<IMemoryCache>();
+            var key = "seen-culture:" + user.Id;
+            if (cache.Get<string>(key) != culture)
+            {
+                var db = ctx.RequestServices.GetRequiredService<MedStockDb>();
+                await db.UserSettings.Where(s => s.UserId == user.Id && s.LastCulture != culture)
+                    .ExecuteUpdateAsync(u => u.SetProperty(s => s.LastCulture, culture), ctx.RequestAborted);
+                cache.Set(key, culture, TimeSpan.FromHours(12));
+            }
+        }
+        await next();
+    });
+}
+
 /// <summary>Accepts both "0.5" and "0,5" for decimals, regardless of the UI language.</summary>
 public sealed class InvariantDecimalBinder : IModelBinder
 {

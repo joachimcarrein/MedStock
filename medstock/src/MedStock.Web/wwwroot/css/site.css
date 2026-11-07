@@ -157,3 +157,8 @@ button.danger { background: var(--ms-red); border-color: var(--ms-red); color: #
 @keyframes ms-fade { to { opacity: 0; height: 0; margin: 0; overflow: hidden; } }
 details.recount, details.archive { margin: 0.75rem 0; }
 .actions a[role=button] { display: flex; align-items: center; justify-content: center; }
+.card-section { border: 1px solid var(--pico-muted-border-color); border-radius: var(--pico-border-radius); padding: 0.75rem; margin-bottom: 1rem; }
+.card-section h2 { margin-top: 0; }
+.card-section form + form { margin-top: 0.5rem; }
+.settings-links { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+.run-report { padding-left: 1.2rem; }

@@ -38,6 +38,9 @@ builder.Services.AddSingleton(new AppMode(addonMode));
 builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddScoped<MedicationService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton<NotificationState>();
+builder.Services.AddHostedService<NotificationWorker>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<MedStockDb>(o => o.UseSqlite($"Data Source={paths.DbPath}"));
@@ -108,6 +111,7 @@ app.MapGet("/healthz", () => Results.Text("ok"));
 app.UseHaIdentity();
 app.UseStaticFiles();
 app.UseRequestLocalization(LocalizationSetup.Options());
+app.UseLastCulture();
 app.UseRouting();
 app.UseAntiforgery();
 app.MapRazorPages();

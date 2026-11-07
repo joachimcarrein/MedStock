@@ -29,6 +29,8 @@ public class UserSettings
     public List<string> StaleNotifyServices { get; set; } = [];
     /// <summary>True once the default device selection has been applied (first visit of Settings).</summary>
     public bool DevicesInitialized { get; set; }
+    /// <summary>UI culture of the user's last request ("nl"/"en"): the language of notifications when <see cref="Language"/> is automatic.</summary>
+    public string? LastCulture { get; set; }
 }
 
 public class Profile

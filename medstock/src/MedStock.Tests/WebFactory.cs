@@ -19,6 +19,7 @@ public class WebFactory : WebApplicationFactory<Program>
     public bool AddonMode { get; init; }
     public FixedClock Clock { get; } = new(new DateTime(2026, 11, 17, 10, 0, 0));
     public FakeHaClient Ha { get; } = new(Microsoft.Extensions.Logging.Abstractions.NullLogger<FakeHaClient>.Instance);
+    public LogSink Logs { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -33,6 +34,9 @@ public class WebFactory : WebApplicationFactory<Program>
             s.RemoveAll<IClock>();
             s.AddSingleton<IClock>(Clock);
             s.AddSingleton<IStartupFilter, RemoteIpStartupFilter>();
+            // Tests drive notification runs themselves.
+            foreach (var d in s.Where(d => d.ImplementationType == typeof(NotificationWorker)).ToList()) s.Remove(d);
+            s.AddSingleton<Microsoft.Extensions.Logging.ILoggerProvider>(Logs);
         });
     }
 
@@ -70,6 +74,25 @@ public class WebFactory : WebApplicationFactory<Program>
             });
             next(app);
         };
+    }
+}
+
+/// <summary>Captures every log line (category, level, message) for log-hygiene assertions.</summary>
+public sealed class LogSink : Microsoft.Extensions.Logging.ILoggerProvider
+{
+    public List<(string Category, Microsoft.Extensions.Logging.LogLevel Level, string Message)> Lines { get; } = [];
+    public Microsoft.Extensions.Logging.ILogger CreateLogger(string category) => new Logger(this, category);
+    public void Dispose() { }
+
+    private sealed class Logger(LogSink sink, string category) : Microsoft.Extensions.Logging.ILogger
+    {
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel level) => true;
+        public void Log<TState>(Microsoft.Extensions.Logging.LogLevel level, Microsoft.Extensions.Logging.EventId id, TState state,
+            Exception? ex, Func<TState, Exception?, string> format)
+        {
+            lock (sink.Lines) sink.Lines.Add((category, level, format(state, ex)));
+        }
     }
 }
 

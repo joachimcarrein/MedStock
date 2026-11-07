@@ -159,4 +159,24 @@
   <data name="Restore" xml:space="preserve"><value>Restore</value></data>
   <data name="DeleteForever" xml:space="preserve"><value>Delete permanently</value></data>
   <data name="DeleteForever_Confirm" xml:space="preserve"><value>Sure? Delete permanently</value></data>
+  <data name="Saved" xml:space="preserve"><value>Saved</value></data>
+  <data name="Ha_Unreachable" xml:space="preserve"><value>Home Assistant not reachable</value></data>
+  <data name="Settings_Mine" xml:space="preserve"><value>My notifications</value></data>
+  <data name="Settings_Notifications" xml:space="preserve"><value>Send me notifications</value></data>
+  <data name="Settings_Devices" xml:space="preserve"><value>Devices</value></data>
+  <data name="Settings_DeviceGone" xml:space="preserve"><value>Device not found anymore; choose again</value></data>
+  <data name="Settings_NoDevices" xml:space="preserve"><value>Select and save at least one device first.</value></data>
+  <data name="Settings_ForProfiles" xml:space="preserve"><value>For these profiles</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_Language_Auto" xml:space="preserve"><value>Automatic</value></data>
+  <data name="Settings_TestNotification" xml:space="preserve"><value>Send test notification</value></data>
+  <data name="Settings_Global" xml:space="preserve"><value>For everyone</value></data>
+  <data name="Settings_DefaultAlertDays" xml:space="preserve"><value>Default alert threshold (days)</value></data>
+  <data name="Settings_NotificationTime" xml:space="preserve"><value>Time of the daily check</value></data>
+  <data name="Settings_RunNow" xml:space="preserve"><value>Run the daily check now</value></data>
+  <data name="Settings_LastRun" xml:space="preserve"><value>Last daily check</value></data>
+  <data name="Settings_WhoAreYou" xml:space="preserve"><value>Who are you?</value></data>
+  <data name="Settings_WhoAreYou_Help" xml:space="preserve"><value>Home Assistant did not tell MedStock who you are. Choose yourself to receive notifications.</value></data>
+  <data name="Settings_ExistingUser" xml:space="preserve"><value>Existing user</value></data>
+  <data name="Settings_OrNewName" xml:space="preserve"><value>Or type your name</value></data>
 </root>

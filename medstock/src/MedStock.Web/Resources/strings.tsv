@@ -154,3 +154,23 @@ Archived_Empty	Nothing archived	Niets gearchiveerd
 Restore	Restore	Herstellen
 DeleteForever	Delete permanently	Definitief verwijderen
 DeleteForever_Confirm	Sure? Delete permanently	Zeker? Definitief verwijderen
+Saved	Saved	Opgeslagen
+Ha_Unreachable	Home Assistant not reachable	Home Assistant niet bereikbaar
+Settings_Mine	My notifications	Mijn meldingen
+Settings_Notifications	Send me notifications	Stuur mij meldingen
+Settings_Devices	Devices	Toestellen
+Settings_DeviceGone	Device not found anymore; choose again	Toestel niet meer gevonden; kies opnieuw
+Settings_NoDevices	Select and save at least one device first.	Kies en bewaar eerst minstens één toestel.
+Settings_ForProfiles	For these profiles	Voor deze profielen
+Settings_Language	Language	Taal
+Settings_Language_Auto	Automatic	Automatisch
+Settings_TestNotification	Send test notification	Test-melding sturen
+Settings_Global	For everyone	Voor iedereen
+Settings_DefaultAlertDays	Default alert threshold (days)	Standaard meldingsdrempel (dagen)
+Settings_NotificationTime	Time of the daily check	Uur van de dagelijkse controle
+Settings_RunNow	Run the daily check now	Dagelijkse controle nu uitvoeren
+Settings_LastRun	Last daily check	Laatste dagelijkse controle
+Settings_WhoAreYou	Who are you?	Wie ben je?
+Settings_WhoAreYou_Help	Home Assistant did not tell MedStock who you are. Choose yourself to receive notifications.	Home Assistant gaf niet door wie je bent. Kies jezelf om meldingen te krijgen.
+Settings_ExistingUser	Existing user	Bestaande gebruiker
+Settings_OrNewName	Or type your name	Of typ je naam

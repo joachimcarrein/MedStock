@@ -1,8 +1,141 @@
 @page
+@model MedStock.Web.Pages.Settings.IndexModel
 @{
     ViewData["Tab"] = "settings";
+    ViewData["HideHouseholdBanner"] = true;
+    var allProfiles = Model.Mine.NotifyProfileIds.Count == 0;
+    var shown = (Model.Services ?? []).Concat(Model.Mine.NotifyServices).Distinct().ToList();
 }
 <h1>@L["Tab_Settings"]</h1>
-<p><a href="~/Settings/Profiles">@L["Profiles_Title"]</a></p>
-<p><a href="~/Medications/Archived">@L["Archived_Title"]</a></p>
-<p><a href="~/Diag">Diagnostics</a></p>
+
+@if (Model.CanChooseUser)
+{
+    <section class="card-section" id="who">
+        <h2>@L["Settings_WhoAreYou"]</h2>
+        <p class="small muted">@L["Settings_WhoAreYou_Help"]</p>
+        <form method="post" asp-page-handler="Choose">
+            <label>
+                @L["Settings_ExistingUser"]
+                <select name="userId">
+                    <option value="">–</option>
+                    @foreach (var u in Model.KnownUsers)
+                    {
+                        <option value="@u.Id" selected="@(u.DisplayName == Model.UserName && !Model.IsHousehold)">@u.DisplayName</option>
+                    }
+                </select>
+            </label>
+            <label>@L["Settings_OrNewName"] <input name="newName" maxlength="100" autocomplete="off" /></label>
+            <button type="submit">@L["Save"]</button>
+        </form>
+    </section>
+}
+
+<section class="card-section">
+    <h2>@L["Settings_Mine"] <span class="small muted">· @Model.UserName</span></h2>
+    @if (Model.UserMessage is not null)
+    {
+        <p class="flash ok" role="status">@Model.UserMessage</p>
+    }
+    @if (Model.UserError is not null)
+    {
+        <p class="error" role="alert">@Model.UserError</p>
+    }
+    @if (Model.IsHousehold)
+    {
+        <p class="small muted">@L["Household_Banner"]</p>
+    }
+    <form method="post" asp-page-handler="User">
+        <label class="inline"><input type="checkbox" name="notificationsEnabled" value="true" checked="@Model.Mine.NotificationsEnabled" /> @L["Settings_Notifications"]</label>
+
+        <fieldset>
+            <legend>@L["Settings_Devices"]</legend>
+            @if (Model.Services is null)
+            {
+                <p class="error small">@L["Ha_Unreachable"]</p>
+            }
+            @foreach (var s in shown)
+            {
+                <label class="inline">
+                    <input type="checkbox" name="services" value="@s" checked="@Model.IsSelected(s)" />
+                    <span>@s.Replace("notify.", "")</span>
+                </label>
+                @if (Model.IsSelected(s) && Model.IsStale(s))
+                {
+                    <p class="error small">@L["Settings_DeviceGone"]</p>
+                }
+            }
+        </fieldset>
+
+        @if (Model.Profiles.Count > 1)
+        {
+            <fieldset>
+                <legend>@L["Settings_ForProfiles"]</legend>
+                @foreach (var p in Model.Profiles)
+                {
+                    <label class="inline">
+                        <input type="checkbox" name="profiles" value="@p.Id" checked="@(allProfiles || Model.Mine.NotifyProfileIds.Contains(p.Id))" />
+                        <span><span class="profile-dot" style="background:@p.Color"></span>@p.Name</span>
+                    </label>
+                }
+            </fieldset>
+        }
+        else
+        {
+            @foreach (var p in Model.Profiles)
+            {
+                <input type="hidden" name="profiles" value="@p.Id" />
+            }
+        }
+
+        <label>
+            @L["Settings_Language"]
+            <select name="language">
+                <option value="" selected="@(Model.Mine.Language is null)">@L["Settings_Language_Auto"]</option>
+                <option value="nl" selected="@(Model.Mine.Language == "nl")">Nederlands</option>
+                <option value="en" selected="@(Model.Mine.Language == "en")">English</option>
+            </select>
+        </label>
+        <button type="submit">@L["Save"]</button>
+    </form>
+    <form method="post" asp-page-handler="Test" hx-disabled-elt="find button">
+        <button type="submit" class="secondary">@L["Settings_TestNotification"]</button>
+    </form>
+</section>
+
+<section class="card-section">
+    <h2>@L["Settings_Global"]</h2>
+    @if (Model.GlobalMessage is not null)
+    {
+        <p class="flash ok" role="status">@Model.GlobalMessage</p>
+    }
+    @if (Model.GlobalError is not null)
+    {
+        <p class="error" role="alert">@Model.GlobalError</p>
+    }
+    <form method="post" asp-page-handler="Global">
+        <label>@L["CoverageDays"] <input type="number" name="coverageDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.CoverageDays" required /></label>
+        <label>@L["Settings_DefaultAlertDays"] <input type="number" name="defaultAlertDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.DefaultAlertDays" required /></label>
+        <label>@L["Settings_NotificationTime"] <input type="time" name="notificationTime" value="@Model.Global.NotificationTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)" required /></label>
+        <button type="submit">@L["Save"]</button>
+    </form>
+    <form method="post" asp-page-handler="Run" hx-disabled-elt="find button">
+        <button type="submit" class="secondary">@L["Settings_RunNow"]</button>
+    </form>
+    @if (Model.Report is { } report)
+    {
+        <ul class="small run-report">
+            @foreach (var line in report.Lines)
+            {
+                <li>@line</li>
+            }
+        </ul>
+    }
+    <p class="small muted">@L["Settings_LastRun"]: @(Model.Global.LastRunAt?.ToString("g", System.Globalization.CultureInfo.CurrentUICulture) ?? "–")</p>
+</section>
+
+<nav class="settings-links">
+    <a href="@Url.Page("/Settings/Profiles")">@L["Profiles_Title"]</a>
+    <a href="@Url.Page("/Medications/Archived")">@L["Archived_Title"]</a>
+    <a href="@Url.Page("/Diag")" class="small muted">Diagnostics</a>
+</nav>
+<p class="small muted">MedStock @MedStock.Web.Data.DbInitializer.AppVersion</p>

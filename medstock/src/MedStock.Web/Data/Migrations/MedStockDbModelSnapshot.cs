@@ -233,6 +233,9 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<string>("Language")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("LastCulture")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("LastProfileFilter")
                         .HasColumnType("INTEGER");
 
