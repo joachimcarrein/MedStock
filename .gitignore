@@ -1,2 +1,19 @@
+# Local only, never commit
 secret.config
 PLAN.md
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+*.swp
+
+# Local app data
+**/data/
+
+# OS
+.DS_Store
+Thumbs.db
