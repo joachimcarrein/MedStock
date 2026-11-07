@@ -104,7 +104,7 @@
     <section class="photo" data-upload-url="@Url.Page("/Medications/Photo", new { id = m.Id })" data-detail-url="@Url.Page("/Medications/Details", new { id = m.Id })">
         <h2>@L["Photo"]</h2>
         <p class="error small photo-error" hidden>@L["Photo_Invalid"]</p>
-        <form method="post" enctype="multipart/form-data" action="@Url.Page("/Medications/Photo", new { id = m.Id })" hx-boost="false" class="photo-form">
+        <form method="post" enctype="multipart/form-data" action="@Url.Page("/Medications/Photo", new { id = m.Id })" hx-boost="false" class="photo-form" asp-antiforgery="true">
             <div class="grid-2">
                 <label role="button" class="secondary">@L["Photo_Take"]<input type="file" name="photo" accept="image/*" capture="environment" hidden /></label>
                 <label role="button" class="secondary">@L["Photo_Choose"]<input type="file" name="photo" accept="image/*" hidden /></label>
@@ -113,7 +113,7 @@
         </form>
         @if (m.HasPhoto)
         {
-            <form method="post" action="@Url.Page("/Medications/Photo", new { id = m.Id, handler = "Delete" })">
+            <form method="post" action="@Url.Page("/Medications/Photo", new { id = m.Id, handler = "Delete" })" asp-antiforgery="true">
                 <button type="submit" class="secondary outline">@L["Photo_Remove"]</button>
             </form>
         }

@@ -1,8 +1,13 @@
 # Changelog
 
+## 0.1.2
+
+- Fix: the profile filter on the overview did nothing. Its form posted to the ingress root without a trailing
+  slash, which Home Assistant answers with 404.
+
 ## 0.1.1
 
-- Fix: the profile filter chips on the overview did not switch on iPhone.
+- Profile filter chips: one form per chip (more robust on iPhone).
 - Clearer injection icon.
 
 ## 0.1.0

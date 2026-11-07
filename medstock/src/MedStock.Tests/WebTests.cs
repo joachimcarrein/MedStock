@@ -42,6 +42,29 @@ public class WebTests : IClassFixture<AddonWebFactory>
         Assert.DoesNotContain("action=\"/Medications", html);
     }
 
+    /// <summary>
+    /// HA ingress only routes the app root WITH a trailing slash (".../&lt;token&gt;/"); ".../&lt;token&gt;?handler=x" is a 404
+    /// from Home Assistant itself (that broke the overview filter in 0.1.1).
+    /// </summary>
+    [Theory]
+    [InlineData("/")]
+    [InlineData("/Doctor")]
+    [InlineData("/Settings")]
+    [InlineData("/Settings/Profiles")]
+    [InlineData("/Medications/Edit")]
+    [InlineData("/Medications/Archived")]
+    public async Task No_url_points_at_the_ingress_root_without_trailing_slash(string page)
+    {
+        _f.WithDb(db =>
+        {
+            if (!db.Profiles.Any(p => p.Name == "Root")) db.Profiles.Add(new MedStock.Web.Domain.Profile { Name = "Root" });
+            if (db.Profiles.Count() < 2) db.Profiles.Add(new MedStock.Web.Domain.Profile { Name = "Root 2" });
+            return db.SaveChanges();
+        });
+        var html = await _f.Client(ingressPath: "/api/hassio_ingress/abc123").GetStringAsync(page);
+        Assert.DoesNotMatch("=\"/api/hassio_ingress/abc123[?#\"]", html);
+    }
+
     [Theory]
     [InlineData("10.0.0.5", HttpStatusCode.Forbidden)]
     [InlineData("192.168.1.20", HttpStatusCode.Forbidden)]
