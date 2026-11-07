@@ -61,3 +61,77 @@ Household_Banner	Choose who you are to receive notifications	Kies wie je bent om
 Error_NotFound	Page not found	Pagina niet gevonden
 Error_Generic	Something went wrong	Er ging iets mis
 Error_Home	Back to the overview	Terug naar het overzicht
+Profiles_Title	Profiles	Profielen
+Profiles_Add	Add profile	Profiel toevoegen
+Profile_Name	Name	Naam
+Profile_Color	Colour	Kleur
+Profile_Coverage	Coverage days (empty = {0})	Dekkingsdagen (leeg = {0})
+Profile_HasMedication	This profile still has medication (archived included) and cannot be deleted.	Dit profiel heeft nog medicatie (ook gearchiveerde) en kan niet verwijderd worden.
+Profile_NameExists	A profile with this name already exists.	Er bestaat al een profiel met deze naam.
+Save	Save	Opslaan
+Delete	Delete	Verwijderen
+Delete_Confirm	Sure? Delete	Zeker? Verwijderen
+Cancel	Cancel	Annuleren
+Move_Up	Move up	Omhoog
+Move_Down	Move down	Omlaag
+Edit	Edit	Bewerken
+Empty_NoProfiles	Create a profile first: one list per person.	Maak eerst een profiel: één lijst per persoon.
+Empty_NoProfiles_Button	New profile	Nieuw profiel
+Empty_NoMedication	No medication yet – tap +	Nog geen medicatie – tik op +
+Med_New	New medication	Nieuwe medicatie
+Med_Edit	Edit medication	Medicatie bewerken
+Med_Profile	Profile	Profiel
+Med_NewProfile	+ New profile…	+ Nieuw profiel…
+Med_NewProfileName	Name of the new profile	Naam van het nieuwe profiel
+Med_Name	Name	Naam
+Med_Strength	Strength (e.g. 0.5 mg)	Sterkte (bv. 0,5 mg)
+Med_Type	Type	Type
+Med_UnitsPerPackage	Units per package	Eenheden per verpakking
+Med_Usage	Usage	Verbruik
+Mode_PerDay	Every day	Elke dag
+Mode_Weekly	Weekly pattern	Weekpatroon
+Mode_AsNeeded	As needed	Zo nodig
+Med_PerDay	Units per day	Eenheden per dag
+Helper_Title	Help me calculate	Help mij rekenen
+Helper_TimesPerDay	times a day	keer per dag
+Helper_PerTime	per time	per keer
+Helper_Apply	Apply	Toepassen
+Daypart_Morning	Morning	Ochtend
+Daypart_Noon	Noon	Middag
+Daypart_Evening	Evening	Avond
+Daypart_Night	Night	Nacht
+Weekly_SameEveryDay	Same every day	Elke dag gelijk
+Med_MinStock	Minimum stock in units (0 = only when empty)	Minimumvoorraad in eenheden (0 = enkel bij leeg)
+Med_AlertDays	Alert threshold in days (empty = {0})	Meldingsdrempel in dagen (leeg = {0})
+Med_CoverageDays	Coverage days for the prescription (empty = {0})	Dekkingsdagen voor het voorschrift (leeg = {0})
+Med_Notifications	Notifications for this medication	Meldingen voor deze medicatie
+Med_InitialStock	Current stock	Huidige voorraad
+Stock_OpenUnits	Units in the open package	Eenheden in de open verpakking
+Stock_SealedPackages	Sealed packages	Gesloten verpakkingen
+Stock_TakenToday	All of today's doses already taken	Alle dosissen van vandaag al genomen
+Usage_FromTomorrow	A change in usage applies from tomorrow.	Een wijziging van het verbruik geldt vanaf morgen.
+Conflict	Someone else just changed this; check and try again.	Iemand anders heeft net iets gewijzigd; controleer en probeer opnieuw.
+Val_Required	Required	Verplicht
+Val_MaxLength	At most {0} characters	Maximaal {0} tekens
+Val_Positive	Must be greater than 0	Moet groter zijn dan 0
+Val_NonNegative	Must be 0 or more	Moet 0 of meer zijn
+Val_Range	Between 0 and 3650	Tussen 0 en 3650
+Val_Number	Not a valid number	Geen geldig getal
+Photo	Photo	Foto
+Photo_Take	Take photo	Foto maken
+Photo_Choose	Choose photo	Foto kiezen
+Photo_Remove	Remove photo	Foto verwijderen
+Photo_Upload	Upload	Uploaden
+Photo_Invalid	Only JPEG or PNG images (max 8 MB)	Enkel JPEG- of PNG-afbeeldingen (max 8 MB)
+Detail_LastCount	Last count on {0}	Laatste telling op {0}
+Detail_Remaining	Stock	Voorraad
+Badge_Empty	Out	Op
+Badge_LastDay	last day	laatste dag
+Badge_Days_One	1 day left	nog 1 dag
+Badge_Days_Other	{0} days left	nog {0} dagen
+Badge_AsNeeded	as needed · {0} left	zo nodig · nog {0}
+Badge_Paused	paused	gepauzeerd
+Badge_Cap	> 10 years	> 10 jaar
+LastDose	last dose {0}	laatste dosis {0}
+CoverageDays	Coverage days	Dekkingsdagen
+AlertDays	Alert threshold	Meldingsdrempel

@@ -66,4 +66,78 @@
   <data name="Error_NotFound" xml:space="preserve"><value>Pagina niet gevonden</value></data>
   <data name="Error_Generic" xml:space="preserve"><value>Er ging iets mis</value></data>
   <data name="Error_Home" xml:space="preserve"><value>Terug naar het overzicht</value></data>
+  <data name="Profiles_Title" xml:space="preserve"><value>Profielen</value></data>
+  <data name="Profiles_Add" xml:space="preserve"><value>Profiel toevoegen</value></data>
+  <data name="Profile_Name" xml:space="preserve"><value>Naam</value></data>
+  <data name="Profile_Color" xml:space="preserve"><value>Kleur</value></data>
+  <data name="Profile_Coverage" xml:space="preserve"><value>Dekkingsdagen (leeg = {0})</value></data>
+  <data name="Profile_HasMedication" xml:space="preserve"><value>Dit profiel heeft nog medicatie (ook gearchiveerde) en kan niet verwijderd worden.</value></data>
+  <data name="Profile_NameExists" xml:space="preserve"><value>Er bestaat al een profiel met deze naam.</value></data>
+  <data name="Save" xml:space="preserve"><value>Opslaan</value></data>
+  <data name="Delete" xml:space="preserve"><value>Verwijderen</value></data>
+  <data name="Delete_Confirm" xml:space="preserve"><value>Zeker? Verwijderen</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
+  <data name="Move_Up" xml:space="preserve"><value>Omhoog</value></data>
+  <data name="Move_Down" xml:space="preserve"><value>Omlaag</value></data>
+  <data name="Edit" xml:space="preserve"><value>Bewerken</value></data>
+  <data name="Empty_NoProfiles" xml:space="preserve"><value>Maak eerst een profiel: één lijst per persoon.</value></data>
+  <data name="Empty_NoProfiles_Button" xml:space="preserve"><value>Nieuw profiel</value></data>
+  <data name="Empty_NoMedication" xml:space="preserve"><value>Nog geen medicatie – tik op +</value></data>
+  <data name="Med_New" xml:space="preserve"><value>Nieuwe medicatie</value></data>
+  <data name="Med_Edit" xml:space="preserve"><value>Medicatie bewerken</value></data>
+  <data name="Med_Profile" xml:space="preserve"><value>Profiel</value></data>
+  <data name="Med_NewProfile" xml:space="preserve"><value>+ Nieuw profiel…</value></data>
+  <data name="Med_NewProfileName" xml:space="preserve"><value>Naam van het nieuwe profiel</value></data>
+  <data name="Med_Name" xml:space="preserve"><value>Naam</value></data>
+  <data name="Med_Strength" xml:space="preserve"><value>Sterkte (bv. 0,5 mg)</value></data>
+  <data name="Med_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Med_UnitsPerPackage" xml:space="preserve"><value>Eenheden per verpakking</value></data>
+  <data name="Med_Usage" xml:space="preserve"><value>Verbruik</value></data>
+  <data name="Mode_PerDay" xml:space="preserve"><value>Elke dag</value></data>
+  <data name="Mode_Weekly" xml:space="preserve"><value>Weekpatroon</value></data>
+  <data name="Mode_AsNeeded" xml:space="preserve"><value>Zo nodig</value></data>
+  <data name="Med_PerDay" xml:space="preserve"><value>Eenheden per dag</value></data>
+  <data name="Helper_Title" xml:space="preserve"><value>Help mij rekenen</value></data>
+  <data name="Helper_TimesPerDay" xml:space="preserve"><value>keer per dag</value></data>
+  <data name="Helper_PerTime" xml:space="preserve"><value>per keer</value></data>
+  <data name="Helper_Apply" xml:space="preserve"><value>Toepassen</value></data>
+  <data name="Daypart_Morning" xml:space="preserve"><value>Ochtend</value></data>
+  <data name="Daypart_Noon" xml:space="preserve"><value>Middag</value></data>
+  <data name="Daypart_Evening" xml:space="preserve"><value>Avond</value></data>
+  <data name="Daypart_Night" xml:space="preserve"><value>Nacht</value></data>
+  <data name="Weekly_SameEveryDay" xml:space="preserve"><value>Elke dag gelijk</value></data>
+  <data name="Med_MinStock" xml:space="preserve"><value>Minimumvoorraad in eenheden (0 = enkel bij leeg)</value></data>
+  <data name="Med_AlertDays" xml:space="preserve"><value>Meldingsdrempel in dagen (leeg = {0})</value></data>
+  <data name="Med_CoverageDays" xml:space="preserve"><value>Dekkingsdagen voor het voorschrift (leeg = {0})</value></data>
+  <data name="Med_Notifications" xml:space="preserve"><value>Meldingen voor deze medicatie</value></data>
+  <data name="Med_InitialStock" xml:space="preserve"><value>Huidige voorraad</value></data>
+  <data name="Stock_OpenUnits" xml:space="preserve"><value>Eenheden in de open verpakking</value></data>
+  <data name="Stock_SealedPackages" xml:space="preserve"><value>Gesloten verpakkingen</value></data>
+  <data name="Stock_TakenToday" xml:space="preserve"><value>Alle dosissen van vandaag al genomen</value></data>
+  <data name="Usage_FromTomorrow" xml:space="preserve"><value>Een wijziging van het verbruik geldt vanaf morgen.</value></data>
+  <data name="Conflict" xml:space="preserve"><value>Iemand anders heeft net iets gewijzigd; controleer en probeer opnieuw.</value></data>
+  <data name="Val_Required" xml:space="preserve"><value>Verplicht</value></data>
+  <data name="Val_MaxLength" xml:space="preserve"><value>Maximaal {0} tekens</value></data>
+  <data name="Val_Positive" xml:space="preserve"><value>Moet groter zijn dan 0</value></data>
+  <data name="Val_NonNegative" xml:space="preserve"><value>Moet 0 of meer zijn</value></data>
+  <data name="Val_Range" xml:space="preserve"><value>Tussen 0 en 3650</value></data>
+  <data name="Val_Number" xml:space="preserve"><value>Geen geldig getal</value></data>
+  <data name="Photo" xml:space="preserve"><value>Foto</value></data>
+  <data name="Photo_Take" xml:space="preserve"><value>Foto maken</value></data>
+  <data name="Photo_Choose" xml:space="preserve"><value>Foto kiezen</value></data>
+  <data name="Photo_Remove" xml:space="preserve"><value>Foto verwijderen</value></data>
+  <data name="Photo_Upload" xml:space="preserve"><value>Uploaden</value></data>
+  <data name="Photo_Invalid" xml:space="preserve"><value>Enkel JPEG- of PNG-afbeeldingen (max 8 MB)</value></data>
+  <data name="Detail_LastCount" xml:space="preserve"><value>Laatste telling op {0}</value></data>
+  <data name="Detail_Remaining" xml:space="preserve"><value>Voorraad</value></data>
+  <data name="Badge_Empty" xml:space="preserve"><value>Op</value></data>
+  <data name="Badge_LastDay" xml:space="preserve"><value>laatste dag</value></data>
+  <data name="Badge_Days_One" xml:space="preserve"><value>nog 1 dag</value></data>
+  <data name="Badge_Days_Other" xml:space="preserve"><value>nog {0} dagen</value></data>
+  <data name="Badge_AsNeeded" xml:space="preserve"><value>zo nodig · nog {0}</value></data>
+  <data name="Badge_Paused" xml:space="preserve"><value>gepauzeerd</value></data>
+  <data name="Badge_Cap" xml:space="preserve"><value>&gt; 10 jaar</value></data>
+  <data name="LastDose" xml:space="preserve"><value>laatste dosis {0}</value></data>
+  <data name="CoverageDays" xml:space="preserve"><value>Dekkingsdagen</value></data>
+  <data name="AlertDays" xml:space="preserve"><value>Meldingsdrempel</value></data>
 </root>

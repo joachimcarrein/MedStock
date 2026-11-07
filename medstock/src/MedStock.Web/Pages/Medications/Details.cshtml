@@ -1,0 +1,63 @@
+@page
+@model MedStock.Web.Pages.Medications.DetailsModel
+@using System.Globalization
+@{
+    ViewData["Tab"] = "overview";
+    var ui = CultureInfo.CurrentUICulture;
+    var r = Model.Row;
+    var m = r.Medication;
+}
+<partial name="_SubHeader" model="@((m.Name, Url.Content("~/")))" />
+
+<div id="detail">
+    <div class="detail-head">
+        @if (Model.PhotoVersion > 0)
+        {
+            <img class="thumb" src="@Url.Page("/Medications/Photo", new { id = m.Id, v = Model.PhotoVersion })" alt="" width="96" height="96" />
+        }
+        else
+        {
+            <div class="thumb"><partial name="_TypeIcon" model="m.Type" /></div>
+        }
+        <div>
+            <div><strong>@m.Name</strong> @m.Strength</div>
+            <div class="small"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name</div>
+            <span class="badge @r.ColorClass">@r.Badge(ui)</span>
+        </div>
+    </div>
+
+    <dl class="kv">
+        <dt>@L["Detail_Remaining"]</dt>
+        <dd>@Texts.Quantity(m.Type, r.Stock, ui)</dd>
+        @if (r.LastDose(ui) is { } lastDose)
+        {
+            <dt></dt>
+            <dd>@lastDose</dd>
+        }
+    </dl>
+    <p class="small muted">@L["Detail_LastCount", Texts.LongDate(r.Snapshot.Date, ui)]</p>
+
+    <p><a href="@Url.Page("/Medications/Edit", new { id = m.Id })" role="button" class="secondary">@L["Edit"]</a></p>
+
+    <section class="photo" data-upload-url="@Url.Page("/Medications/Photo", new { id = m.Id })" data-detail-url="@Url.Page("/Medications/Details", new { id = m.Id })">
+        <h2>@L["Photo"]</h2>
+        <p class="error small photo-error" hidden>@L["Photo_Invalid"]</p>
+        <form method="post" enctype="multipart/form-data" action="@Url.Page("/Medications/Photo", new { id = m.Id })" hx-boost="false" class="photo-form">
+            <div class="grid-2">
+                <label role="button" class="secondary">@L["Photo_Take"]<input type="file" name="photo" accept="image/*" capture="environment" hidden /></label>
+                <label role="button" class="secondary">@L["Photo_Choose"]<input type="file" name="photo" accept="image/*" hidden /></label>
+            </div>
+            <noscript><button type="submit">@L["Photo_Upload"]</button></noscript>
+        </form>
+        @if (m.HasPhoto)
+        {
+            <form method="post" action="@Url.Page("/Medications/Photo", new { id = m.Id, handler = "Delete" })">
+                <button type="submit" class="secondary outline">@L["Photo_Remove"]</button>
+            </form>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/photo.js" asp-append-version="true"></script>
+}

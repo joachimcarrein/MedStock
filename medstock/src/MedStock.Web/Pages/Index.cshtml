@@ -1,6 +1,43 @@
 @page
+@model IndexModel
+@using System.Globalization
 @{
     ViewData["Tab"] = "overview";
+    var ui = CultureInfo.CurrentUICulture;
 }
 <h1>@L["Tab_Overview"]</h1>
-<p class="muted">MedStock @MedStock.Web.Data.DbInitializer.AppVersion</p>
+
+@if (!Model.HasProfiles)
+{
+    <div class="empty-state">
+        <p>@L["Empty_NoProfiles"]</p>
+        <a href="@Url.Page("/Settings/Profiles", new { next = "new" })" role="button">@L["Empty_NoProfiles_Button"]</a>
+    </div>
+}
+else if (Model.Rows.Count == 0)
+{
+    <p class="empty-state muted">@L["Empty_NoMedication"]</p>
+}
+else
+{
+    <ul class="cards">
+        @foreach (var r in Model.Rows)
+        {
+            var m = r.Medication;
+            <li>
+                <a class="card state-@r.ColorClass" href="@Url.Page("/Medications/Details", new { id = m.Id })">
+                    <span class="thumb"><partial name="_TypeIcon" model="m.Type" /></span>
+                    <span class="body">
+                        <span class="name">@m.Name @m.Strength</span>
+                        <span class="meta"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name · @Texts.Quantity(m.Type, r.Stock, ui)</span><br />
+                        <span class="badge @r.ColorClass">@r.Badge(ui)</span> <span class="meta">@r.LastDose(ui)</span>
+                    </span>
+                </a>
+            </li>
+        }
+    </ul>
+}
+@if (Model.HasProfiles)
+{
+    <a class="fab" href="@Url.Page("/Medications/Edit")" aria-label="@L["Med_New"]">+</a>
+}

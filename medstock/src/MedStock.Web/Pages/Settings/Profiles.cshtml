@@ -1,0 +1,76 @@
+@page
+@model MedStock.Web.Pages.Settings.ProfilesModel
+@{
+    ViewData["Tab"] = "settings";
+    var coverageLabel = L["Profile_Coverage", Model.GlobalCoverageDays];
+}
+<partial name="_SubHeader" model="@((L["Profiles_Title"].Value, Url.Page("/Settings/Index")!))" />
+
+@if (Model.Error is not null && Model.ErrorProfileId is null)
+{
+    <p class="error" role="alert">@Model.Error</p>
+}
+
+<ul class="profile-list">
+@for (var i = 0; i < Model.Profiles.Count; i++)
+{
+    var p = Model.Profiles[i];
+    <li>
+        <details open="@(Model.ErrorProfileId == p.Id)">
+            <summary><span class="profile-dot" style="background:@p.Color"></span>@p.Name</summary>
+            @if (Model.ErrorProfileId == p.Id)
+            {
+                <p class="error" role="alert">@Model.Error</p>
+            }
+            <form method="post" asp-page-handler="Save" asp-route-id="@p.Id">
+                <label>@L["Profile_Name"] <input name="name" value="@p.Name" required maxlength="50" /></label>
+                <fieldset class="palette">
+                    <legend>@L["Profile_Color"]</legend>
+                    @foreach (var c in ProfilesModel.Palette)
+                    {
+                        <label class="swatch" style="--swatch:@c"><input type="radio" name="color" value="@c" checked="@(c == p.Color)" /><span></span></label>
+                    }
+                </fieldset>
+                <label>@coverageLabel <input name="coverageDays" type="number" inputmode="numeric" min="0" max="3650" value="@p.CoverageDays" /></label>
+                <button type="submit">@L["Save"]</button>
+            </form>
+            <div class="row-actions">
+                <form method="post" asp-page-handler="Move" asp-route-id="@p.Id" asp-route-direction="-1">
+                    <button type="submit" class="secondary" disabled="@(i == 0)">↑ @L["Move_Up"]</button>
+                </form>
+                <form method="post" asp-page-handler="Move" asp-route-id="@p.Id" asp-route-direction="1">
+                    <button type="submit" class="secondary" disabled="@(i == Model.Profiles.Count - 1)">↓ @L["Move_Down"]</button>
+                </form>
+            </div>
+            @if (!Model.InUse.Contains(p.Id))
+            {
+                <details class="confirm">
+                    <summary role="button" class="secondary">@L["Delete"]</summary>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id">
+                        <button type="submit" class="danger">@L["Delete_Confirm"]</button>
+                    </form>
+                </details>
+            }
+            else
+            {
+                <p class="small muted">@L["Profile_HasMedication"]</p>
+            }
+        </details>
+    </li>
+}
+</ul>
+
+<h2>@L["Profiles_Add"]</h2>
+<form method="post" asp-page-handler="Add" asp-route-next="@Model.Next">
+    <label>@L["Profile_Name"] <input name="name" required maxlength="50" autofocus="@(Model.Profiles.Count == 0)" /></label>
+    <fieldset class="palette">
+        <legend>@L["Profile_Color"]</legend>
+        @for (var i = 0; i < ProfilesModel.Palette.Length; i++)
+        {
+            var c = ProfilesModel.Palette[i];
+            <label class="swatch" style="--swatch:@c"><input type="radio" name="color" value="@c" checked="@(i == Model.Profiles.Count % ProfilesModel.Palette.Length)" /><span></span></label>
+        }
+    </fieldset>
+    <label>@coverageLabel <input name="coverageDays" type="number" inputmode="numeric" min="0" max="3650" /></label>
+    <button type="submit">@L["Profiles_Add"]</button>
+</form>

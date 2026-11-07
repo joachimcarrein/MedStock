@@ -1,0 +1,168 @@
+@page
+@model MedStock.Web.Pages.Medications.EditModel
+@using System.Globalization
+@{
+    ViewData["Tab"] = "overview";
+    var inv = CultureInfo.InvariantCulture;
+    var ui = CultureInfo.CurrentUICulture;
+    var title = Model.IsNew ? L["Med_New"].Value : L["Med_Edit"].Value;
+    var back = Model.IsNew ? Url.Content("~/") : Url.Page("/Medications/Details", new { id = Model.Input.Id });
+    string Num(decimal? d) => d?.ToString(inv) ?? "";
+    var first = (int)ui.DateTimeFormat.FirstDayOfWeek; // 0 = Sunday
+    var dayOrder = Enumerable.Range(0, 7).Select(k => ((first + k) % 7 + 6) % 7).ToArray(); // storage index, Monday = 0
+    string DayName(int storageIndex) => ui.DateTimeFormat.AbbreviatedDayNames[(storageIndex + 1) % 7];
+}
+<partial name="_SubHeader" model="@((title, back!))" />
+
+@if (Model.Conflict is not null)
+{
+    <p class="error" role="alert">@Model.Conflict</p>
+}
+
+<form method="post" class="med-form" novalidate>
+    <input type="hidden" asp-for="Input.Id" />
+    <input type="hidden" asp-for="Input.ExpectedSnapshotId" />
+
+    <label>
+        @L["Med_Profile"]
+        <select asp-for="Input.Profile" id="profile-select">
+            @foreach (var p in Model.Profiles)
+            {
+                <option value="@p.Id">@p.Name</option>
+            }
+            <option value="@EditModel.NewProfileValue">@L["Med_NewProfile"]</option>
+        </select>
+        <span asp-validation-for="Input.Profile" class="error small"></span>
+    </label>
+    <label class="new-profile">
+        @L["Med_NewProfileName"]
+        <input asp-for="Input.NewProfileName" maxlength="50" />
+        <span asp-validation-for="Input.NewProfileName" class="error small"></span>
+    </label>
+
+    <label>
+        @L["Med_Name"]
+        <input asp-for="Input.Name" maxlength="100" required autocomplete="off" />
+        <span asp-validation-for="Input.Name" class="error small"></span>
+    </label>
+    <label>
+        @L["Med_Strength"]
+        <input asp-for="Input.Strength" maxlength="50" autocomplete="off" />
+        <span asp-validation-for="Input.Strength" class="error small"></span>
+    </label>
+    <label>
+        @L["Med_Type"]
+        <select asp-for="Input.Type">
+            @foreach (var t in Enum.GetValues<MedicationType>())
+            {
+                <option value="@t">@L["Type_" + t]</option>
+            }
+        </select>
+    </label>
+    <label>
+        @L["Med_UnitsPerPackage"]
+        <input name="Input.UnitsPerPackage" value="@Num(Model.Input.UnitsPerPackage)" type="number" step="any" min="0" inputmode="decimal" required />
+        <span asp-validation-for="Input.UnitsPerPackage" class="error small"></span>
+    </label>
+
+    <fieldset class="usage">
+        <legend>@L["Med_Usage"]</legend>
+        @foreach (var mode in Enum.GetValues<UsageMode>())
+        {
+            <label class="inline"><input type="radio" name="Input.UsageMode" value="@mode" checked="@(Model.Input.UsageMode == mode)" /> @L["Mode_" + mode]</label>
+        }
+        @if (!Model.IsNew)
+        {
+            <p class="small muted">@L["Usage_FromTomorrow"]</p>
+        }
+
+        <div class="mode-perday">
+            <label>
+                @L["Med_PerDay"]
+                <input name="Input.PerDay" id="perday" value="@Num(Model.Input.PerDay)" type="number" step="any" min="0" inputmode="decimal" />
+                <span asp-validation-for="Input.PerDay" class="error small"></span>
+            </label>
+            <details class="helper">
+                <summary>@L["Helper_Title"]</summary>
+                <div class="inline-form">
+                    <input type="number" step="any" min="0" inputmode="decimal" id="h-times" aria-label="@L["Helper_TimesPerDay"]" />
+                    <span>@L["Helper_TimesPerDay"] ×</span>
+                    <input type="number" step="any" min="0" inputmode="decimal" id="h-per" aria-label="@L["Helper_PerTime"]" />
+                    <span>@L["Helper_PerTime"]</span>
+                </div>
+                <div class="dayparts">
+                    @foreach (var part in new[] { "Morning", "Noon", "Evening", "Night" })
+                    {
+                        <label>@L["Daypart_" + part] <input type="number" step="any" min="0" inputmode="decimal" class="h-part" /></label>
+                    }
+                </div>
+            </details>
+        </div>
+
+        <div class="mode-weekly">
+            <div class="week-grid">
+                @foreach (var i in dayOrder)
+                {
+                    <label>
+                        @DayName(i)
+                        <input name="Input.Weekly[@i]" value="@Num(Model.Input.Weekly.ElementAtOrDefault(i))" type="number" step="any" min="0" inputmode="decimal" class="weekday" />
+                    </label>
+                }
+            </div>
+            @for (var i = 0; i < 7; i++)
+            {
+                <span asp-validation-for="Input.Weekly[i]" class="error small"></span>
+            }
+            <button type="button" class="secondary" id="same-every-day">@L["Weekly_SameEveryDay"]</button>
+        </div>
+
+        <div class="mode-asneeded">
+            <label>
+                @L["Med_MinStock"]
+                <input name="Input.MinStockUnits" value="@Num(Model.Input.MinStockUnits)" type="number" step="any" min="0" inputmode="decimal" />
+                <span asp-validation-for="Input.MinStockUnits" class="error small"></span>
+            </label>
+        </div>
+    </fieldset>
+
+    @if (Model.IsNew)
+    {
+        <fieldset>
+            <legend>@L["Med_InitialStock"]</legend>
+            <div class="grid-2">
+                <label>
+                    @L["Stock_OpenUnits"]
+                    <input name="Input.OpenUnits" value="@Num(Model.Input.OpenUnits)" type="number" step="any" min="0" inputmode="decimal" />
+                    <span asp-validation-for="Input.OpenUnits" class="error small"></span>
+                </label>
+                <label>
+                    @L["Stock_SealedPackages"]
+                    <input name="Input.SealedPackages" value="@Model.Input.SealedPackages" type="number" step="1" min="0" inputmode="numeric" />
+                    <span asp-validation-for="Input.SealedPackages" class="error small"></span>
+                </label>
+            </div>
+            <label class="inline mode-regular"><input type="checkbox" asp-for="Input.TakenToday" /> @L["Stock_TakenToday"]</label>
+        </fieldset>
+    }
+
+    <details class="advanced" open="@(Model.Input.AlertDays is not null || Model.Input.CoverageDays is not null || !Model.Input.NotificationsEnabled)">
+        <summary>@L["Tab_Settings"]</summary>
+        <label>
+            @L["Med_AlertDays", Model.Global.DefaultAlertDays]
+            <input name="Input.AlertDays" value="@Model.Input.AlertDays" type="number" min="0" max="3650" inputmode="numeric" />
+            <span asp-validation-for="Input.AlertDays" class="error small"></span>
+        </label>
+        <label>
+            @L["Med_CoverageDays", Model.Profiles.FirstOrDefault(p => p.Id.ToString() == Model.Input.Profile)?.CoverageDays ?? Model.Global.CoverageDays]
+            <input name="Input.CoverageDays" value="@Model.Input.CoverageDays" type="number" min="0" max="3650" inputmode="numeric" />
+            <span asp-validation-for="Input.CoverageDays" class="error small"></span>
+        </label>
+        <label class="inline"><input type="checkbox" asp-for="Input.NotificationsEnabled" /> @L["Med_Notifications"]</label>
+    </details>
+
+    <button type="submit" hx-disabled-elt="this">@L["Save"]</button>
+</form>
+
+@section Scripts {
+    <script src="~/js/edit.js" asp-append-version="true"></script>
+}

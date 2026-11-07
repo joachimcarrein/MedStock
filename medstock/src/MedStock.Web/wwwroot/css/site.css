@@ -112,3 +112,39 @@ dl.kv dd { margin: 0; word-break: break-all; }
 .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
 .week-grid label { font-size: 0.75rem; text-align: center; }
 .week-grid input { padding: 0.4rem 0.2rem; text-align: center; }
+
+/* Forms */
+label.inline { display: flex; align-items: center; gap: 0.5rem; }
+label.inline input { margin: 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.dayparts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; font-size: 0.8rem; }
+.helper summary, .advanced summary { font-size: 0.9rem; }
+.inline-form span { align-self: center; font-size: 0.85rem; white-space: nowrap; }
+/* Show only the block of the chosen usage mode (without JS when :has() is unsupported, all blocks stay visible). */
+.usage:has(input[value="PerDay"]:checked) :is(.mode-weekly, .mode-asneeded),
+.usage:has(input[value="Weekly"]:checked) :is(.mode-perday, .mode-asneeded),
+.usage:has(input[value="AsNeeded"]:checked) :is(.mode-perday, .mode-weekly) { display: none; }
+.med-form:has(input[value="AsNeeded"]:checked) .mode-regular { display: none; }
+.med-form:has(#profile-select option[value="new"]:not(:checked)) .new-profile { display: none; }
+
+/* Profiles */
+.profile-list { list-style: none; padding: 0; }
+.profile-list li { list-style: none; border-bottom: 1px solid var(--pico-muted-border-color); padding: 0.25rem 0; }
+.palette { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.palette legend { width: 100%; }
+.swatch input { position: absolute; opacity: 0; }
+.swatch span { display: inline-block; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--swatch); border: 3px solid transparent; }
+.swatch input:checked + span { border-color: var(--pico-color); }
+.swatch input:focus-visible + span { outline: 2px solid var(--pico-primary); }
+.row-actions { display: flex; gap: 0.5rem; }
+.row-actions form { flex: 1; margin: 0; }
+.row-actions button { width: 100%; }
+details.confirm summary[role=button] { display: inline-block; width: auto; }
+button.danger { background: var(--ms-red); border-color: var(--ms-red); color: #fff; }
+.type-icon { fill: none; }
+
+/* Detail */
+.detail-head { display: flex; gap: 1rem; align-items: center; }
+.detail-head .thumb { width: 96px; height: 96px; flex: none; border-radius: 12px; object-fit: cover; display: flex; align-items: center; justify-content: center; background: var(--pico-muted-border-color); }
+.detail-head .thumb svg { width: 56px; height: 56px; opacity: 0.75; }
+.photo.busy { opacity: 0.5; pointer-events: none; }

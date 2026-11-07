@@ -37,6 +37,7 @@ builder.Services.AddSingleton(paths);
 builder.Services.AddSingleton(new AppMode(addonMode));
 builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddScoped<CurrentUser>();
+builder.Services.AddScoped<MedicationService>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<MedStockDb>(o => o.UseSqlite($"Data Source={paths.DbPath}"));
