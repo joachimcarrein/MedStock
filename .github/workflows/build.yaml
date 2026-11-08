@@ -1,0 +1,100 @@
+# Builds the app image for amd64 and aarch64 on native runners, signs it and publishes a multi-arch manifest:
+#   ghcr.io/joachimcarrein/amd64-medstock:<version>, ghcr.io/joachimcarrein/aarch64-medstock:<version>
+#   ghcr.io/joachimcarrein/medstock:<version>   (the name used by `image:` in medstock/config.yaml)
+# Release flow: bump version + CHANGELOG on a release branch, publish a GitHub release with tag <version>
+# (e.g. 0.2.0, a leading "v" is accepted), check the manifest anonymously, then merge the branch into main.
+name: Build
+
+on:
+  release:
+    types: [published]
+
+env:
+  ARCHITECTURES: '["amd64", "aarch64"]'
+  IMAGE_NAME: medstock
+
+permissions:
+  contents: read
+
+jobs:
+  init:
+    name: Initialize build
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Version from the tag must match config.yaml
+        id: version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="${TAG#v}"
+          configured=$(sed -n 's/^version: *"\{0,1\}\([^"]*\)"\{0,1\}$/\1/p' medstock/config.yaml)
+          echo "tag $version, config.yaml $configured"
+          if [ "$version" != "$configured" ]; then
+            echo "::error::Release tag $TAG does not match version $configured in medstock/config.yaml"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Get build matrix
+        id: matrix
+        uses: home-assistant/builder/actions/prepare-multi-arch-matrix@2026.09.0
+        with:
+          architectures: ${{ env.ARCHITECTURES }}
+          image-name: ${{ env.IMAGE_NAME }}
+
+  build:
+    name: Build ${{ matrix.arch }} image
+    needs: init
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read # check out the code
+      id-token: write # Cosign signing
+      packages: write # push to GitHub Container Registry
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build image
+        uses: home-assistant/builder/actions/build-image@2026.09.0
+        with:
+          arch: ${{ matrix.arch }}
+          context: medstock
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          image: ${{ matrix.image }}
+          image-tags: |
+            ${{ needs.init.outputs.version }}
+            latest
+          labels: |
+            io.hass.type=addon
+            io.hass.name=MedStock
+            io.hass.description=Household medication stock tracker
+            io.hass.url=https://github.com/joachimcarrein/MedStock
+          push: "true"
+          skip-existing: ${{ needs.init.outputs.version }}
+          version: ${{ needs.init.outputs.version }}
+
+  manifest:
+    name: Publish multi-arch manifest
+    needs: [init, build]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Cosign signing
+      packages: write # push the manifest
+    steps:
+      - name: Publish multi-arch manifest
+        uses: home-assistant/builder/actions/publish-multi-arch-manifest@2026.09.0
+        with:
+          architectures: ${{ env.ARCHITECTURES }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          image-name: ${{ env.IMAGE_NAME }}
+          image-tags: |
+            ${{ needs.init.outputs.version }}
+            latest
+          skip-existing: ${{ needs.init.outputs.version }}

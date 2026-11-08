@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Prebuilt images for amd64 and aarch64: installing and updating takes seconds instead of a local build.
+
 ## 0.1.3
 
 - Security: own AppArmor profile. The app can only write to its data folder and /tmp. Security rating 8/8.

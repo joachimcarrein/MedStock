@@ -14,9 +14,7 @@ You only act when you buy more ("+1 box") or when you want to correct the count 
 
 1. Add the repository `https://github.com/joachimcarrein/MedStock` under
    **Settings › Apps › App store › ⋮ › Repositories** (or use the badge in the README).
-2. Install **MedStock**. The first installation builds the image on your Home Assistant host,
-   which takes 5–20 minutes. Do not press Install twice; progress is visible under
-   **Settings › System › Logs › Supervisor**.
+2. Install **MedStock**. A prebuilt image (amd64 or aarch64) is downloaded; this takes about a minute.
 3. Start the app and enable **Show in sidebar**.
 
 To update: **App store › ⋮ › Check for updates**, then update (or **Rebuild**) on the app page.
