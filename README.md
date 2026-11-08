@@ -16,6 +16,20 @@ and tells you **how many days you have left**, without logging every single inta
 
 The UI is available in English and Dutch.
 
+<p>
+  <img src="docs/screenshots/overview.png" alt="Overview: medication sorted by urgency" width="260">
+  <img src="docs/screenshots/detail.png" alt="Detail: restock, recount, pause" width="260">
+  <img src="docs/screenshots/prescription.png" alt="Prescription: what to ask the doctor" width="260">
+</p>
+
+<sub>Screenshots use fictional demo data (`--demo`).</sub>
+
+Optional extras (off by default, in **Settings**):
+
+- a **"+1 box" button** in every notification;
+- **sensors** in Home Assistant with the days remaining per medication (MQTT discovery; requires the Mosquitto broker app);
+- a **to-do list** entry when something runs low.
+
 ## Installation
 
 1. Click the badge above, or go to **Settings › Apps › App store › ⋮ › Repositories** and add

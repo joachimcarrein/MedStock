@@ -64,6 +64,17 @@ To update: **App store › ⋮ › Check for updates**, then update (or **Rebuil
 - **Test notification** sends a test to your own devices; **Run daily check now** runs the check
   immediately.
 
+## Optional extras
+
+- **"+1" button in notifications**: every notification has a button such as "+1 bottle". Tapping it books one
+  package for that medication, without opening the app.
+- **Sensors** (Settings › For everyone): a sensor per medication with the days remaining, on one "MedStock" device,
+  via MQTT discovery. Requires an MQTT broker (the Mosquitto broker app). Off by default: with sensors on, medication
+  and profile names are visible in Home Assistant's history, logbook and dashboards to every Home Assistant user.
+  Turning it off removes the sensors again.
+- **To-do list** (Settings › For everyone): choose a `todo.*` list (e.g. "Local To-do" or the shopping list).
+  When a medication reaches its first alert level, "Name (profile)" is added to that list, unless it is still open there.
+
 ## Configuration
 
 | Option | Description |
