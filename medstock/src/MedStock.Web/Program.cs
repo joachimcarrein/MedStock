@@ -48,8 +48,9 @@ builder.Services.AddSingleton<SensorStatus>();
 builder.Services.AddScoped<SensorSync>();
 builder.Services.AddSingleton<Func<IMqttConnection>>(() => new MqttNetConnection());
 builder.Services.AddHostedService<SensorWorker>();
-// The only external service, and only when the user taps "search" for a picture (Wikimedia asks for a descriptive User-Agent).
-builder.Services.AddHttpClient<IImageSearch, WikimediaImageSearch>(c =>
+// The only external services (Wikimedia Commons, DailyMed), and only when the user taps "search" for a picture.
+// Wikimedia asks for a descriptive User-Agent.
+builder.Services.AddHttpClient<IImageSearch, ImageSearchService>(c =>
 {
     c.Timeout = TimeSpan.FromSeconds(15);
     c.DefaultRequestHeaders.UserAgent.ParseAdd($"MedStock/{DbInitializer.AppVersion} (+https://github.com/joachimcarrein/MedStock)");

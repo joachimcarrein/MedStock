@@ -10,20 +10,20 @@ namespace MedStock.Tests;
 
 public sealed class FakeImageSearch : IImageSearch
 {
-    public List<string> Queries { get; } = [];
+    public List<(ImageSource Source, string Query)> Queries { get; } = [];
     public bool Unavailable { get; set; }
     public byte[] Picture { get; set; } = [0xFF, 0xD8, 0xFF, 0xE0, 1, 2, 3, 0xFF, 0xD9];
 
-    public Task<IReadOnlyList<ImageHit>> SearchAsync(string query, int offset, CancellationToken ct = default)
+    public Task<IReadOnlyList<ImageHit>> SearchAsync(ImageSource source, string query, int offset, CancellationToken ct = default)
     {
-        Queries.Add(query);
+        Queries.Add((source, query));
         if (Unavailable) throw new ImageSearchUnavailableException(new HttpRequestException());
         return Task.FromResult<IReadOnlyList<ImageHit>>(
             [new ImageHit("https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/X.jpg/400px-X.jpg", "X.jpg", "https://commons.wikimedia.org/wiki/File:X.jpg")]);
     }
 
     public Task<byte[]?> DownloadAsync(string url, CancellationToken ct = default) =>
-        Task.FromResult(WikimediaImageSearch.IsAllowed(url) ? Picture : null);
+        Task.FromResult(ImageSearchService.IsAllowed(url) ? Picture : null);
 }
 
 public class ExportAndImageSearchTests : IClassFixture<AddonWebFactory>
@@ -89,11 +89,14 @@ public class ExportAndImageSearchTests : IClassFixture<AddonWebFactory>
     [InlineData("https://thumb.wikimedia.org.evil.example/x.jpg", false)]
     [InlineData("https://user@thumb.wikimedia.org/x.jpg", false)]
     [InlineData("https://thumb.wikimedia.org:8443/x.jpg", false)]
+    [InlineData("https://dailymed.nlm.nih.gov/dailymed/image.cfm?setid=ee06186f-2aa3-4990-a760-757579d8f77b&name=Carton-0-5.jpg", true)]
+    [InlineData("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json", false)]
+    [InlineData("https://dailymed.nlm.nih.gov.evil.example/dailymed/image.cfm", false)]
     [InlineData("http://supervisor/core/api/states", false)]
     [InlineData("file:///data/medstock.db", false)]
     [InlineData(null, false)]
     public void Only_wikimedia_image_urls_are_allowed(string? url, bool allowed) =>
-        Assert.Equal(allowed, WikimediaImageSearch.IsAllowed(url));
+        Assert.Equal(allowed, ImageSearchService.IsAllowed(url));
 
     [Fact]
     public async Task Search_page_sends_nothing_until_the_user_taps_search()
@@ -105,7 +108,12 @@ public class ExportAndImageSearchTests : IClassFixture<AddonWebFactory>
         Assert.Equal(before, search.Queries.Count);
 
         html = await Client().GetStringAsync($"/Medications/ImageSearch?id={_medId}&go=true&q=Saline");
-        Assert.Equal("Saline", search.Queries.Last());
+        Assert.Equal((ImageSource.Wikimedia, "Saline"), search.Queries.Last());
+
+        html = await Client().GetStringAsync($"/Medications/ImageSearch?id={_medId}&go=true&source=DailyMed&q=Nasalix");
+        Assert.Equal((ImageSource.DailyMed, "Nasalix"), search.Queries.Last());
+        Assert.Contains("DailyMed (US packaging)", html);
+        Assert.Contains("source=DailyMed", html); // "other pictures" keeps the source
         Assert.Contains("400px-X.jpg", html);
     }
 
@@ -133,7 +141,7 @@ public class ExportAndImageSearchTests : IClassFixture<AddonWebFactory>
         try
         {
             var html = await Client().GetStringAsync($"/Medications/ImageSearch?id={_medId}&go=true");
-            Assert.Contains("Wikimedia Commons cannot be reached", html);
+            Assert.Contains("The picture source cannot be reached right now", html);
         }
         finally { search.Unavailable = false; }
     }
@@ -155,10 +163,41 @@ public class ExportAndImageSearchTests : IClassFixture<AddonWebFactory>
             requested = req.RequestUri!.AbsoluteUri;
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body, Encoding.UTF8, "application/json") };
         }));
-        var hits = await new WikimediaImageSearch(http, NullLogger<WikimediaImageSearch>.Instance).SearchAsync("Nasalix 50 µg", 12);
+        var hits = await new ImageSearchService(http, NullLogger<ImageSearchService>.Instance).SearchAsync(ImageSource.Wikimedia, "Nasalix 50 µg", 12);
         Assert.Equal(["A.jpg", "B.png"], hits.Select(h => h.Title));
         Assert.Contains("gsroffset=12", requested);
         Assert.Contains("gsrsearch=Nasalix%2050%20%C2%B5g", requested);
+    }
+
+    [Fact]
+    public async Task DailyMed_lists_packaging_pictures_first_and_skips_structures()
+    {
+        const string setId = "ee06186f-2aa3-4990-a760-757579d8f77b";
+        const string img = "https://dailymed.nlm.nih.gov/dailymed/image.cfm?setid=" + setId + "&name=";
+        var requests = new List<string>();
+        var http = new HttpClient(new StubHandler(req =>
+        {
+            var u = req.RequestUri!.AbsoluteUri;
+            requests.Add(u);
+            var body = u.Contains("spls.json")
+                ? $$$"""{"data":[{"setid":"{{{setId}}}","title":"WEEKJECT"},{"setid":"not-a-guid/../x","title":"x"}]}"""
+                : $$$"""
+                  {"data":{"media":[
+                    {"mime_type":"image/jpeg","url":"{{{img}}}structure.jpg","name":"structure.jpg"},
+                    {"mime_type":"image/jpeg","url":"{{{img}}}figure-1.jpg","name":"figure-1.jpg"},
+                    {"mime_type":"image/jpeg","url":"{{{img}}}image-01.jpg","name":"image-01.jpg"},
+                    {"mime_type":"image/jpeg","url":"{{{img}}}image-02.jpg","name":"image-02.jpg"},
+                    {"mime_type":"image/jpeg","url":"{{{img}}}Carton-0-5.jpg","name":"Carton-0-5.jpg"},
+                    {"mime_type":"image/gif","url":"{{{img}}}anim.gif","name":"anim.gif"},
+                    {"mime_type":"image/jpeg","url":"https://evil.example/x.jpg","name":"label.jpg"}
+                  ]}}
+                  """;
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body, Encoding.UTF8, "application/json") };
+        }));
+        var hits = await new ImageSearchService(http, NullLogger<ImageSearchService>.Instance).SearchAsync(ImageSource.DailyMed, "Weekject", 0);
+        Assert.Equal(["Carton-0-5.jpg", "image-02.jpg", "image-01.jpg"], hits.Select(h => h.Title)); // unnamed: last first
+        Assert.Equal(2, requests.Count); // the invalid set id was never requested
+        Assert.Contains("drug_name=Weekject", requests[0]);
     }
 
     private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler

@@ -64,8 +64,11 @@ To update: **App store › ⋮ › Check for updates**, then update (or **Rebuil
 
 ## Optional extras
 
-- **Picture by name** (detail › *Search a picture by name*): searches Wikimedia Commons (free pictures, no AI, no
-  account) for the medication name; tap a picture to use it as the photo. *Other pictures* shows the next ones.
+- **Picture by name** (detail › *Search a picture by name*): searches the medication name in one of two sources (no AI,
+  no account) and you tap a picture to use it as the photo; *Other pictures* shows the next ones.
+  - **Wikimedia Commons**: free pictures of all kinds.
+  - **DailyMed** (US National Library of Medicine): official packaging and label pictures of medicines sold in the US.
+    Good for brand names that also exist there (e.g. Weekject, Nasalix); Belgian-only products are not in it.
 - **Export** (Settings › *Export data*): downloads a JSON file with the profiles, all medication (also archived) with
   their current stock and the general settings. Photos and personal notification settings are not included.
 
@@ -100,6 +103,6 @@ All other settings are in the app itself (**Settings**).
 
 - Android: taking a photo with the camera may open the gallery instead; choose a photo there.
 - MedStock only contacts an external service when you tap **Search** on *Search a picture by name*: the search
-  text goes to Wikimedia Commons and your phone loads the previews from there. Nothing else leaves your Home Assistant.
+  text goes to the chosen source (Wikimedia Commons or DailyMed) and your phone loads the previews from there. Nothing else leaves your Home Assistant.
 - If a schema upgrade fails, the app stops and logs the path of the database copy in `/data/backup`.
   Restore a Home Assistant backup, or open an issue with the log (it contains no medication names).

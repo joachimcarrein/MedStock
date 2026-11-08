@@ -207,3 +207,4 @@ details.icon-confirm > summary, details.icon-confirm[open] > summary { margin: 0
 .image-hits form { margin: 0; }
 button.image-hit { padding: 0; margin: 0; width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--pico-muted-border-color) !important; border: 0; border-radius: 8px; }
 button.image-hit img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.image-search-form { flex-wrap: wrap; } .image-search-form select { flex: 1 1 100%; margin: 0; } .image-search-form input[type=search] { flex: 1; min-width: 0; }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- Picture search: second source DailyMed (US National Library of Medicine) with official packaging and label pictures.
+  Packaging pictures are shown first.
+
 ## 1.1.0
 
 - Search a picture by name on Wikimedia Commons (free pictures, no AI) and use it as the photo. This is the only

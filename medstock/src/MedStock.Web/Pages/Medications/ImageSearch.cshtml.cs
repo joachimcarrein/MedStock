@@ -8,13 +8,14 @@ using Microsoft.Extensions.Localization;
 
 namespace MedStock.Web.Pages.Medications;
 
-/// <summary>Pick a picture for a medication from Wikimedia Commons, searched by name (fase 4).</summary>
+/// <summary>Pick a picture for a medication from Wikimedia Commons or DailyMed, searched by name.</summary>
 public class ImageSearchModel(MedStockDb db, IImageSearch search, MedicationService service, IStringLocalizer<SharedResource> l)
     : PageModel
 {
     public Medication Medication { get; private set; } = null!;
     [BindProperty(SupportsGet = true)] public string? Q { get; set; }
     [BindProperty(SupportsGet = true)] public int Offset { get; set; }
+    [BindProperty(SupportsGet = true)] public ImageSource Source { get; set; } = ImageSource.Wikimedia;
     /// <summary>Only search after an explicit tap (the query is sent to Wikimedia), not when the page opens.</summary>
     [BindProperty(SupportsGet = true)] public bool Go { get; set; }
     public IReadOnlyList<ImageHit>? Hits { get; private set; }
@@ -27,14 +28,14 @@ public class ImageSearchModel(MedStockDb db, IImageSearch search, MedicationServ
         Medication = m;
         Q = string.IsNullOrWhiteSpace(Q) ? m.Name : Q.Trim()[..Math.Min(100, Q.Trim().Length)];
         if (!Go) return Page();
-        try { Hits = await search.SearchAsync(Q, Offset, HttpContext.RequestAborted); }
+        try { Hits = await search.SearchAsync(Source, Q, Offset, HttpContext.RequestAborted); }
         catch (ImageSearchUnavailableException) { Error = l["ImageSearch_Unavailable"]; }
         return Page();
     }
 
     public async Task<IActionResult> OnPostUseAsync(int id, string? url)
     {
-        if (!WikimediaImageSearch.IsAllowed(url)) return BadRequest();
+        if (!ImageSearchService.IsAllowed(url)) return BadRequest();
         var bytes = await search.DownloadAsync(url!, HttpContext.RequestAborted);
         if (bytes is null) return await Failed(id, l["ImageSearch_DownloadFailed"]);
         try

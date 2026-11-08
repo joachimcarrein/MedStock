@@ -8,9 +8,13 @@
 
 <p class="small muted">@L["ImageSearch_Privacy"]</p>
 
-<form method="get" action="@Url.Page("/Medications/ImageSearch")" class="inline-form">
+<form method="get" action="@Url.Page("/Medications/ImageSearch")" class="inline-form image-search-form">
     <input type="hidden" name="id" value="@id" />
     <input type="hidden" name="go" value="true" />
+    <select name="source" aria-label="@L["ImageSearch_Source"]">
+        <option value="Wikimedia" selected="@(Model.Source == ImageSource.Wikimedia)">Wikimedia</option>
+        <option value="DailyMed" selected="@(Model.Source == ImageSource.DailyMed)">@L["ImageSearch_DailyMed"]</option>
+    </select>
     <input type="search" name="q" value="@Model.Q" maxlength="100" aria-label="@L["ImageSearch_Title"]" />
     <button type="submit" hx-disabled-elt="this">@L["ImageSearch_Search"]</button>
 </form>
@@ -41,16 +45,16 @@
                 </li>
             }
         </ul>
-        <p class="small muted">@L["ImageSearch_License"]</p>
+        <p class="small muted">@(Model.Source == ImageSource.DailyMed ? L["ImageSearch_License_DailyMed"] : L["ImageSearch_License"])</p>
     }
     <div class="actions">
         @if (Model.Offset > 0)
         {
-            <a role="button" class="secondary" href="@Url.Page("/Medications/ImageSearch", new { id, q = Model.Q, go = true, offset = Math.Max(0, Model.Offset - MedStock.Web.Services.WikimediaImageSearch.PageSize) })">@L["ImageSearch_Previous"]</a>
+            <a role="button" class="secondary" href="@Url.Page("/Medications/ImageSearch", new { id, q = Model.Q, go = true, source = Model.Source, offset = Math.Max(0, Model.Offset - ImageSearchService.PageSize) })">@L["ImageSearch_Previous"]</a>
         }
         @if (hits.Count > 0)
         {
-            <a role="button" class="secondary" href="@Url.Page("/Medications/ImageSearch", new { id, q = Model.Q, go = true, offset = Model.Offset + MedStock.Web.Services.WikimediaImageSearch.PageSize })">@L["ImageSearch_More"]</a>
+            <a role="button" class="secondary" href="@Url.Page("/Medications/ImageSearch", new { id, q = Model.Q, go = true, source = Model.Source, offset = Model.Offset + ImageSearchService.PageSize })">@L["ImageSearch_More"]</a>
         }
     </div>
 }

@@ -199,12 +199,15 @@
   <data name="Export_Help" xml:space="preserve"><value>Profiles, medication with their current stock and the general settings. Without photos and personal notification settings.</value></data>
   <data name="ImageSearch_Link" xml:space="preserve"><value>Search a picture by name (internet)</value></data>
   <data name="ImageSearch_Title" xml:space="preserve"><value>Search a picture</value></data>
-  <data name="ImageSearch_Privacy" xml:space="preserve"><value>The search text is sent to Wikimedia Commons (and your phone loads the previews from there). Nothing is sent until you tap Search.</value></data>
+  <data name="ImageSearch_Privacy" xml:space="preserve"><value>The search text is sent to the chosen source, Wikimedia Commons or DailyMed (and your phone loads the previews from there). Nothing is sent until you tap Search.</value></data>
   <data name="ImageSearch_Search" xml:space="preserve"><value>Search</value></data>
-  <data name="ImageSearch_None" xml:space="preserve"><value>No pictures found. Try another word, e.g. the active substance.</value></data>
+  <data name="ImageSearch_None" xml:space="preserve"><value>No pictures found. Try another word (e.g. the active substance) or the other source.</value></data>
   <data name="ImageSearch_More" xml:space="preserve"><value>Other pictures</value></data>
   <data name="ImageSearch_Previous" xml:space="preserve"><value>Previous</value></data>
   <data name="ImageSearch_License" xml:space="preserve"><value>Pictures from Wikimedia Commons; each has its own free licence. Tap a picture to use it.</value></data>
-  <data name="ImageSearch_Unavailable" xml:space="preserve"><value>Wikimedia Commons cannot be reached right now.</value></data>
+  <data name="ImageSearch_Unavailable" xml:space="preserve"><value>The picture source cannot be reached right now.</value></data>
   <data name="ImageSearch_DownloadFailed" xml:space="preserve"><value>The picture could not be downloaded; choose another one.</value></data>
+  <data name="ImageSearch_Source" xml:space="preserve"><value>Source</value></data>
+  <data name="ImageSearch_DailyMed" xml:space="preserve"><value>DailyMed (US packaging)</value></data>
+  <data name="ImageSearch_License_DailyMed" xml:space="preserve"><value>Official US packaging and label pictures from DailyMed (US National Library of Medicine). Tap a picture to use it.</value></data>
 </root>
