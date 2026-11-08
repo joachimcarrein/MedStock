@@ -39,7 +39,7 @@ jobs:
         run: |
           # Root-owned like /data on Home Assistant (the profile grants no dac_override capability).
           sudo mkdir -p "$RUNNER_TEMP/data" && sudo chown root:root "$RUNNER_TEMP/data" && sudo chmod 755 "$RUNNER_TEMP/data"
-          docker run -d --name ms --security-opt apparmor=medstock -p 8099:8099 -v "$RUNNER_TEMP/data:/data" \
+          docker run -d --init --name ms --security-opt apparmor=medstock -p 8099:8099 -v "$RUNNER_TEMP/data:/data" \
             -e TZ=Europe/Brussels -e ASPNETCORE_ENVIRONMENT=Development -e MEDSTOCK_DATA_DIR=/data medstock --demo
           for i in $(seq 1 30); do
             curl -fsS http://127.0.0.1:8099/healthz && break

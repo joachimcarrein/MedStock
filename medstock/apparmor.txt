@@ -23,9 +23,9 @@ profile medstock flags=(attach_disconnected,mediate_deleted) {
   /usr/share/dotnet/ r,
   /usr/share/dotnet/** mrix,
 
-  # The published app.
+  # The published app (configuration files are read with a shared lock).
   /app/ r,
-  /app/** mr,
+  /app/** mrk,
 
   # Shared libraries (ICU, OpenSSL, SQLite native), configuration, time zones, certificates.
   /lib/** mr,
@@ -33,8 +33,9 @@ profile medstock flags=(attach_disconnected,mediate_deleted) {
   /etc/** r,
   /usr/share/** r,
 
-  # Runtime introspection (cgroup limits for the GC, CPU count, own process info).
+  # Runtime introspection (cgroup limits for the GC, CPU count, own process info); .NET names its threads.
   /proc/** r,
+  owner /proc/*/task/*/comm rw,
   /sys/** r,
 
   # Devices.
