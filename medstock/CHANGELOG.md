@@ -1,8 +1,11 @@
 # Changelog
 
-## 0.2.0
+## 1.0.0
 
-- Prebuilt images for amd64 and aarch64: installing and updating takes seconds instead of a local build.
+- Prebuilt, signed images for amd64 and aarch64: installing and updating takes seconds instead of a local build.
+- "+1" button in every notification: books one package without opening the app.
+- Optional sensors in Home Assistant (MQTT discovery) with the days remaining per medication. Off by default.
+- Optional to-do list: medication that runs low is added to a Home Assistant to-do list of your choice.
 
 ## 0.1.3
 
