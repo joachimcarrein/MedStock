@@ -7,7 +7,7 @@
     <InvariantGlobalization>false</InvariantGlobalization>
     <UseAppHost>false</UseAppHost>
     <RootNamespace>MedStock.Web</RootNamespace>
-    <Version>0.1.2</Version>
+    <Version>0.1.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

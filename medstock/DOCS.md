@@ -80,6 +80,7 @@ All other settings are in the app itself (**Settings**).
 - The app is part of your Home Assistant backups. It uses a *cold* backup: the app is stopped
   for a few seconds during the backup so the database is consistent.
 - Medication names never appear in the log at `info` level.
+- The app runs under its own AppArmor profile: it can only write to `/data` and `/tmp`.
 
 ## Limitations
 

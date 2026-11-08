@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Security: own AppArmor profile. The app can only write to its data folder and /tmp. Security rating 8/8.
+
 ## 0.1.2
 
 - Fix: the profile filter on the overview did nothing. Its form posted to the ingress root without a trailing

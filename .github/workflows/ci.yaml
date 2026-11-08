@@ -31,15 +31,41 @@ jobs:
       - uses: actions/checkout@v7
       - name: Build image (same context as the Supervisor)
         run: docker build -t medstock medstock/
-      - name: Smoke test
+      - name: Load the AppArmor profile (as the Supervisor does on Home Assistant OS)
         run: |
-          docker run -d --name ms -e TZ=Europe/Brussels -e ASPNETCORE_ENVIRONMENT=Development -e MEDSTOCK_DATA_DIR=/data medstock
+          sudo apparmor_parser -r medstock/apparmor.txt
+          sudo aa-status | grep -w medstock
+      - name: Smoke test (confined by the AppArmor profile)
+        run: |
+          mkdir -p "$RUNNER_TEMP/data"
+          docker run -d --name ms --security-opt apparmor=medstock -p 8099:8099 -v "$RUNNER_TEMP/data:/data" \
+            -e TZ=Europe/Brussels -e ASPNETCORE_ENVIRONMENT=Development -e MEDSTOCK_DATA_DIR=/data medstock --demo
           for i in $(seq 1 30); do
-            if docker exec ms bash -c 'exec 3<>/dev/tcp/127.0.0.1/8099 && printf "GET /healthz HTTP/1.0\r\n\r\n" >&3 && cat <&3' 2>/dev/null | grep -q ok; then break; fi
+            curl -fsS http://127.0.0.1:8099/healthz && break
             sleep 1
           done
           docker logs ms
           docker logs ms 2>&1 | grep -q "Europe/Brussels"
-          docker exec ms bash -c 'exec 3<>/dev/tcp/127.0.0.1/8099 && printf "GET /api/hassio_ingress/dev/ HTTP/1.0\r\nAccept-Language: nl-BE\r\n\r\n" >&3 && cat <&3' | tee page.html | head -5
+          curl -fsS -H "Accept-Language: nl-BE" http://127.0.0.1:8099/api/hassio_ingress/dev/ | tee page.html | head -5
           grep -q "Overzicht" page.html
-          docker exec ms ls -la /data
+          # Exercise the other screens (database reads, fake HA client, culture data).
+          for p in Doctor Settings Settings/Profiles Medications/Archived "Medications/Details?id=1" "Medications/Edit?id=1"; do
+            curl -fsS -o /dev/null -w "%{http_code} $p\n" -H "Accept-Language: nl-BE" "http://127.0.0.1:8099/api/hassio_ingress/dev/$p"
+          done
+          # A photo upload writes /data/photos/<id>.jpg (atomic replace via a .tmp file).
+          curl -fsS -c jar -b jar -o form.html http://127.0.0.1:8099/api/hassio_ingress/dev/Medications/Details?id=1
+          token=$(grep -o 'name="__RequestVerificationToken" type="hidden" value="[^"]*"' form.html | head -1 | sed 's/.*value="//;s/"$//')
+          printf '\xff\xd8\xff\xe0testjpeg\xff\xd9' > photo.jpg
+          curl -fsS -c jar -b jar -H "RequestVerificationToken: $token" -F "photo=@photo.jpg;type=image/jpeg" \
+            -o /dev/null -w "%{http_code} photo upload\n" "http://127.0.0.1:8099/api/hassio_ingress/dev/Medications/Photo?id=1"
+          docker stop -t 8 ms
+          docker logs ms 2>&1 | tail -3
+          sudo ls -la "$RUNNER_TEMP/data" "$RUNNER_TEMP/data/photos"
+          sudo test -f "$RUNNER_TEMP/data/photos/1.jpg"
+      - name: No AppArmor denials
+        run: |
+          if sudo dmesg | grep 'apparmor="DENIED"' | grep 'profile="medstock'; then
+            echo "::error::The AppArmor profile blocked something the app needs (see above)"
+            exit 1
+          fi
+          echo "No denials."

@@ -1,0 +1,57 @@
+#include <tunables/global>
+
+# AppArmor profile for MedStock (.NET on the Ubuntu-based aspnet image).
+# The Supervisor renames the profile to the app slug when it loads it.
+# Principle: read what the runtime needs, write only /data (database, photos, keys, backups) and /tmp.
+profile medstock flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  # Kestrel on 8099, DNS and HTTP to the Supervisor proxy; netlink for .NET's network interface queries.
+  network inet stream,
+  network inet6 stream,
+  network inet dgram,
+  network inet6 dgram,
+  network netlink raw,
+  network unix,
+
+  # Docker stop (SIGTERM) and the runtime's own thread signals.
+  signal,
+
+  # Docker init (the app runs with init: true) and the .NET host.
+  /sbin/docker-init ix,
+  /usr/bin/dotnet ix,
+  /usr/share/dotnet/ r,
+  /usr/share/dotnet/** mrix,
+
+  # The published app.
+  /app/ r,
+  /app/** mr,
+
+  # Shared libraries (ICU, OpenSSL, SQLite native), configuration, time zones, certificates.
+  /lib/** mr,
+  /usr/lib/** mr,
+  /etc/** r,
+  /usr/share/** r,
+
+  # Runtime introspection (cgroup limits for the GC, CPU count, own process info).
+  /proc/** r,
+  /sys/** r,
+
+  # Devices.
+  /dev/null rw,
+  /dev/zero r,
+  /dev/random r,
+  /dev/urandom r,
+  /dev/tty rw,
+  /dev/shm/ r,
+  /dev/shm/** rwk,
+
+  # W^X double mapping of the JIT (memfd).
+  /memfd:* rwm,
+
+  # Writable: temp files and the app data folder (SQLite needs locks).
+  /tmp/ rw,
+  /tmp/** rwk,
+  /data/ rw,
+  /data/** rwk,
+}
