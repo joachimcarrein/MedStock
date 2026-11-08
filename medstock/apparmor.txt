@@ -3,6 +3,7 @@
 # AppArmor profile for MedStock (.NET on the Ubuntu-based aspnet image).
 # The Supervisor renames the profile to the app slug when it loads it.
 # Principle: read what the runtime needs, write only /data (database, photos, keys, backups) and /tmp.
+# .NET takes a shared lock (k) when it opens files for reading, so read-only paths also get k (a lock grants no write access).
 profile medstock flags=(attach_disconnected,mediate_deleted) {
   #include <abstractions/base>
 
@@ -21,22 +22,22 @@ profile medstock flags=(attach_disconnected,mediate_deleted) {
   /sbin/docker-init ix,
   /usr/bin/dotnet ix,
   /usr/share/dotnet/ r,
-  /usr/share/dotnet/** mrix,
+  /usr/share/dotnet/** mrixk,
 
   # The published app (configuration files are read with a shared lock).
   /app/ r,
   /app/** mrk,
 
   # Shared libraries (ICU, OpenSSL, SQLite native), configuration, time zones, certificates.
-  /lib/** mr,
-  /usr/lib/** mr,
-  /etc/** r,
-  /usr/share/** r,
+  /lib/** mrk,
+  /usr/lib/** mrk,
+  /etc/** rk,
+  /usr/share/** rk,
 
   # Runtime introspection (cgroup limits for the GC, CPU count, own process info); .NET names its threads.
-  /proc/** r,
+  /proc/** rk,
   owner /proc/*/task/*/comm rw,
-  /sys/** r,
+  /sys/** rk,
 
   # Devices.
   /dev/null rw,
