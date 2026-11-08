@@ -12,7 +12,7 @@ namespace MedStock.Web.Pages.Settings;
 
 /// <summary>Settings (§3.7): per HA user (devices, profiles, language, test) and global (one row).</summary>
 public class IndexModel(
-    MedStockDb db, CurrentUser user, AppMode mode, IHaClient ha, IMemoryCache cache, NotificationService notifications,
+    MedStockDb db, CurrentUser user, AppMode mode, IHaClient ha, IMemoryCache cache, NotificationService notifications, SensorSignal sensors, SensorStatus sensorStatus,
     IStringLocalizer<SharedResource> l, ILogger<IndexModel> log) : PageModel
 {
     public UserSettings Mine { get; private set; } = new();
@@ -30,6 +30,7 @@ public class IndexModel(
     public string? GlobalMessage { get; private set; }
     public string? GlobalError { get; private set; }
     public RunReport? Report { get; private set; }
+    public SensorStatus Sensors => sensorStatus;
 
     public static bool IsMobile(string service) => service.StartsWith("notify.mobile_app_", StringComparison.Ordinal);
 
@@ -86,7 +87,7 @@ public class IndexModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostGlobalAsync(int? coverageDays, int? defaultAlertDays, string? notificationTime)
+    public async Task<IActionResult> OnPostGlobalAsync(int? coverageDays, int? defaultAlertDays, string? notificationTime, bool sensorsEnabled)
     {
         if (coverageDays is not (>= 0 and <= 3650) || defaultAlertDays is not (>= 0 and <= 3650)
             || !TimeOnly.TryParse(notificationTime, System.Globalization.CultureInfo.InvariantCulture, out var time))
@@ -100,7 +101,9 @@ public class IndexModel(
         g.CoverageDays = coverageDays.Value;
         g.DefaultAlertDays = defaultAlertDays.Value;
         g.NotificationTime = new TimeOnly(time.Hour, time.Minute);
+        g.SensorsEnabled = sensorsEnabled;
         await db.SaveChangesAsync();
+        sensors.Request();
         log.LogInformation("Global settings saved");
         return RedirectToPage(new { saved = "global" });
     }

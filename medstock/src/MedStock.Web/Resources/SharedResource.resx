@@ -187,4 +187,9 @@
   <data name="Doctor_Text" xml:space="preserve"><value>Text for the doctor</value></data>
   <data name="Doctor_Share" xml:space="preserve"><value>Share</value></data>
   <data name="Doctor_Copied" xml:space="preserve"><value>Copied</value></data>
+  <data name="Settings_Sensors" xml:space="preserve"><value>Show the days remaining as sensors in Home Assistant (MQTT)</value></data>
+  <data name="Settings_Sensors_Privacy" xml:space="preserve"><value>Medication and profile names then appear in Home Assistant: in history, the logbook and dashboards, for every Home Assistant user.</value></data>
+  <data name="Settings_Sensors_NoBroker" xml:space="preserve"><value>No MQTT broker found. Install and start the Mosquitto broker app.</value></data>
+  <data name="Settings_Sensors_ConnectFailed" xml:space="preserve"><value>Could not connect to the MQTT broker; retrying.</value></data>
+  <data name="Settings_Sensors_Status" xml:space="preserve"><value>{0} sensors published at {1}</value></data>
 </root>

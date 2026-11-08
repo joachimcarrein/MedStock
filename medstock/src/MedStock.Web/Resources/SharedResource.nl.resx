@@ -187,4 +187,9 @@
   <data name="Doctor_Text" xml:space="preserve"><value>Tekst voor de dokter</value></data>
   <data name="Doctor_Share" xml:space="preserve"><value>Delen</value></data>
   <data name="Doctor_Copied" xml:space="preserve"><value>Gekopieerd</value></data>
+  <data name="Settings_Sensors" xml:space="preserve"><value>Dagen resterend als sensoren in Home Assistant tonen (MQTT)</value></data>
+  <data name="Settings_Sensors_Privacy" xml:space="preserve"><value>Medicatie- en profielnamen komen dan in Home Assistant terecht: in de geschiedenis, het logboek en dashboards, voor elke Home Assistant-gebruiker.</value></data>
+  <data name="Settings_Sensors_NoBroker" xml:space="preserve"><value>Geen MQTT-broker gevonden. Installeer en start de app Mosquitto broker.</value></data>
+  <data name="Settings_Sensors_ConnectFailed" xml:space="preserve"><value>Kon niet verbinden met de MQTT-broker; nieuwe poging volgt.</value></data>
+  <data name="Settings_Sensors_Status" xml:space="preserve"><value>{0} sensoren gepubliceerd om {1}</value></data>
 </root>

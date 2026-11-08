@@ -34,6 +34,12 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<TimeOnly>("NotificationTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PublishedSensorIds")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("SensorsEnabled")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("WrittenByVersion")
                         .IsRequired()
                         .HasMaxLength(50)

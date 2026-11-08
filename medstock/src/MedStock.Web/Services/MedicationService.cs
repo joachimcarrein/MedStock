@@ -15,7 +15,8 @@ public sealed class InvalidPhotoException() : Exception("Only JPEG or PNG images
 /// Every change to stock goes through here: one process-wide lock, the current remaining stock is recalculated
 /// inside the lock and a new snapshot is written (§3.1).
 /// </summary>
-public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser user, AppPaths paths, ILogger<MedicationService> log)
+public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser user, AppPaths paths, SensorSignal sensors,
+    ILogger<MedicationService> log)
 {
     private static readonly SemaphoreSlim Gate = new(1, 1);
     public const long MaxPhotoBytes = 8_000_000;
@@ -47,6 +48,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
             m.Snapshots.Add(NewSnapshot(0, today, CountedUnits(m, openUnits, sealedPackages, takenToday, today), SnapshotReason.Initial));
             db.Medications.Add(m);
             await db.SaveChangesAsync();
+            sensors.Request();
             log.LogInformation("Medication {MedicationId} created in profile {ProfileId}", m.Id, m.ProfileId);
             return m.Id;
         }
@@ -74,6 +76,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
                 db.Snapshots.Add(NewSnapshot(m.Id, clock.Today, StockCalculator.Remaining(before, clock.Today), SnapshotReason.DoseChange));
             }
             await db.SaveChangesAsync();
+            sensors.Request();
             log.LogInformation("Medication {MedicationId} updated (usage changed: {UsageChanged})", id, usageChanged);
         }
         finally { Gate.Release(); }
@@ -94,6 +97,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
             if (latest.Id != expectedSnapshotId) throw new StaleSnapshotException();
             db.Snapshots.Add(NewSnapshot(m.Id, clock.Today, CountedUnits(m, openUnits, sealedPackages, takenToday, clock.Today), SnapshotReason.Recount));
             await db.SaveChangesAsync();
+            sensors.Request();
             log.LogInformation("Medication {MedicationId} recounted", id);
         }
         finally { Gate.Release(); }
@@ -111,6 +115,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
                 paused ? SnapshotReason.Pause : SnapshotReason.Resume));
             m.Paused = paused;
             await db.SaveChangesAsync();
+            sensors.Request();
             log.LogInformation("Medication {MedicationId} paused: {Paused}", id, paused);
         }
         finally { Gate.Release(); }
@@ -122,6 +127,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
         var m = await db.Medications.FindAsync(id) ?? throw new KeyNotFoundException();
         m.Archived = archived;
         await db.SaveChangesAsync();
+        sensors.Request();
         log.LogInformation("Medication {MedicationId} archived: {Archived}", id, archived);
     }
 
@@ -135,6 +141,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
             db.NotificationLogs.RemoveRange(db.NotificationLogs.Where(n => n.MedicationId == id));
             db.Medications.Remove(m); // snapshots cascade
             await db.SaveChangesAsync();
+            sensors.Request();
             File.Delete(paths.PhotoPath(id));
             log.LogInformation("Medication {MedicationId} deleted permanently", id);
         }
@@ -159,6 +166,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
         File.Move(tmp, target, overwrite: true);
         m.HasPhoto = true;
         await db.SaveChangesAsync();
+        sensors.Request();
         log.LogInformation("Photo stored for medication {MedicationId} ({Bytes} bytes)", id, bytes.Length);
     }
 
@@ -168,6 +176,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
         File.Delete(paths.PhotoPath(id));
         m.HasPhoto = false;
         await db.SaveChangesAsync();
+        sensors.Request();
     }
 
     private async Task RelativeAsync(int id, SnapshotReason reason, Func<Medication, decimal, decimal> next, int amount)
@@ -179,6 +188,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
             var remaining = StockCalculator.Remaining(StockInput.From(m, latest), clock.Today);
             db.Snapshots.Add(NewSnapshot(m.Id, clock.Today, next(m, remaining), reason));
             await db.SaveChangesAsync();
+            sensors.Request();
             log.LogInformation("Medication {MedicationId}: {Reason} {Amount}", id, reason, amount);
         }
         finally { Gate.Release(); }
@@ -193,7 +203,11 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
 
     private Snapshot NewSnapshot(int medicationId, DateOnly date, decimal units, SnapshotReason reason) => new()
     {
-        MedicationId = medicationId, Date = date, TotalUnits = units, Reason = reason,
-        CreatedAt = DateTime.UtcNow, CreatedByUserId = user.Id,
+        MedicationId = medicationId,
+        Date = date,
+        TotalUnits = units,
+        Reason = reason,
+        CreatedAt = DateTime.UtcNow,
+        CreatedByUserId = user.Id,
     };
 }

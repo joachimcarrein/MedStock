@@ -116,6 +116,25 @@
         <label>@L["CoverageDays"] <input type="number" name="coverageDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.CoverageDays" required /></label>
         <label>@L["Settings_DefaultAlertDays"] <input type="number" name="defaultAlertDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.DefaultAlertDays" required /></label>
         <label>@L["Settings_NotificationTime"] <input type="time" name="notificationTime" value="@Model.Global.NotificationTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)" required /></label>
+        <fieldset>
+            <label class="inline"><input type="checkbox" name="sensorsEnabled" value="true" checked="@Model.Global.SensorsEnabled" /> @L["Settings_Sensors"]</label>
+            <p class="small muted">@L["Settings_Sensors_Privacy"]</p>
+            @if (Model.Global.SensorsEnabled)
+            {
+                @if (Model.Sensors.Problem == "no-broker")
+                {
+                    <p class="error small">@L["Settings_Sensors_NoBroker"]</p>
+                }
+                else if (Model.Sensors.Problem == "connect-failed")
+                {
+                    <p class="error small">@L["Settings_Sensors_ConnectFailed"]</p>
+                }
+                else if (Model.Sensors.LastPublishedAt is { } at)
+                {
+                    <p class="small ok">@L["Settings_Sensors_Status", Model.Sensors.Count, at.ToString("t", System.Globalization.CultureInfo.CurrentUICulture)]</p>
+                }
+            }
+        </fieldset>
         <button type="submit">@L["Save"]</button>
     </form>
     <form method="post" asp-page-handler="Run" hx-disabled-elt="find button">

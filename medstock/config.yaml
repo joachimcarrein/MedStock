@@ -14,6 +14,8 @@ panel_icon: mdi:pill
 panel_title: MedStock
 panel_admin: false
 homeassistant_api: true
+services:
+  - mqtt:want                 # broker credentials for the optional sensors (MQTT discovery)
 backup: cold
 options:
   log_level: info

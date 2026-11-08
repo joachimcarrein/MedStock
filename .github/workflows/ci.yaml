@@ -16,8 +16,12 @@ jobs:
       - name: Restore tools
         working-directory: medstock/src
         run: dotnet tool restore
+      - name: Start an MQTT broker for the integration test
+        run: docker run -d -p 1883:1883 eclipse-mosquitto:2.0.20 mosquitto -c /mosquitto-no-auth.conf
       - name: Test
         working-directory: medstock/src
+        env:
+          MEDSTOCK_TEST_MQTT: 127.0.0.1:1883
         run: dotnet test MedStock.sln -c Release
       - name: No pending model changes
         working-directory: medstock/src

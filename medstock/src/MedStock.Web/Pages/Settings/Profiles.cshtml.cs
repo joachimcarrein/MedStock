@@ -7,7 +7,7 @@ using Microsoft.Extensions.Localization;
 
 namespace MedStock.Web.Pages.Settings;
 
-public class ProfilesModel(MedStockDb db, IStringLocalizer<SharedResource> l, ILogger<ProfilesModel> log) : PageModel
+public class ProfilesModel(MedStockDb db, IStringLocalizer<SharedResource> l, Services.SensorSignal sensors, ILogger<ProfilesModel> log) : PageModel
 {
     public static readonly string[] Palette =
         ["#1e88e5", "#d81b60", "#43a047", "#fb8c00", "#8e24aa", "#00897b", "#6d4c41", "#546e7a"];
@@ -52,6 +52,7 @@ public class ProfilesModel(MedStockDb db, IStringLocalizer<SharedResource> l, IL
         if (Palette.Contains(color)) profile.Color = color!;
         profile.CoverageDays = ParseDays(coverageDays);
         await db.SaveChangesAsync();
+        sensors.Request(); // sensor names include the profile
         return RedirectToPage();
     }
 

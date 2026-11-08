@@ -96,4 +96,8 @@ public class GlobalSettings
     public TimeOnly NotificationTime { get; set; } = new(9, 0);
     public DateTime? LastRunAt { get; set; }
     public string WrittenByVersion { get; set; } = "";
+    /// <summary>Opt-in: publish a "days remaining" sensor per medication to Home Assistant via MQTT discovery.</summary>
+    public bool SensorsEnabled { get; set; }
+    /// <summary>Medication ids that currently have a retained discovery config (comma separated), so removed ones get cleaned up.</summary>
+    public string? PublishedSensorIds { get; set; }
 }

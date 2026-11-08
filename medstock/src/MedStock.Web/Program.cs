@@ -43,6 +43,11 @@ builder.Services.AddSingleton<NotificationState>();
 builder.Services.AddHostedService<NotificationWorker>();
 builder.Services.AddScoped<NotificationActionHandler>();
 if (addonMode) builder.Services.AddHostedService<HaEventListener>();
+builder.Services.AddSingleton<SensorSignal>();
+builder.Services.AddSingleton<SensorStatus>();
+builder.Services.AddScoped<SensorSync>();
+builder.Services.AddSingleton<Func<IMqttConnection>>(() => new MqttNetConnection());
+builder.Services.AddHostedService<SensorWorker>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<MedStockDb>(o => o.UseSqlite($"Data Source={paths.DbPath}"));

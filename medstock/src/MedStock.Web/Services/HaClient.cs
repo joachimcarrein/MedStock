@@ -20,7 +20,12 @@ public interface IHaClient
 
     /// <summary>The full add-on slug including the repository prefix (e.g. "a1b2c3d4_medstock").</summary>
     Task<string?> GetSelfSlugAsync(CancellationToken ct = default);
+
+    /// <summary>MQTT broker credentials from the Supervisor (services: mqtt:want); null when no broker is available.</summary>
+    Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default);
 }
+
+public sealed record MqttBroker(string Host, int Port, bool Ssl, string? Username, string? Password);
 
 public sealed class HaUnavailableException(string message, Exception? inner = null) : Exception(message, inner);
 
@@ -88,7 +93,30 @@ public sealed class HaClient(HttpClient http, ILogger<HaClient> logger) : IHaCli
             return null;
         }
     }
+    public async Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var resp = await http.GetAsync("http://supervisor/services/mqtt", ct);
+            if (!resp.IsSuccessStatusCode)
+            {
+                logger.LogInformation("No MQTT service available from the Supervisor ({Status})", (int)resp.StatusCode);
+                return null;
+            }
+            var d = (await resp.Content.ReadFromJsonAsync<JsonObject>(ct))?["data"];
+            var host = (string?)d?["host"];
+            if (string.IsNullOrEmpty(host)) return null;
+            return new MqttBroker(host, (int?)d?["port"] ?? 1883, (bool?)d?["ssl"] ?? false, (string?)d?["username"], (string?)d?["password"]);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or InvalidOperationException or FormatException)
+        {
+            logger.LogWarning("Could not read the MQTT service: {Error}", ex.GetType().Name);
+            return null;
+        }
+    }
 }
+
+
 
 /// <summary>Development stand-in: two fake phones, payloads are logged.</summary>
 public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
@@ -118,4 +146,7 @@ public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
     }
 
     public Task<string?> GetSelfSlugAsync(CancellationToken ct = default) => Task.FromResult<string?>("local_medstock");
+
+    public MqttBroker? Broker { get; set; }
+    public Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default) => Task.FromResult(Broker);
 }
