@@ -20,7 +20,7 @@ The UI is available in English and Dutch.
 
 1. Click the badge above, or go to **Settings › Apps › App store › ⋮ › Repositories** and add
    `https://github.com/joachimcarrein/MedStock`.
-2. Install **MedStock**. The first installation builds the app locally and can take 5–20 minutes.
+2. Install **MedStock** (a prebuilt image for amd64 or aarch64 is downloaded).
 3. Start it and enable **Show in sidebar**.
 
 See [DOCS.md](medstock/DOCS.md) for the full documentation.
