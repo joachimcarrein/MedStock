@@ -1,0 +1,11 @@
+name: Feature request
+description: An idea to make MedStock more useful
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: Describe the situation and what is missing today.
+    validations:
+      required: true

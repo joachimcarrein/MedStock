@@ -53,6 +53,10 @@ In development the app uses a fake Home Assistant client, a local SQLite databas
 `%LOCALAPPDATA%\MedStock\dev` (or `$MEDSTOCK_DATA_DIR`) and the user `dev`.
 Add `--demo` to seed fictional demo data.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security problems: see [SECURITY.md](SECURITY.md).
+
 ## License
 
 MIT

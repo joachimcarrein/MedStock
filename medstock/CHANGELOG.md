@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- No changes in the app: new release process and contribution guidelines for the repository.
+
 ## 1.2.1
 
 - To-do list: medication that is already low when you choose the list is added at the next daily check (once per

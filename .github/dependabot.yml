@@ -1,0 +1,21 @@
+# Weekly update pull requests for NuGet packages, GitHub Actions (pinned by SHA) and the Docker base images.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /medstock/src
+    schedule:
+      interval: weekly
+    groups:
+      nuget:
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: /medstock
+    schedule:
+      interval: weekly

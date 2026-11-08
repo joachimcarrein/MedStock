@@ -1,0 +1,153 @@
+# One-click release (Actions › Release › Run workflow, or `gh workflow run release.yaml -f version=1.2.3`).
+# Only people with write access can start it. Order matters: Home Assistant offers an update as soon as main has a
+# new version, so main is only updated after the image exists and can be pulled anonymously.
+#   1. prepare  bump version (config.yaml, csproj), turn "## Unreleased" in CHANGELOG.md into "## <version>",
+#               commit it on branch release/<version>
+#   2. test     run the tests on that commit
+#   3. build    build, sign and publish the images (build.yaml)
+#   4. publish  check the manifest anonymously, fast-forward main (via the RELEASE_DEPLOY_KEY deploy key, the only
+#               bypass of the main rulesets), tag, create the GitHub release
+# If any step fails, main is untouched; delete the release/<version> branch and run it again.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: New version (e.g. 1.2.3)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare release/${{ inputs.version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the release branch
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Validate the version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Version must look like 1.2.3"; exit 1
+          fi
+          current=$(sed -n 's/^version: *"\{0,1\}\([^"]*\)"\{0,1\}$/\1/p' medstock/config.yaml)
+          highest=$(printf '%s\n%s\n' "$current" "$VERSION" | sort -V | tail -1)
+          if [ "$VERSION" = "$current" ] || [ "$highest" != "$VERSION" ]; then
+            echo "::error::$VERSION must be higher than the current version $current"; exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null; then
+            echo "::error::Tag $VERSION already exists"; exit 1
+          fi
+          if ! grep -q '^## Unreleased' medstock/CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## Unreleased' section"; exit 1
+          fi
+          entries=$(awk '/^## Unreleased/{f=1;next} /^## /{f=0} f' medstock/CHANGELOG.md | grep -c '^- ' || true)
+          if [ "$entries" -eq 0 ]; then
+            echo "::error::The '## Unreleased' section of CHANGELOG.md is empty"; exit 1
+          fi
+
+      - name: Bump version and changelog
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          sed -i "s/^version: .*/version: \"$VERSION\"/" medstock/config.yaml
+          sed -i "s#<Version>[^<]*</Version>#<Version>$VERSION</Version>#" medstock/src/MedStock.Web/MedStock.Web.csproj
+          sed -i "0,/^## Unreleased/s//## Unreleased\n\n## $VERSION/" medstock/CHANGELOG.md
+          git diff --stat
+
+      - name: Commit on release/${{ inputs.version }}
+        id: commit
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "release/$VERSION"
+          git commit -am "release: $VERSION"
+          git push origin "release/$VERSION"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test the release commit
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Test
+        working-directory: medstock/src
+        run: dotnet test MedStock.sln -c Release
+
+  build:
+    name: Build images
+    needs: [prepare, test]
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    uses: ./.github/workflows/build.yaml
+    with:
+      version: ${{ inputs.version }}
+      ref: ${{ needs.prepare.outputs.sha }}
+
+  publish:
+    name: Publish ${{ inputs.version }}
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # update main, tag, release
+    steps:
+      - name: The image can be pulled anonymously
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          token=$(curl -fsS "https://ghcr.io/token?scope=repository:${GITHUB_REPOSITORY_OWNER}/medstock:pull" | jq -r .token)
+          curl -fsS -o manifest.json -H "Authorization: Bearer $token" \
+            -H "Accept: application/vnd.oci.image.index.v1+json" \
+            "https://ghcr.io/v2/${GITHUB_REPOSITORY_OWNER}/medstock/manifests/$VERSION"
+          jq -r '.manifests[].platform.architecture' manifest.json | sort -u | tee archs.txt
+          grep -qx amd64 archs.txt && grep -qx arm64 archs.txt
+
+      # main is protected (pull requests + required checks); the release deploy key is the only bypass.
+      # Repository secrets are never available to workflows triggered from forks.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
+
+      - name: Fast-forward main, tag and release
+        env:
+          VERSION: ${{ inputs.version }}
+          SHA: ${{ needs.prepare.outputs.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main "$SHA"; then
+            echo "::error::main moved on while releasing; merge main into release/$VERSION or run the release again"; exit 1
+          fi
+          git push origin "$SHA:refs/heads/main"
+          git tag "$VERSION" "$SHA"
+          git push origin "refs/tags/$VERSION"
+          notes=$(awk -v v="## $VERSION" '$0==v{f=1;next} /^## /{f=0} f' medstock/CHANGELOG.md | sed '/^$/d')
+          gh release create "$VERSION" --title "$VERSION" --notes "$notes" --verify-tag
+          git push origin --delete "release/$VERSION"
