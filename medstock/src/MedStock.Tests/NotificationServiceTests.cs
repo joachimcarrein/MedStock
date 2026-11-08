@@ -212,7 +212,7 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task Low_medication_is_put_on_the_chosen_todo_list_once_per_cycle()
+    public async Task Low_medication_is_put_on_the_chosen_todo_list_without_duplicates()
     {
         using var e = new Env();
         var list = e.F.Ha.Todo["todo.shopping_list"];
@@ -229,9 +229,14 @@ public class NotificationServiceTests
         await e.RunAsync();
         Assert.Equal(["Nasalix (Husband)"], list);
 
-        e.Day(13); // 7-day level: same cycle, no second item
+        e.Day(13); // 7-day level: still open on the list, no duplicate
         await e.RunAsync();
         Assert.Single(list);
+
+        list.Clear(); // checked off while still low
+        e.Day(17); // 3-day level
+        await e.RunAsync();
+        Assert.Equal(["Nasalix (Husband)"], list);
     }
 
     [Fact]

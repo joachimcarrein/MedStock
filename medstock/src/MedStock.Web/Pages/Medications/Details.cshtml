@@ -36,6 +36,34 @@
             <div class="small"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name</div>
             <span class="badge @r.ColorClass"><partial name="_StateIcon" model="r.Stock.State" />@r.Badge(ui)</span>
         </div>
+        <div class="head-actions">
+            <a href="@Url.Page("/Medications/Edit", new { id = m.Id })" class="icon-btn" aria-label="@L["Edit"]" title="@L["Edit"]">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </a>
+            <form method="post" asp-page-handler="Pause" asp-route-id="@m.Id" hx-disabled-elt="find button">
+                <input type="hidden" name="expectedSnapshotId" value="@r.Snapshot.Id" />
+                <input type="hidden" name="paused" value="@(m.Paused ? "false" : "true")" />
+                @{ var pauseLabel = m.Paused ? L["Action_Resume"] : L["Action_Pause"]; }
+                <button type="submit" class="icon-btn" aria-label="@pauseLabel" title="@pauseLabel">
+                    @if (m.Paused)
+                    {
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                    }
+                    else
+                    {
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    }
+                </button>
+            </form>
+            <details class="icon-confirm">
+                <summary class="icon-btn danger-icon" aria-label="@L["Action_Archive"]" title="@L["Action_Archive"]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5 6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+                </summary>
+                <form method="post" asp-page-handler="Archive" asp-route-id="@m.Id">
+                    <button type="submit" class="danger">@L["Archive_Confirm"]</button>
+                </form>
+            </details>
+        </div>
     </div>
 
     <p class="big-quantity">@Texts.Quantity(m.Type, r.Stock, ui)</p>
@@ -90,14 +118,6 @@
         </form>
     </details>
 
-    <div class="actions">
-        <form method="post" asp-page-handler="Pause" asp-route-id="@m.Id" hx-disabled-elt="find button">
-            <input type="hidden" name="expectedSnapshotId" value="@r.Snapshot.Id" />
-            <input type="hidden" name="paused" value="@(m.Paused ? "false" : "true")" />
-            <button type="submit" class="secondary">@(m.Paused ? L["Action_Resume"] : L["Action_Pause"])</button>
-        </form>
-        <a href="@Url.Page("/Medications/Edit", new { id = m.Id })" role="button" class="secondary">@L["Edit"]</a>
-    </div>
 
     <p class="small muted">@L["Detail_LastCount", Texts.LongDate(r.Snapshot.Date, ui)]</p>
 
@@ -119,12 +139,6 @@
         }
     </section>
 
-    <details class="confirm archive">
-        <summary role="button" class="secondary outline">@L["Action_Archive"]</summary>
-        <form method="post" asp-page-handler="Archive" asp-route-id="@m.Id">
-            <button type="submit" class="danger">@L["Archive_Confirm"]</button>
-        </form>
-    </details>
 </div>
 
 @section Scripts {

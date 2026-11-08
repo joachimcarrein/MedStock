@@ -178,3 +178,26 @@ button.outline, [role=button].outline, summary[role=button].outline { background
 details.archive summary[role=button] { width: auto; }
 nav.chips { justify-content: flex-start; }
 .chips form { margin: 0; flex: none; }
+/* Detail header: name/icon left, actions (edit, pause/resume, archive) right */
+.detail-head > div:not(.thumb):not(.head-actions) { flex: 1; min-width: 0; }
+.head-actions { display: flex; flex-direction: column; gap: 0.35rem; align-items: flex-end; flex: none; position: relative; }
+.head-actions form { margin: 0; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem; padding: 0; margin: 0;
+  border-radius: 50%; border: 1px solid var(--pico-muted-border-color); background: transparent; color: var(--pico-color); cursor: pointer;
+}
+.icon-btn svg { width: 1.3rem; height: 1.3rem; }
+.icon-btn.danger-icon { color: var(--ms-red); border-color: var(--ms-red); }
+details.icon-confirm { margin: 0; }
+details.icon-confirm > summary { list-style: none; }
+details.icon-confirm > summary::-webkit-details-marker { display: none; }
+details.icon-confirm > summary::after { display: none; }
+details.icon-confirm > form { position: absolute; right: 0; top: 100%; z-index: 5; margin-top: 0.35rem; width: max-content; }
+details.icon-confirm > form button { margin: 0; }
+/* Titles must not lose their descenders (g, y, p) */
+.subheader h1 { line-height: 1.35; padding-bottom: 0.1em; }
+.card .name { line-height: 1.35; padding-bottom: 0.05em; }
+.head-actions form, .head-actions .icon-btn, .head-actions button.icon-btn { width: 2.4rem; min-width: 2.4rem; height: 2.4rem; flex: none; }
+.head-actions button.icon-btn { background: transparent; color: var(--pico-color); border: 1px solid var(--pico-muted-border-color); padding: 0; box-shadow: none; }
+details.icon-confirm > summary, details.icon-confirm[open] > summary { margin: 0; }
+.head-actions button.icon-btn { color: var(--pico-primary) !important; background: transparent !important; }

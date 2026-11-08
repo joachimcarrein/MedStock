@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+- Detail screen: edit, pause/resume and archive are now icon buttons next to the name.
+- Titles no longer lose the bottom of letters such as g and y.
+- To-do list: every alert puts the medication on the list when it is not open there yet (also after you checked it
+  off while the stock is still low).
+
 ## 1.0.0
 
 - Prebuilt, signed images for amd64 and aarch64: installing and updating takes seconds instead of a local build.
