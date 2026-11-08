@@ -104,7 +104,10 @@ public class IndexModel(
         g.DefaultAlertDays = defaultAlertDays.Value;
         g.NotificationTime = new TimeOnly(time.Hour, time.Minute);
         g.SensorsEnabled = sensorsEnabled;
-        g.TodoEntityId = todoEntityId is { Length: > 5 and <= 255 } && todoEntityId.StartsWith("todo.", StringComparison.Ordinal) ? todoEntityId : null;
+        var todo = todoEntityId is { Length: > 5 and <= 255 } && todoEntityId.StartsWith("todo.", StringComparison.Ordinal) ? todoEntityId : null;
+        if (todo != g.TodoEntityId) // another list: medication that is low now goes on it at the next check
+            db.NotificationLogs.RemoveRange(db.NotificationLogs.Where(l => l.Level == NotificationService.TodoMarkerLevel));
+        g.TodoEntityId = todo;
         await db.SaveChangesAsync();
         sensors.Request();
         log.LogInformation("Global settings saved");

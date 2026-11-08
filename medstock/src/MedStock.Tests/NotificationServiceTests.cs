@@ -240,6 +240,43 @@ public class NotificationServiceTests
     }
 
     [Fact]
+    public async Task Medication_that_was_already_alerted_goes_on_a_newly_chosen_list_once()
+    {
+        using var e = new Env();
+        e.F.Ha.Todo["todo.other"] = [];
+        var list = e.F.Ha.Todo["todo.shopping_list"];
+        e.Day(6);
+        await e.RunAsync(); // 14-day alert sent, no list chosen yet
+        Assert.Single(e.F.Ha.Sent);
+
+        e.F.WithDb(db =>
+        {
+            db.GlobalSettings.Single().TodoEntityId = "todo.shopping_list";
+            return db.SaveChanges();
+        });
+        e.Day(7);
+        var report = await e.RunAsync(); // no new alert, but it is low: on the list
+        Assert.Single(e.F.Ha.Sent);
+        Assert.Equal(["Nasalix (Husband)"], list);
+        Assert.Contains(report.Lines, l => l.Contains("added to the to-do list"));
+
+        list.Clear(); // checked off: not back every day, only at the next alert
+        e.Day(8);
+        await e.RunAsync();
+        Assert.Empty(list);
+
+        // Another list chosen in Settings: the markers are reset there; simulate the same here.
+        e.F.WithDb(db =>
+        {
+            db.GlobalSettings.Single().TodoEntityId = "todo.other";
+            db.NotificationLogs.RemoveRange(db.NotificationLogs.Where(l => l.Level == NotificationService.TodoMarkerLevel));
+            return db.SaveChanges();
+        });
+        await e.RunAsync();
+        Assert.Equal(["Nasalix (Husband)"], e.F.Ha.Todo["todo.other"]);
+    }
+
+    [Fact]
     public async Task Logs_of_a_run_contain_no_medication_or_profile_names()
     {
         using var e = new Env(services: [Phone, "notify.mobile_app_gone"]);

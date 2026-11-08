@@ -24,6 +24,8 @@ public sealed class NotificationState
 public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock clock, NotificationState state, ILogger<NotificationService> log)
 {
     public const int MaxFailedTicks = 30;
+    /// <summary>NotificationLog level meaning "put on the to-do list in this cycle" (never an alert level).</summary>
+    public const int TodoMarkerLevel = -100;
     public static readonly TimeSpan WarningInterval = TimeSpan.FromMinutes(15);
 
     /// <summary>Called every minute by the worker: runs when due, and handles transport failures (retry next tick).</summary>
@@ -83,8 +85,26 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
             var alertDays = m.AlertDays ?? global.DefaultAlertDays;
             var active = NotificationRules.ActiveLevels(m.UsageMode, row.Stock, m.MinStockUnits, alertDays);
             var logged = logs[m.Id].Select(l => l.Level).ToList();
+            var decision = NotificationRules.Decide(active, logged);
 
-            switch (NotificationRules.Decide(active, logged))
+            // To-do list: every alert, and once per cycle for medication that is already low (e.g. when the list was
+            // chosen after its alert was sent). Skipped when the item is still open on the list; the marker row is
+            // removed with the other log rows when the stock is sufficient again, or when another list is chosen.
+            if (!string.IsNullOrEmpty(global.TodoEntityId) && active.Count > 0
+                && (decision is NotificationDecision.Send || !logged.Contains(TodoMarkerLevel)))
+            {
+                var item = string.IsNullOrWhiteSpace(m.Strength) ? $"{m.Name} ({row.Profile.Name})" : $"{m.Name} {m.Strength} ({row.Profile.Name})";
+                var added = await ha.AddTodoItemIfMissingAsync(global.TodoEntityId, item, ct);
+                log.LogInformation("Medication {MedicationId}: to-do item {Result}", m.Id, added ? "ensured" : "failed");
+                if (added && !logged.Contains(TodoMarkerLevel))
+                {
+                    db.NotificationLogs.Add(new NotificationLog { MedicationId = m.Id, Level = TodoMarkerLevel, SentAt = DateTime.UtcNow });
+                    logged.Add(TodoMarkerLevel);
+                }
+                if (decision is not NotificationDecision.Send) lines.Add($"{m.Name} ({row.Profile.Name}): added to the to-do list");
+            }
+
+            switch (decision)
             {
                 case NotificationDecision.ClearLog:
                     db.NotificationLogs.RemoveRange(logs[m.Id]);
@@ -93,14 +113,6 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
                     break;
 
                 case NotificationDecision.Send send:
-                    // Every alert puts it on the to-do list unless it is still open there (checked off while still low →
-                    // back on the list at the next level).
-                    if (!string.IsNullOrEmpty(global.TodoEntityId))
-                    {
-                        var item = string.IsNullOrWhiteSpace(m.Strength) ? $"{m.Name} ({row.Profile.Name})" : $"{m.Name} {m.Strength} ({row.Profile.Name})";
-                        var added = await ha.AddTodoItemIfMissingAsync(global.TodoEntityId, item, ct);
-                        log.LogInformation("Medication {MedicationId}: to-do item {Result}", m.Id, added ? "ensured" : "failed");
-                    }
                     var recipients = NotificationRules.Recipients(users, m.ProfileId).ToList();
                     if (recipients.Count == 0)
                     {

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1
+
+- To-do list: medication that is already low when you choose the list is added at the next daily check (once per
+  cycle), not only at its next notification step.
+- Documentation rewritten: getting started with usage examples, colours and badges, sensors, privacy overview and
+  troubleshooting.
+
 ## 1.2.0
 
 - Picture search: second source DailyMed (US National Library of Medicine) with official packaging and label pictures.
