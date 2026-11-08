@@ -31,6 +31,8 @@ public class WebFactory : WebApplicationFactory<Program>
             s.RemoveAll<IHaClient>();
             s.AddSingleton<IHaClient>(Ha);
             s.AddSingleton(Ha);
+            s.RemoveAll<IImageSearch>();
+            s.AddSingleton<IImageSearch>(new FakeImageSearch()); // never call Wikimedia from tests
             s.RemoveAll<IClock>();
             s.AddSingleton<IClock>(Clock);
             s.AddSingleton<IStartupFilter, RemoteIpStartupFilter>();

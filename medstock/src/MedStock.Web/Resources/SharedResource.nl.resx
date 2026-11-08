@@ -195,4 +195,16 @@
   <data name="Settings_Todo" xml:space="preserve"><value>Medicatie die bijna op is op deze to-do-lijst zetten</value></data>
   <data name="Settings_Todo_None" xml:space="preserve"><value>(geen)</value></data>
   <data name="Settings_Todo_Hint" xml:space="preserve"><value>Nog geen to-do-lijsten in Home Assistant. Voeg de integratie "Local To-do" (of de boodschappenlijst) toe om dit te gebruiken.</value></data>
+  <data name="Export_Link" xml:space="preserve"><value>Gegevens exporteren (JSON)</value></data>
+  <data name="Export_Help" xml:space="preserve"><value>Profielen, medicatie met hun huidige voorraad en de algemene instellingen. Zonder foto's en persoonlijke meldingsinstellingen.</value></data>
+  <data name="ImageSearch_Link" xml:space="preserve"><value>Afbeelding zoeken op naam (internet)</value></data>
+  <data name="ImageSearch_Title" xml:space="preserve"><value>Afbeelding zoeken</value></data>
+  <data name="ImageSearch_Privacy" xml:space="preserve"><value>De zoektekst wordt naar Wikimedia Commons gestuurd (en je gsm laadt de voorbeelden van daar). Er wordt niets verstuurd tot je op Zoeken tikt.</value></data>
+  <data name="ImageSearch_Search" xml:space="preserve"><value>Zoeken</value></data>
+  <data name="ImageSearch_None" xml:space="preserve"><value>Geen afbeeldingen gevonden. Probeer een ander woord, bv. de werkzame stof.</value></data>
+  <data name="ImageSearch_More" xml:space="preserve"><value>Andere afbeeldingen</value></data>
+  <data name="ImageSearch_Previous" xml:space="preserve"><value>Vorige</value></data>
+  <data name="ImageSearch_License" xml:space="preserve"><value>Afbeeldingen van Wikimedia Commons, elk met een eigen vrije licentie. Tik op een afbeelding om ze te gebruiken.</value></data>
+  <data name="ImageSearch_Unavailable" xml:space="preserve"><value>Wikimedia Commons is nu niet bereikbaar.</value></data>
+  <data name="ImageSearch_DownloadFailed" xml:space="preserve"><value>De afbeelding kon niet gedownload worden; kies een andere.</value></data>
 </root>

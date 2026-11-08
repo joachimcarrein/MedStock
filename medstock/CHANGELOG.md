@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Search a picture by name on Wikimedia Commons (free pictures, no AI) and use it as the photo. This is the only
+  external call MedStock makes, and only when you tap Search.
+- Export all data (profiles, medication with current stock, settings) as a JSON file from Settings.
+
 ## 1.0.1
 
 - Detail screen: edit, pause/resume and archive are now icon buttons next to the name.

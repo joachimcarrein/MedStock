@@ -64,6 +64,11 @@ To update: **App store › ⋮ › Check for updates**, then update (or **Rebuil
 
 ## Optional extras
 
+- **Picture by name** (detail › *Search a picture by name*): searches Wikimedia Commons (free pictures, no AI, no
+  account) for the medication name; tap a picture to use it as the photo. *Other pictures* shows the next ones.
+- **Export** (Settings › *Export data*): downloads a JSON file with the profiles, all medication (also archived) with
+  their current stock and the general settings. Photos and personal notification settings are not included.
+
 - **"+1" button in notifications**: every notification has a button such as "+1 bottle". Tapping it books one
   package for that medication, without opening the app.
 - **Sensors** (Settings › For everyone): a sensor per medication with the days remaining, on one "MedStock" device,
@@ -94,6 +99,7 @@ All other settings are in the app itself (**Settings**).
 ## Limitations
 
 - Android: taking a photo with the camera may open the gallery instead; choose a photo there.
-- MedStock never contacts external services. Images are only the photos you take or an icon per type.
+- MedStock only contacts an external service when you tap **Search** on *Search a picture by name*: the search
+  text goes to Wikimedia Commons and your phone loads the previews from there. Nothing else leaves your Home Assistant.
 - If a schema upgrade fails, the app stops and logs the path of the database copy in `/data/backup`.
   Restore a Home Assistant backup, or open an issue with the log (it contains no medication names).

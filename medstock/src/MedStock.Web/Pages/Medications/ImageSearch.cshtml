@@ -1,0 +1,56 @@
+@page
+@model MedStock.Web.Pages.Medications.ImageSearchModel
+@{
+    ViewData["Tab"] = "overview";
+    var id = Model.Medication.Id;
+}
+<partial name="_SubHeader" model="@((L["ImageSearch_Title"].Value, Url.Page("/Medications/Details", new { id })!))" />
+
+<p class="small muted">@L["ImageSearch_Privacy"]</p>
+
+<form method="get" action="@Url.Page("/Medications/ImageSearch")" class="inline-form">
+    <input type="hidden" name="id" value="@id" />
+    <input type="hidden" name="go" value="true" />
+    <input type="search" name="q" value="@Model.Q" maxlength="100" aria-label="@L["ImageSearch_Title"]" />
+    <button type="submit" hx-disabled-elt="this">@L["ImageSearch_Search"]</button>
+</form>
+
+@if (Model.Error is not null)
+{
+    <p class="error" role="alert">@Model.Error</p>
+}
+
+@if (Model.Hits is { } hits)
+{
+    @if (hits.Count == 0)
+    {
+        <p class="muted">@L["ImageSearch_None"]</p>
+    }
+    else
+    {
+        <ul class="image-hits">
+            @foreach (var h in hits)
+            {
+                <li>
+                    <form method="post" asp-page-handler="Use" asp-route-id="@id" hx-disabled-elt="find button">
+                        <input type="hidden" name="url" value="@h.ThumbUrl" />
+                        <button type="submit" class="image-hit" title="@h.Title">
+                            <img src="@h.ThumbUrl" alt="@h.Title" loading="lazy" referrerpolicy="no-referrer" />
+                        </button>
+                    </form>
+                </li>
+            }
+        </ul>
+        <p class="small muted">@L["ImageSearch_License"]</p>
+    }
+    <div class="actions">
+        @if (Model.Offset > 0)
+        {
+            <a role="button" class="secondary" href="@Url.Page("/Medications/ImageSearch", new { id, q = Model.Q, go = true, offset = Math.Max(0, Model.Offset - MedStock.Web.Services.WikimediaImageSearch.PageSize) })">@L["ImageSearch_Previous"]</a>
+        }
+        @if (hits.Count > 0)
+        {
+            <a role="button" class="secondary" href="@Url.Page("/Medications/ImageSearch", new { id, q = Model.Q, go = true, offset = Model.Offset + MedStock.Web.Services.WikimediaImageSearch.PageSize })">@L["ImageSearch_More"]</a>
+        }
+    </div>
+}

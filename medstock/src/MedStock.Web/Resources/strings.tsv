@@ -190,3 +190,15 @@ Settings_Sensors_Status	{0} sensors published at {1}	{0} sensoren gepubliceerd o
 Settings_Todo	Add medication that runs low to this to-do list	Medicatie die bijna op is op deze to-do-lijst zetten
 Settings_Todo_None	(none)	(geen)
 Settings_Todo_Hint	No to-do lists in Home Assistant yet. Add the "Local To-do" integration (or the shopping list) to use this.	Nog geen to-do-lijsten in Home Assistant. Voeg de integratie "Local To-do" (of de boodschappenlijst) toe om dit te gebruiken.
+Export_Link	Export data (JSON)	Gegevens exporteren (JSON)
+Export_Help	Profiles, medication with their current stock and the general settings. Without photos and personal notification settings.	Profielen, medicatie met hun huidige voorraad en de algemene instellingen. Zonder foto's en persoonlijke meldingsinstellingen.
+ImageSearch_Link	Search a picture by name (internet)	Afbeelding zoeken op naam (internet)
+ImageSearch_Title	Search a picture	Afbeelding zoeken
+ImageSearch_Privacy	The search text is sent to Wikimedia Commons (and your phone loads the previews from there). Nothing is sent until you tap Search.	De zoektekst wordt naar Wikimedia Commons gestuurd (en je gsm laadt de voorbeelden van daar). Er wordt niets verstuurd tot je op Zoeken tikt.
+ImageSearch_Search	Search	Zoeken
+ImageSearch_None	No pictures found. Try another word, e.g. the active substance.	Geen afbeeldingen gevonden. Probeer een ander woord, bv. de werkzame stof.
+ImageSearch_More	Other pictures	Andere afbeeldingen
+ImageSearch_Previous	Previous	Vorige
+ImageSearch_License	Pictures from Wikimedia Commons; each has its own free licence. Tap a picture to use it.	Afbeeldingen van Wikimedia Commons, elk met een eigen vrije licentie. Tik op een afbeelding om ze te gebruiken.
+ImageSearch_Unavailable	Wikimedia Commons cannot be reached right now.	Wikimedia Commons is nu niet bereikbaar.
+ImageSearch_DownloadFailed	The picture could not be downloaded; choose another one.	De afbeelding kon niet gedownload worden; kies een andere.

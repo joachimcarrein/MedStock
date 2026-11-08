@@ -11,8 +11,9 @@ and tells you **how many days you have left**, without logging every single inta
 - One list (profile) per person; everybody logged in to Home Assistant sees and edits everything.
 - Push notifications through the Home Assistant Companion app when something runs low.
 - A doctor screen that tells you what to ask for, and how many boxes, to cover the next 90 days.
-- Works inside the Home Assistant sidebar and Companion app via ingress. No extra ports, no cloud,
-  no external services. Data is part of your Home Assistant backups.
+- Works inside the Home Assistant sidebar and Companion app via ingress. No extra ports, no cloud. The only
+  external call is the optional picture search on Wikimedia Commons, when you tap it. Data is part of your Home
+  Assistant backups and can be exported as JSON.
 
 The UI is available in English and Dutch.
 

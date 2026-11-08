@@ -131,6 +131,7 @@
             </div>
             <noscript><button type="submit">@L["Photo_Upload"]</button></noscript>
         </form>
+        <p><a href="@Url.Page("/Medications/ImageSearch", new { id = m.Id })">@L["ImageSearch_Link"]</a></p>
         @if (m.HasPhoto)
         {
             <form method="post" action="@Url.Page("/Medications/Photo", new { id = m.Id, handler = "Delete" })" asp-antiforgery="true">
