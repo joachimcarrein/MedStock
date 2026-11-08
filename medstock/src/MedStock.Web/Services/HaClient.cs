@@ -7,12 +7,16 @@ namespace MedStock.Web.Services;
 
 public enum NotifyOutcome { Ok, UnknownService, TransportError }
 
+/// <summary>An actionable-notification button (Companion app): <paramref name="Action"/> comes back in a mobile_app_notification_action event.</summary>
+public sealed record NotifyAction(string Action, string Title);
+
 public interface IHaClient
 {
     /// <summary>All notify services as "notify.xxx". Throws <see cref="HaUnavailableException"/> when HA cannot be reached.</summary>
     Task<IReadOnlyList<string>> GetNotifyServicesAsync(CancellationToken ct = default);
 
-    Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag, CancellationToken ct = default);
+    Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag,
+        IReadOnlyList<NotifyAction>? actions = null, CancellationToken ct = default);
 
     /// <summary>The full add-on slug including the repository prefix (e.g. "a1b2c3d4_medstock").</summary>
     Task<string?> GetSelfSlugAsync(CancellationToken ct = default);
@@ -44,12 +48,15 @@ public sealed class HaClient(HttpClient http, ILogger<HaClient> logger) : IHaCli
         }
     }
 
-    public async Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag, CancellationToken ct = default)
+    public async Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag,
+        IReadOnlyList<NotifyAction>? actions = null, CancellationToken ct = default)
     {
         var name = service.StartsWith("notify.", StringComparison.Ordinal) ? service["notify.".Length..] : service;
         var data = new JsonObject();
         if (deepLink is not null) { data["url"] = deepLink; data["clickAction"] = deepLink; }
         if (tag is not null) data["tag"] = tag;
+        if (actions is { Count: > 0 })
+            data["actions"] = new JsonArray(actions.Select(a => (JsonNode)new JsonObject { ["action"] = a.Action, ["title"] = a.Title }).ToArray());
         var body = new JsonObject { ["title"] = title, ["message"] = message, ["data"] = data };
         try
         {
@@ -87,6 +94,7 @@ public sealed class HaClient(HttpClient http, ILogger<HaClient> logger) : IHaCli
 public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
 {
     public List<(string Service, string Title, string Message, string? DeepLink, string? Tag)> Sent { get; } = [];
+    public List<IReadOnlyList<NotifyAction>?> SentActions { get; } = [];
     public bool Unavailable { get; set; }
     public HashSet<string> Services { get; } = ["notify.mobile_app_dev_iphone", "notify.mobile_app_dev_android", "notify.persistent_notification"];
 
@@ -95,11 +103,16 @@ public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
             ? throw new HaUnavailableException("fake: unavailable")
             : Task.FromResult<IReadOnlyList<string>>(Services.Order(StringComparer.Ordinal).ToList());
 
-    public Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag, CancellationToken ct = default)
+    public Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag,
+        IReadOnlyList<NotifyAction>? actions = null, CancellationToken ct = default)
     {
         if (Unavailable) return Task.FromResult(NotifyOutcome.TransportError);
         if (!Services.Contains(service)) return Task.FromResult(NotifyOutcome.UnknownService);
-        lock (Sent) Sent.Add((service, title, message, deepLink, tag));
+        lock (Sent)
+        {
+            Sent.Add((service, title, message, deepLink, tag));
+            SentActions.Add(actions);
+        }
         logger.LogInformation("[FakeHa] {Service}: {Title} - {Message} ({Link}, {Tag})", service, title, message, deepLink, tag);
         return Task.FromResult(NotifyOutcome.Ok);
     }

@@ -41,6 +41,8 @@ builder.Services.AddScoped<MedicationService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton<NotificationState>();
 builder.Services.AddHostedService<NotificationWorker>();
+builder.Services.AddScoped<NotificationActionHandler>();
+if (addonMode) builder.Services.AddHostedService<HaEventListener>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<MedStockDb>(o => o.UseSqlite($"Data Source={paths.DbPath}"));

@@ -177,6 +177,41 @@ public class NotificationServiceTests
     }
 
     [Fact]
+    public async Task Notification_carries_a_purchase_button_and_a_tap_books_one_package()
+    {
+        using var e = new Env();
+        e.Day(6);
+        await e.RunAsync();
+        var action = Assert.Single(e.F.Ha.SentActions.Single()!);
+        Assert.Equal($"MEDSTOCK_PURCHASE_{e.MedId}", action.Action);
+        Assert.Equal("+1 flesje", action.Title);
+
+        using var scope = e.F.Services.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<NotificationActionHandler>();
+        Assert.True(await handler.HandleAsync(action.Action, "ha-user-1"));
+        var latest = e.F.WithDb(db => db.Snapshots.Where(s => s.MedicationId == e.MedId).OrderByDescending(s => s.Id).First());
+        Assert.Equal(SnapshotReason.Purchase, latest.Reason);
+        Assert.Equal(14m + 140m, latest.TotalUnits);
+        Assert.Equal("ha-user-1", latest.CreatedByUserId);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("OTHER_ACTION")]
+    [InlineData("MEDSTOCK_PURCHASE_")]
+    [InlineData("MEDSTOCK_PURCHASE_-3")]
+    [InlineData("MEDSTOCK_PURCHASE_12abc")]
+    [InlineData("MEDSTOCK_PURCHASE_999999")] // unknown medication
+    public async Task Foreign_or_invalid_actions_are_ignored(string? action)
+    {
+        using var e = new Env();
+        using var scope = e.F.Services.CreateScope();
+        Assert.False(await scope.ServiceProvider.GetRequiredService<NotificationActionHandler>().HandleAsync(action, null));
+        Assert.Equal(1, e.F.WithDb(db => db.Snapshots.Count()));
+    }
+
+    [Fact]
     public async Task Logs_of_a_run_contain_no_medication_or_profile_names()
     {
         using var e = new Env(services: [Phone, "notify.mobile_app_gone"]);

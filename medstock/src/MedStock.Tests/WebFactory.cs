@@ -35,7 +35,7 @@ public class WebFactory : WebApplicationFactory<Program>
             s.AddSingleton<IClock>(Clock);
             s.AddSingleton<IStartupFilter, RemoteIpStartupFilter>();
             // Tests drive notification runs themselves.
-            foreach (var d in s.Where(d => d.ImplementationType == typeof(NotificationWorker)).ToList()) s.Remove(d);
+            foreach (var d in s.Where(d => d.ImplementationType == typeof(NotificationWorker) || d.ImplementationType == typeof(HaEventListener)).ToList()) s.Remove(d);
             s.AddSingleton<Microsoft.Extensions.Logging.ILoggerProvider>(Logs);
         });
     }

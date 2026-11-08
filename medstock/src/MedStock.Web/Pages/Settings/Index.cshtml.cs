@@ -74,7 +74,7 @@ public class IndexModel(
         foreach (var service in Mine.NotifyServices)
         {
             var outcome = await ha.NotifyAsync(service, Texts.Get("Notify_Title", culture), Texts.Get("Notify_Test", culture),
-                slug is null ? null : "/app/" + slug, "medstock-test", HttpContext.RequestAborted);
+                slug is null ? null : "/app/" + slug, "medstock-test", ct: HttpContext.RequestAborted);
             results.Add(outcome switch
             {
                 NotifyOutcome.Ok => $"{service}: ✓",
