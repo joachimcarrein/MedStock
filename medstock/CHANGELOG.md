@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.2
+
 - No changes in the app: new release process and contribution guidelines for the repository.
 
 ## 1.2.1
