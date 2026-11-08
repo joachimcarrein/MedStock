@@ -93,6 +93,13 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
                     break;
 
                 case NotificationDecision.Send send:
+                    // First level of a new cycle: put it on the shopping/to-do list (once while the item is open).
+                    if (logged.Count == 0 && !string.IsNullOrEmpty(global.TodoEntityId))
+                    {
+                        var item = string.IsNullOrWhiteSpace(m.Strength) ? $"{m.Name} ({row.Profile.Name})" : $"{m.Name} {m.Strength} ({row.Profile.Name})";
+                        var added = await ha.AddTodoItemIfMissingAsync(global.TodoEntityId, item, ct);
+                        log.LogInformation("Medication {MedicationId}: to-do item {Result}", m.Id, added ? "ensured" : "failed");
+                    }
                     var recipients = NotificationRules.Recipients(users, m.ProfileId).ToList();
                     if (recipients.Count == 0)
                     {

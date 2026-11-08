@@ -40,6 +40,9 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<bool>("SensorsEnabled")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("TodoEntityId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("WrittenByVersion")
                         .IsRequired()
                         .HasMaxLength(50)

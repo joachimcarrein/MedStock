@@ -100,4 +100,6 @@ public class GlobalSettings
     public bool SensorsEnabled { get; set; }
     /// <summary>Medication ids that currently have a retained discovery config (comma separated), so removed ones get cleaned up.</summary>
     public string? PublishedSensorIds { get; set; }
+    /// <summary>Optional todo.* entity: medication that runs low is added to this list (once while it is open).</summary>
+    public string? TodoEntityId { get; set; }
 }

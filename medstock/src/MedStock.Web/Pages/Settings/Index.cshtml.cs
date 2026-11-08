@@ -21,6 +21,8 @@ public class IndexModel(
     /// <summary>All notify services, mobile_app first; null when Home Assistant could not be reached.</summary>
     public List<string>? Services { get; private set; }
     public List<User> KnownUsers { get; private set; } = [];
+    /// <summary>todo.* entities; null when Home Assistant could not be reached.</summary>
+    public IReadOnlyList<(string EntityId, string Name)>? TodoLists { get; private set; }
     public bool CanChooseUser => mode.AddonMode && !user.FromHeader;
     public bool IsHousehold => user.IsHousehold;
     public string UserName => user.DisplayName;
@@ -87,7 +89,7 @@ public class IndexModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostGlobalAsync(int? coverageDays, int? defaultAlertDays, string? notificationTime, bool sensorsEnabled)
+    public async Task<IActionResult> OnPostGlobalAsync(int? coverageDays, int? defaultAlertDays, string? notificationTime, bool sensorsEnabled, string? todoEntityId)
     {
         if (coverageDays is not (>= 0 and <= 3650) || defaultAlertDays is not (>= 0 and <= 3650)
             || !TimeOnly.TryParse(notificationTime, System.Globalization.CultureInfo.InvariantCulture, out var time))
@@ -102,6 +104,7 @@ public class IndexModel(
         g.DefaultAlertDays = defaultAlertDays.Value;
         g.NotificationTime = new TimeOnly(time.Hour, time.Minute);
         g.SensorsEnabled = sensorsEnabled;
+        g.TodoEntityId = todoEntityId is { Length: > 5 and <= 255 } && todoEntityId.StartsWith("todo.", StringComparison.Ordinal) ? todoEntityId : null;
         await db.SaveChangesAsync();
         sensors.Request();
         log.LogInformation("Global settings saved");
@@ -158,6 +161,8 @@ public class IndexModel(
         {
             Services = null;
         }
+        try { TodoLists = await ha.GetTodoListsAsync(HttpContext.RequestAborted); }
+        catch (HaUnavailableException) { TodoLists = null; }
         var saved = Request.Query["saved"].ToString();
         if (saved == "user") UserMessage = l["Saved"];
         if (saved == "global") GlobalMessage = l["Saved"];

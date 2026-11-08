@@ -23,6 +23,12 @@ public interface IHaClient
 
     /// <summary>MQTT broker credentials from the Supervisor (services: mqtt:want); null when no broker is available.</summary>
     Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default);
+
+    /// <summary>All todo.* entities as (entity id, friendly name). Throws <see cref="HaUnavailableException"/>.</summary>
+    Task<IReadOnlyList<(string EntityId, string Name)>> GetTodoListsAsync(CancellationToken ct = default);
+
+    /// <summary>Adds an item unless an open item with the same text exists. Returns false on any failure.</summary>
+    Task<bool> AddTodoItemIfMissingAsync(string entityId, string item, CancellationToken ct = default);
 }
 
 public sealed record MqttBroker(string Host, int Port, bool Ssl, string? Username, string? Password);
@@ -93,6 +99,50 @@ public sealed class HaClient(HttpClient http, ILogger<HaClient> logger) : IHaCli
             return null;
         }
     }
+    public async Task<IReadOnlyList<(string EntityId, string Name)>> GetTodoListsAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var resp = await http.GetAsync(CoreBase + "states", ct);
+            if (!resp.IsSuccessStatusCode) throw new HaUnavailableException($"GET states returned {(int)resp.StatusCode}");
+            var arr = await resp.Content.ReadFromJsonAsync<JsonArray>(ct) ?? [];
+            return arr.Select(s => ((string?)s?["entity_id"], (string?)s?["attributes"]?["friendly_name"]))
+                .Where(x => x.Item1 is not null && x.Item1.StartsWith("todo.", StringComparison.Ordinal))
+                .Select(x => (x.Item1!, x.Item2 ?? x.Item1!))
+                .OrderBy(x => x.Item2, StringComparer.CurrentCultureIgnoreCase).ToList();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            throw new HaUnavailableException("Home Assistant not reachable", ex);
+        }
+    }
+
+    public async Task<bool> AddTodoItemIfMissingAsync(string entityId, string item, CancellationToken ct = default)
+    {
+        try
+        {
+            // todo.get_items with return_response: skip when the item is still open on the list.
+            using (var get = await http.PostAsJsonAsync(CoreBase + "services/todo/get_items?return_response",
+                       new JsonObject { ["entity_id"] = entityId, ["status"] = new JsonArray("needs_action") }, ct))
+            {
+                if (get.IsSuccessStatusCode)
+                {
+                    var items = (await get.Content.ReadFromJsonAsync<JsonObject>(ct))?["service_response"]?[entityId]?["items"] as JsonArray;
+                    if (items?.Any(i => string.Equals((string?)i?["summary"], item, StringComparison.OrdinalIgnoreCase)) == true) return true;
+                }
+            }
+            using var add = await http.PostAsJsonAsync(CoreBase + "services/todo/add_item",
+                new JsonObject { ["entity_id"] = entityId, ["item"] = item }, ct);
+            logger.LogDebug("todo.add_item {Entity} -> {Status}", entityId, (int)add.StatusCode);
+            return add.IsSuccessStatusCode;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            logger.LogWarning("Could not add a to-do item: {Error}", ex.GetType().Name);
+            return false;
+        }
+    }
+
     public async Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default)
     {
         try
@@ -148,5 +198,18 @@ public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
     public Task<string?> GetSelfSlugAsync(CancellationToken ct = default) => Task.FromResult<string?>("local_medstock");
 
     public MqttBroker? Broker { get; set; }
+    public Dictionary<string, List<string>> Todo { get; } = new() { ["todo.shopping_list"] = [] };
+
+    public Task<IReadOnlyList<(string EntityId, string Name)>> GetTodoListsAsync(CancellationToken ct = default) =>
+        Unavailable
+            ? throw new HaUnavailableException("fake: unavailable")
+            : Task.FromResult<IReadOnlyList<(string, string)>>(Todo.Keys.Order().Select(k => (k, k)).ToList());
+
+    public Task<bool> AddTodoItemIfMissingAsync(string entityId, string item, CancellationToken ct = default)
+    {
+        if (Unavailable || !Todo.TryGetValue(entityId, out var list)) return Task.FromResult(false);
+        lock (list) if (!list.Contains(item, StringComparer.OrdinalIgnoreCase)) list.Add(item);
+        return Task.FromResult(true);
+    }
     public Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default) => Task.FromResult(Broker);
 }

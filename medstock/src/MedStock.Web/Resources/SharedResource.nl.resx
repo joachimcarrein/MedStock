@@ -192,4 +192,7 @@
   <data name="Settings_Sensors_NoBroker" xml:space="preserve"><value>Geen MQTT-broker gevonden. Installeer en start de app Mosquitto broker.</value></data>
   <data name="Settings_Sensors_ConnectFailed" xml:space="preserve"><value>Kon niet verbinden met de MQTT-broker; nieuwe poging volgt.</value></data>
   <data name="Settings_Sensors_Status" xml:space="preserve"><value>{0} sensoren gepubliceerd om {1}</value></data>
+  <data name="Settings_Todo" xml:space="preserve"><value>Medicatie die bijna op is op deze to-do-lijst zetten</value></data>
+  <data name="Settings_Todo_None" xml:space="preserve"><value>(geen)</value></data>
+  <data name="Settings_Todo_Hint" xml:space="preserve"><value>Nog geen to-do-lijsten in Home Assistant. Voeg de integratie "Local To-do" (of de boodschappenlijst) toe om dit te gebruiken.</value></data>
 </root>

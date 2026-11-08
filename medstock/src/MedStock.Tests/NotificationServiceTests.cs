@@ -212,6 +212,29 @@ public class NotificationServiceTests
     }
 
     [Fact]
+    public async Task Low_medication_is_put_on_the_chosen_todo_list_once_per_cycle()
+    {
+        using var e = new Env();
+        var list = e.F.Ha.Todo["todo.shopping_list"];
+        e.Day(6);
+        await e.RunAsync();
+        Assert.Empty(list); // no list chosen
+
+        e.F.WithDb(db =>
+        {
+            db.GlobalSettings.Single().TodoEntityId = "todo.shopping_list";
+            db.NotificationLogs.RemoveRange(db.NotificationLogs);
+            return db.SaveChanges();
+        });
+        await e.RunAsync();
+        Assert.Equal(["Nasalix (Husband)"], list);
+
+        e.Day(13); // 7-day level: same cycle, no second item
+        await e.RunAsync();
+        Assert.Single(list);
+    }
+
+    [Fact]
     public async Task Logs_of_a_run_contain_no_medication_or_profile_names()
     {
         using var e = new Env(services: [Phone, "notify.mobile_app_gone"]);
@@ -300,6 +323,25 @@ public class SettingsWebTests : IClassFixture<AddonWebFactory>
         Assert.Equal((60, 10, new TimeOnly(8, 30)), (g.CoverageDays, g.DefaultAlertDays, g.NotificationTime));
         // restore defaults for other tests in this class
         await c.PostAsync("/Settings?handler=Global", Form(Token(html), ("coverageDays", "90"), ("defaultAlertDays", "14"), ("notificationTime", "09:00")));
+    }
+
+    [Fact]
+    public async Task Todo_list_and_sensors_are_saved_in_global_settings()
+    {
+        var c = _f.Client("set-5", ingressPath: null);
+        var html = await c.GetStringAsync("/Settings");
+        Assert.Contains("<option value=\"todo.shopping_list\"", html);
+        await c.PostAsync("/Settings?handler=Global", Form(Token(html), ("coverageDays", "90"), ("defaultAlertDays", "14"),
+            ("notificationTime", "09:00"), ("sensorsEnabled", "true"), ("todoEntityId", "todo.shopping_list")));
+        var g = _f.WithDb(db => db.GlobalSettings.Single());
+        Assert.True(g.SensorsEnabled);
+        Assert.Equal("todo.shopping_list", g.TodoEntityId);
+
+        await c.PostAsync("/Settings?handler=Global", Form(Token(html), ("coverageDays", "90"), ("defaultAlertDays", "14"),
+            ("notificationTime", "09:00"), ("todoEntityId", "light.kitchen")));
+        g = _f.WithDb(db => db.GlobalSettings.Single());
+        Assert.False(g.SensorsEnabled);
+        Assert.Null(g.TodoEntityId); // only todo.* entities are accepted
     }
 
     [Fact]

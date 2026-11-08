@@ -192,4 +192,7 @@
   <data name="Settings_Sensors_NoBroker" xml:space="preserve"><value>No MQTT broker found. Install and start the Mosquitto broker app.</value></data>
   <data name="Settings_Sensors_ConnectFailed" xml:space="preserve"><value>Could not connect to the MQTT broker; retrying.</value></data>
   <data name="Settings_Sensors_Status" xml:space="preserve"><value>{0} sensors published at {1}</value></data>
+  <data name="Settings_Todo" xml:space="preserve"><value>Add medication that runs low to this to-do list</value></data>
+  <data name="Settings_Todo_None" xml:space="preserve"><value>(none)</value></data>
+  <data name="Settings_Todo_Hint" xml:space="preserve"><value>No to-do lists in Home Assistant yet. Add the "Local To-do" integration (or the shopping list) to use this.</value></data>
 </root>

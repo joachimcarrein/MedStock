@@ -187,3 +187,6 @@ Settings_Sensors_Privacy	Medication and profile names then appear in Home Assist
 Settings_Sensors_NoBroker	No MQTT broker found. Install and start the Mosquitto broker app.	Geen MQTT-broker gevonden. Installeer en start de app Mosquitto broker.
 Settings_Sensors_ConnectFailed	Could not connect to the MQTT broker; retrying.	Kon niet verbinden met de MQTT-broker; nieuwe poging volgt.
 Settings_Sensors_Status	{0} sensors published at {1}	{0} sensoren gepubliceerd om {1}
+Settings_Todo	Add medication that runs low to this to-do list	Medicatie die bijna op is op deze to-do-lijst zetten
+Settings_Todo_None	(none)	(geen)
+Settings_Todo_Hint	No to-do lists in Home Assistant yet. Add the "Local To-do" integration (or the shopping list) to use this.	Nog geen to-do-lijsten in Home Assistant. Voeg de integratie "Local To-do" (of de boodschappenlijst) toe om dit te gebruiken.

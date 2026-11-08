@@ -116,6 +116,24 @@
         <label>@L["CoverageDays"] <input type="number" name="coverageDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.CoverageDays" required /></label>
         <label>@L["Settings_DefaultAlertDays"] <input type="number" name="defaultAlertDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.DefaultAlertDays" required /></label>
         <label>@L["Settings_NotificationTime"] <input type="time" name="notificationTime" value="@Model.Global.NotificationTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)" required /></label>
+        <label>
+            @L["Settings_Todo"]
+            <select name="todoEntityId">
+                <option value="">@L["Settings_Todo_None"]</option>
+                @foreach (var t in Model.TodoLists ?? [])
+                {
+                    <option value="@t.EntityId" selected="@(t.EntityId == Model.Global.TodoEntityId)">@t.Name</option>
+                }
+                @if (Model.Global.TodoEntityId is { } chosen && Model.TodoLists?.All(t => t.EntityId != chosen) != false)
+                {
+                    <option value="@chosen" selected>@chosen</option>
+                }
+            </select>
+        </label>
+        @if (Model.TodoLists is { Count: 0 })
+        {
+            <p class="small muted">@L["Settings_Todo_Hint"]</p>
+        }
         <fieldset>
             <label class="inline"><input type="checkbox" name="sensorsEnabled" value="true" checked="@Model.Global.SensorsEnabled" /> @L["Settings_Sensors"]</label>
             <p class="small muted">@L["Settings_Sensors_Privacy"]</p>
