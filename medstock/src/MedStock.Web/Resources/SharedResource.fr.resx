@@ -287,4 +287,5 @@
   <data name="Med_OverTheCounter" xml:space="preserve"><value>En vente libre (sans ordonnance)</value></data>
   <data name="Doctor_OverTheCounter" xml:space="preserve"><value>En vente libre, à acheter vous-même ({0})</value></data>
   <data name="Doctor_Buy" xml:space="preserve"><value>acheter {0} {1}</value></data>
+  <data name="Share_ToText" xml:space="preserve"><value>Vers le texte ↓</value></data>
 </root>

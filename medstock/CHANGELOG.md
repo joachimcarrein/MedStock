@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Prescription and trip: Share at the top of the list, with a link down to the text, so a long list needs no scrolling.
+- Prescription and trip: Share and "To the text" buttons at the top of the list, so a long list needs no scrolling.
 
 ## 2026.11.4
 
