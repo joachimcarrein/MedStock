@@ -1,9 +1,10 @@
 // Share the prescription text: native share sheet, else clipboard, else select + execCommand (plain http has neither).
+// Every button with data-share-text shares (one at the top of the page, one under the text).
 (function () {
   if (window.medstockShare) return;
   window.medstockShare = true;
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest && e.target.closest('#share');
+    var btn = e.target.closest && e.target.closest('[data-share-text]');
     if (!btn) return;
     var text = btn.dataset.shareText;
     var label = btn.textContent;
