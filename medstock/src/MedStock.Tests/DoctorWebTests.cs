@@ -74,4 +74,45 @@ public class DoctorWebTests : IClassFixture<AddonWebFactory>
         var html = await GetAsync("/Doctor");
         Assert.Contains("Voorschrift Husband", html);
     }
+
+    [Fact]
+    public void Vacation_need_counts_the_trip_and_what_to_buy_before_leaving()
+    {
+        var today = T.D("2026-11-17");
+        var nasalix = new StockInput(UsageMode.PerDay, 8, new decimal[7], false, 0, 140, T.D("2026-11-07"), 240);
+        var n = PrescriptionCalculator.Vacation(nasalix, today, T.D("2026-12-01"), 14)!;
+        Assert.Equal(112m, n.NeedUnits);       // 14 × 8
+        Assert.Equal(1, n.NeedPackages);
+        Assert.Equal(56m, n.UnitsAtDeparture); // 240 − 23 × 8 on 30 Nov
+        Assert.Equal(1, n.BuyPackages);        // 27 × 8 = 216 until 14 Dec, 160 in stock → 56 short
+
+        var weekject = new StockInput(UsageMode.Weekly, 0, T.Saturday, false, 0, 4, T.D("2026-11-09"), 3);
+        var w = PrescriptionCalculator.Vacation(weekject, today, T.D("2026-12-01"), 14)!;
+        Assert.Equal(2m, w.NeedUnits);         // Sat 5 and 12 Dec
+        Assert.Equal(0m, w.UnitsAtDeparture);  // 21 and 28 Nov use the last two
+        Assert.Equal(1, w.BuyPackages);
+
+        Assert.Null(PrescriptionCalculator.Vacation(nasalix with { Paused = true }, today, T.D("2026-12-01"), 14));
+        Assert.Null(PrescriptionCalculator.Vacation(nasalix with { Mode = UsageMode.AsNeeded }, today, T.D("2026-12-01"), 14));
+    }
+
+    [Fact]
+    public async Task Vacation_page_lists_what_to_buy_and_take()
+    {
+        var html = await GetAsync($"/Vacation?from=2026-12-01&days=14&profile={_husband}");
+        var nl = new CultureInfo("nl");
+        var dec1 = Texts.ShortDate(new DateOnly(2026, 12, 1), nl);
+        Assert.Contains($"koop 1 flesje vóór {dec1}", html);
+        Assert.Contains($"koop 1 verpakking vóór {dec1}", html);
+        Assert.Contains("genoeg in voorraad", html); // Vitamin D
+        Assert.Contains("neem 112 doses mee (≈ 1 flesje)", html);
+        Assert.Contains("nog 56 doses bij vertrek", html);
+        Assert.Contains("zelf nakijken: Paused", html);
+        Assert.Contains($"Reis vanaf {Texts.LongDate(new DateOnly(2026, 12, 1), nl)}, 14 dagen", html);
+        Assert.DoesNotContain("Other", html.Split("<textarea")[1]); // only the chosen profile
+
+        Assert.Contains("Op reis?", await GetAsync("/Doctor"));
+        var c = _f.Client("vac-bad", ingressPath: null);
+        Assert.Equal(HttpStatusCode.BadRequest, (await c.GetAsync("/Vacation?from=2026-11-01&days=7")).StatusCode);
+    }
 }

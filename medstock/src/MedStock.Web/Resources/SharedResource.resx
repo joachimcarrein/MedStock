@@ -221,4 +221,19 @@
   <data name="Notify_Discreet_LastDay" xml:space="preserve"><value>{0}: last dose of a medication today</value></data>
   <data name="Notify_Discreet_Low" xml:space="preserve"><value>{0}: a medication is running low</value></data>
   <data name="Notify_Discreet_Empty" xml:space="preserve"><value>{0}: a medication is out of stock</value></data>
+  <data name="Vacation_Title" xml:space="preserve"><value>Trip</value></data>
+  <data name="Vacation_Link" xml:space="preserve"><value>Going away? Work out what to take along</value></data>
+  <data name="Vacation_From" xml:space="preserve"><value>Departure</value></data>
+  <data name="Vacation_Days" xml:space="preserve"><value>Number of days</value></data>
+  <data name="Vacation_Calculate" xml:space="preserve"><value>Calculate</value></data>
+  <data name="Vacation_All" xml:space="preserve"><value>Everyone</value></data>
+  <data name="Vacation_Take" xml:space="preserve"><value>take {0}</value></data>
+  <data name="Vacation_TakePackages" xml:space="preserve"><value>(≈ {0} {1})</value></data>
+  <data name="Vacation_Buy" xml:space="preserve"><value>buy {0} {1} before {2}</value></data>
+  <data name="Vacation_Enough" xml:space="preserve"><value>enough in stock</value></data>
+  <data name="Vacation_AtDeparture" xml:space="preserve"><value>{0} left at departure</value></data>
+  <data name="Vacation_AsNeeded" xml:space="preserve"><value>As needed or paused, check yourself: {0}</value></data>
+  <data name="Vacation_ShareTitle" xml:space="preserve"><value>Trip from {0}, {1} days</value></data>
+  <data name="Vacation_Text" xml:space="preserve"><value>Shopping list</value></data>
+  <data name="Vacation_Invalid" xml:space="preserve"><value>Choose a departure from today on and 1 to 365 days.</value></data>
 </root>

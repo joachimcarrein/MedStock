@@ -221,4 +221,19 @@
   <data name="Notify_Discreet_LastDay" xml:space="preserve"><value>{0}: vandaag laatste dosis van een medicatie</value></data>
   <data name="Notify_Discreet_Low" xml:space="preserve"><value>{0}: een medicatie raakt op</value></data>
   <data name="Notify_Discreet_Empty" xml:space="preserve"><value>{0}: een medicatie is op</value></data>
+  <data name="Vacation_Title" xml:space="preserve"><value>Op reis</value></data>
+  <data name="Vacation_Link" xml:space="preserve"><value>Op reis? Bereken wat je meeneemt</value></data>
+  <data name="Vacation_From" xml:space="preserve"><value>Vertrek</value></data>
+  <data name="Vacation_Days" xml:space="preserve"><value>Aantal dagen</value></data>
+  <data name="Vacation_Calculate" xml:space="preserve"><value>Berekenen</value></data>
+  <data name="Vacation_All" xml:space="preserve"><value>Iedereen</value></data>
+  <data name="Vacation_Take" xml:space="preserve"><value>neem {0} mee</value></data>
+  <data name="Vacation_TakePackages" xml:space="preserve"><value>(≈ {0} {1})</value></data>
+  <data name="Vacation_Buy" xml:space="preserve"><value>koop {0} {1} vóór {2}</value></data>
+  <data name="Vacation_Enough" xml:space="preserve"><value>genoeg in voorraad</value></data>
+  <data name="Vacation_AtDeparture" xml:space="preserve"><value>nog {0} bij vertrek</value></data>
+  <data name="Vacation_AsNeeded" xml:space="preserve"><value>Zo nodig of gepauzeerd, zelf nakijken: {0}</value></data>
+  <data name="Vacation_ShareTitle" xml:space="preserve"><value>Reis vanaf {0}, {1} dagen</value></data>
+  <data name="Vacation_Text" xml:space="preserve"><value>Boodschappenlijst</value></data>
+  <data name="Vacation_Invalid" xml:space="preserve"><value>Kies een vertrek vanaf vandaag en 1 tot 365 dagen.</value></data>
 </root>

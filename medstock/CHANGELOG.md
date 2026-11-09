@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Trip planner (Prescription › Going away?): what to buy before leaving and what to take along.
 - Discreet notifications (per user): without the medication name.
 - Sensors also work without an MQTT broker (written as plain Home Assistant states).
 - New option: a summary sensor per profile (lowest days remaining, counts; no medication names).

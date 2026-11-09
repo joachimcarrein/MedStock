@@ -1,0 +1,72 @@
+@page
+@model VacationModel
+@using System.Globalization
+@{
+    ViewData["Tab"] = "doctor";
+    var ui = CultureInfo.CurrentUICulture;
+    var inv = CultureInfo.InvariantCulture;
+}
+<partial name="_SubHeader" model="@((L["Vacation_Title"].Value, Url.Page("/Doctor")!))" />
+
+<form method="get">
+    <label>@L["Vacation_From"] <input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd", inv)" required /></label>
+    <label>@L["Vacation_Days"] <input type="number" name="days" min="1" max="@VacationModel.MaxDays" inputmode="numeric" value="@Model.Days" required /></label>
+    @if (Model.Profiles.Count > 1)
+    {
+        <label>
+            @L["Med_Profile"]
+            <select name="profile">
+                <option value="all" selected="@(Model.ProfileId is null)">@L["Vacation_All"]</option>
+                @foreach (var p in Model.Profiles)
+                {
+                    <option value="@p.Id" selected="@(p.Id == Model.ProfileId)">@p.Name</option>
+                }
+            </select>
+        </label>
+    }
+    <button type="submit">@L["Vacation_Calculate"]</button>
+</form>
+
+@if (Model.Invalid)
+{
+    <p class="error" role="alert">@L["Vacation_Invalid"]</p>
+}
+@if (Model.Calculated)
+{
+    var regular = Model.Lines.Where(l => l.Need is not null).ToList();
+    var other = Model.Lines.Where(l => l.Need is null).ToList();
+    @if (Model.Lines.Count == 0)
+    {
+        <p class="empty-state muted">@L["Empty_NoMedication"]</p>
+    }
+    <ul class="rx">
+        @foreach (var l in regular)
+        {
+            var m = l.Row.Medication;
+            <li class="state-@(l.Need!.BuyPackages > 0 ? "red" : "green")">
+                <div class="rx-name">@m.Name <span class="muted">@m.Strength</span>
+                    @if (Model.ProfileId is null)
+                    {
+                        <span class="small muted"><span class="profile-dot" style="background:@l.Row.Profile.Color"></span>@l.Row.Profile.Name</span>
+                    }
+                </div>
+                <div class="rx-ask">@VacationModel.Buy(l, Model.From, ui)</div>
+                <div class="small">@VacationModel.Take(l, ui) · @L["Vacation_AtDeparture", Texts.UnitsCount(m.Type, l.Need.UnitsAtDeparture, ui)]</div>
+            </li>
+        }
+    </ul>
+    @if (other.Count > 0)
+    {
+        <p class="small muted">@L["Vacation_AsNeeded", string.Join(", ", other.Select(l => VacationModel.Name(l.Row.Medication)))]</p>
+    }
+    @if (regular.Count > 0)
+    {
+        <h2>@L["Vacation_Text"]</h2>
+        <textarea id="share-text" readonly rows="@(Math.Max(3, Model.ShareText.Split('\n').Length + 1))">@Model.ShareText</textarea>
+        <button type="button" id="share" data-share-text="@Model.ShareText" data-copied="@L["Doctor_Copied"]">@L["Doctor_Share"]</button>
+    }
+}
+
+@section Scripts {
+    <script src="~/js/share.js" asp-append-version="true"></script>
+}

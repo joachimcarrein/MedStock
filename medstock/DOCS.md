@@ -91,6 +91,17 @@ taken from the medication, else the profile, else the global setting (default 90
 top; **Share** sends the list via the share sheet, or copies it when sharing is not available (for example when
 Home Assistant is opened over plain http at home). The text also stays selectable in the box below the list.
 
+### Trip
+
+**Prescription › Going away?** Enter the departure date and the number of days, and choose a profile or everyone.
+Per medication you see:
+
+- **buy n packages before <departure>** when the stock does not last until the last day of the trip (counting all
+  use from today), or **enough in stock**;
+- **take n units along** (about how many packages) for the trip itself, and what is left the evening before you leave.
+
+As-needed and paused medication is listed separately: check those yourself. **Share** sends the list as text.
+
 ### Archive
 
 Medication you no longer use: **archive** it from the detail screen. **Settings › Archived** lists it per profile,

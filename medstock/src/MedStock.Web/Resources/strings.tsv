@@ -216,3 +216,18 @@ Notify_Discreet_Day	{0}: a medication has 1 day left	{0}: een medicatie heeft no
 Notify_Discreet_LastDay	{0}: last dose of a medication today	{0}: vandaag laatste dosis van een medicatie
 Notify_Discreet_Low	{0}: a medication is running low	{0}: een medicatie raakt op
 Notify_Discreet_Empty	{0}: a medication is out of stock	{0}: een medicatie is op
+Vacation_Title	Trip	Op reis
+Vacation_Link	Going away? Work out what to take along	Op reis? Bereken wat je meeneemt
+Vacation_From	Departure	Vertrek
+Vacation_Days	Number of days	Aantal dagen
+Vacation_Calculate	Calculate	Berekenen
+Vacation_All	Everyone	Iedereen
+Vacation_Take	take {0}	neem {0} mee
+Vacation_TakePackages	(≈ {0} {1})	(≈ {0} {1})
+Vacation_Buy	buy {0} {1} before {2}	koop {0} {1} vóór {2}
+Vacation_Enough	enough in stock	genoeg in voorraad
+Vacation_AtDeparture	{0} left at departure	nog {0} bij vertrek
+Vacation_AsNeeded	As needed or paused, check yourself: {0}	Zo nodig of gepauzeerd, zelf nakijken: {0}
+Vacation_ShareTitle	Trip from {0}, {1} days	Reis vanaf {0}, {1} dagen
+Vacation_Text	Shopping list	Boodschappenlijst
+Vacation_Invalid	Choose a departure from today on and 1 to 365 days.	Kies een vertrek vanaf vandaag en 1 tot 365 dagen.
