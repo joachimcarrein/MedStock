@@ -69,7 +69,7 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
             var before = StockInput.From(m, latest) with { Weekly = (decimal[])m.Weekly.Clone() };
             apply(m);
             var usageChanged = before.Mode != m.UsageMode || before.PerDay != m.PerDay || before.MinStockUnits != m.MinStockUnits
-                               || !before.Weekly.SequenceEqual(m.Weekly);
+                               || !before.Weekly.SequenceEqual(m.Weekly) || before.EndDate != m.EndDate;
             if (usageChanged)
             {
                 if (latest.Id != expectedSnapshotId) throw new StaleSnapshotException();

@@ -136,6 +136,10 @@
   <data name="Badge_Days_Other" xml:space="preserve"><value>nog {0} dagen</value></data>
   <data name="Badge_AsNeeded" xml:space="preserve"><value>zo nodig · nog {0}</value></data>
   <data name="Badge_Paused" xml:space="preserve"><value>gepauzeerd</value></data>
+  <data name="Badge_CourseCovered" xml:space="preserve"><value>genoeg tot einde kuur</value></data>
+  <data name="Badge_CourseEnded" xml:space="preserve"><value>kuur afgelopen</value></data>
+  <data name="Med_EndDate" xml:space="preserve"><value>Einde kuur (optioneel)</value></data>
+  <data name="Med_EndDate_Help" xml:space="preserve"><value>Laatste dag van een kuur, bv. antibiotica. Daarna telt MedStock niet meer af. Is er genoeg tot die dag, dan komen er geen meldingen.</value></data>
   <data name="Badge_Cap" xml:space="preserve"><value>&gt; 10 jaar</value></data>
   <data name="LastDose" xml:space="preserve"><value>laatste dosis {0}</value></data>
   <data name="CoverageDays" xml:space="preserve"><value>Dekkingsdagen</value></data>
@@ -265,6 +269,8 @@
   <data name="Scan_Hint" xml:space="preserve"><value>Camera starten… Lukt het niet, tik dan op Foto.</value></data>
   <data name="Scan_LiveHint" xml:space="preserve"><value>Richt de camera op de barcode.</value></data>
   <data name="Scan_Black" xml:space="preserve"><value>Geen camerabeeld? Tik op Foto om een foto van de barcode te nemen.</value></data>
+  <data name="Scan_Torch" xml:space="preserve"><value>Lamp</value></data>
+  <data name="Scan_Zoom" xml:space="preserve"><value>Zoom</value></data>
   <data name="Scan_Photo" xml:space="preserve"><value>Foto</value></data>
   <data name="Scan_Live" xml:space="preserve"><value>Live camera</value></data>
   <data name="Scan_Looking" xml:space="preserve"><value>Barcode zoeken…</value></data>

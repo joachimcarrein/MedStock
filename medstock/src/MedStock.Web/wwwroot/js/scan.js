@@ -44,6 +44,8 @@
     state.stream = null;
     var v = box() && box().querySelector('video');
     if (v) { v.srcObject = null; v.hidden = true; }
+    var tools = box() && box().querySelector('.scan-tools');
+    if (tools) tools.hidden = true;
   }
 
   function close() {
@@ -77,6 +79,28 @@
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) live();
   }
 
+  // Lamp and zoom, only when the camera offers them (feature-detected; many webviews do not).
+  function tools(b, stream) {
+    var track = stream.getVideoTracks()[0];
+    var caps = track && track.getCapabilities ? track.getCapabilities() : {};
+    var box = b.querySelector('.scan-tools'), torch = b.querySelector('.scan-torch');
+    var zoomLabel = b.querySelector('.scan-zoom-label'), zoom = b.querySelector('.scan-zoom');
+    torch.hidden = !caps.torch;
+    zoomLabel.hidden = !(caps.zoom && caps.zoom.max > caps.zoom.min);
+    box.hidden = torch.hidden && zoomLabel.hidden;
+    torch.setAttribute('aria-pressed', 'false');
+    torch.onclick = function () {
+      var on = torch.getAttribute('aria-pressed') !== 'true';
+      track.applyConstraints({ advanced: [{ torch: on }] }).then(function () { torch.setAttribute('aria-pressed', String(on)); }, function () {});
+    };
+    if (!zoomLabel.hidden) {
+      var settings = track.getSettings ? track.getSettings() : {};
+      zoom.min = caps.zoom.min; zoom.max = caps.zoom.max; zoom.step = caps.zoom.step || 0.1;
+      zoom.value = settings.zoom || caps.zoom.min;
+      zoom.oninput = function () { track.applyConstraints({ advanced: [{ zoom: Number(zoom.value) }] }).catch(function () {}); };
+    }
+  }
+
   // True when a frame is (nearly) all black: some webviews give a stream without a picture.
   function isBlack(data) {
     var sum = 0, n = 0;
@@ -99,6 +123,7 @@
         video.srcObject = stream;
         return video.play().then(function () {
           status(b.dataset.liveHint);
+          tools(b, stream);
           var started = Date.now(), seen = false, warned = false;
           var canvas = document.createElement('canvas');
           var ctx = canvas.getContext('2d', { willReadFrequently: true });

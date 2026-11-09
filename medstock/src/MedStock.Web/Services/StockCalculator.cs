@@ -2,7 +2,8 @@ using MedStock.Web.Domain;
 
 namespace MedStock.Web.Services;
 
-public enum StockState { Empty, LastDay, Critical, AsNeededLow, Warning, Ok, AsNeededOk, Paused }
+/// <summary>CourseCovered: enough stock until the end date of a course; CourseEnded: the course is over.</summary>
+public enum StockState { Empty, LastDay, Critical, AsNeededLow, Warning, Ok, AsNeededOk, Paused, CourseCovered, CourseEnded }
 
 /// <summary>The inputs of the stock model for one medication (medication + its current snapshot).</summary>
 public sealed record StockInput(
@@ -13,10 +14,11 @@ public sealed record StockInput(
     decimal MinStockUnits,
     decimal UnitsPerPackage,
     DateOnly SnapshotDate,
-    decimal SnapshotUnits)
+    decimal SnapshotUnits,
+    DateOnly? EndDate = null)
 {
     public static StockInput From(Medication m, Snapshot s) =>
-        new(m.UsageMode, m.PerDay, m.Weekly, m.Paused, m.MinStockUnits, m.UnitsPerPackage, s.Date, s.TotalUnits);
+        new(m.UsageMode, m.PerDay, m.Weekly, m.Paused, m.MinStockUnits, m.UnitsPerPackage, s.Date, s.TotalUnits, m.EndDate);
 }
 
 public sealed record StockResult(
@@ -44,7 +46,7 @@ public static class StockCalculator
     public static int WeekdayIndex(DateOnly d) => ((int)d.DayOfWeek + 6) % 7;
 
     public static decimal Usage(StockInput i, DateOnly d) =>
-        i.Paused ? 0m : i.Mode switch
+        i.Paused || d > i.EndDate ? 0m : i.Mode switch
         {
             UsageMode.PerDay => i.PerDay,
             UsageMode.Weekly => i.Weekly.Length == 7 ? i.Weekly[WeekdayIndex(d)] : 0m,
@@ -54,6 +56,7 @@ public static class StockCalculator
     /// <summary>Σ usage(d) for d in (from, to]. Zero for an empty or negative interval.</summary>
     public static decimal UsageBetween(StockInput i, DateOnly from, DateOnly to)
     {
+        if (i.EndDate is { } end && to > end) to = end; // a course uses nothing after its last day
         int days = to.DayNumber - from.DayNumber;
         if (days <= 0 || i.Paused) return 0m;
         switch (i.Mode)
@@ -131,6 +134,12 @@ public static class StockCalculator
         else state = StockState.Ok;
 
         if (state == StockState.Paused) { days = null; lastDose = null; cap = false; }
+        else if (i.EndDate is { } end && i.Mode != UsageMode.AsNeeded && state != StockState.Empty)
+        {
+            // A course: no countdown once the stock lasts until the last day (no notifications, nothing to buy).
+            if (today > end) { state = StockState.CourseEnded; days = null; lastDose = null; cap = false; }
+            else if (cap || lastDose >= end) { state = StockState.CourseCovered; days = null; lastDose = end; cap = false; }
+        }
 
         return new StockResult(remaining, days, lastDose, state, cap, packages, rest);
     }
@@ -159,7 +168,7 @@ public static class StockCalculator
         StockState.Critical => 2,
         StockState.AsNeededLow => 2,
         StockState.Warning => 3,
-        StockState.Ok => 4,
+        StockState.Ok or StockState.CourseCovered => 4,
         StockState.AsNeededOk => 5,
         _ => 6,
     };

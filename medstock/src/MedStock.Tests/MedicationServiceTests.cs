@@ -197,7 +197,7 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
         Assert.Contains("value=\"05499999000017\"", html);
         var token = System.Text.RegularExpressions.Regex.Match(html, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
         var fields = NasalixFields(profileId.ToString()).Where(f => f.Item1 != "Input.Name")
-            .Append(("Input.Name", "Paracetamol")).Append(("Input.Barcode", "05499999000017")).Append(("Input.TakeAlongUnits", "141")).ToArray();
+            .Append(("Input.Name", "Paracetamol")).Append(("Input.Barcode", "05499999000017")).Append(("Input.EndDate", "2026-12-24")).Append(("Input.TakeAlongUnits", "141")).ToArray();
         var resp = await c.PostAsync("/Medications/Edit", Form(token, fields));
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode); // 141 > 140 per package
         fields[^1] = ("Input.TakeAlongUnits", "10");
@@ -206,6 +206,7 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
         var med = _f.WithDb(db => db.Medications.Single(m => m.ProfileId == profileId));
         Assert.Equal("05499999000017", med.Barcode);
         Assert.Equal(10m, med.TakeAlongUnits);
+        Assert.Equal(new DateOnly(2026, 12, 24), med.EndDate);
     }
 
     [Fact]

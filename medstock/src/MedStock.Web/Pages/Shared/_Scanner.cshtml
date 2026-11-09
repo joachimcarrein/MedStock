@@ -4,6 +4,10 @@
      data-hint="@L["Scan_Hint"]" data-looking="@L["Scan_Looking"]" data-not-found="@L["Scan_NotFound"]" data-no-camera="@L["Scan_NoCamera"]"
      data-live-hint="@L["Scan_LiveHint"]" data-black="@L["Scan_Black"]">
     <video playsinline muted autoplay hidden></video>
+    <div class="scan-tools" hidden>
+        <button type="button" class="secondary outline scan-torch" hidden aria-pressed="false">@L["Scan_Torch"]</button>
+        <label class="scan-zoom-label" hidden>@L["Scan_Zoom"] <input type="range" class="scan-zoom" /></label>
+    </div>
     <p class="scanner-status small" role="status"></p>
     <div class="grid-2">
         <label role="button">@L["Scan_Photo"]<input type="file" class="scan-photo" accept="image/*" capture="environment" hidden /></label>

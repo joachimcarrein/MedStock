@@ -93,6 +93,8 @@ directly, with a reminder to tap **+1** when you just bought it.
 
 - The **live camera** starts at once and reads the code from the camera image. Whether this works depends on the
   Companion app and the phone; when there is no picture after a few seconds, MedStock says so: use **Photo**.
+- When the phone allows it, a **lamp** button and a **zoom** slider appear under the camera picture; zoom in a little
+  for small codes. (Not every phone or app offers these; the buttons simply do not appear then.)
 - **Photo** takes a picture of the code and reads it on your phone. This always works.
 - European medicine boxes carry a square DataMatrix code with a serial number per box. MedStock keeps only the
   product number (GTIN) from it, so every new box of the same product is recognised. Ordinary barcodes (EAN) work too.
@@ -106,6 +108,16 @@ Per profile: what to ask your doctor for and how many packages, to cover the **c
 taken from the medication, else the profile, else the global setting (default 90 days). Items you need are at the
 top; **Share** sends the list via the share sheet, or copies it when sharing is not available (for example when
 Home Assistant is opened over plain http at home). The text also stays selectable in the box below the list.
+
+### Course with an end date
+
+For a course such as antibiotics, fill in **End of course** when adding or editing the medication. MedStock then
+counts no use after that day:
+
+- with enough stock until the last day the card says **enough until the course ends** (green, with the date of the
+  last dose): no countdown, no notifications, nothing to ask the doctor;
+- with too little stock it counts down as usual, so you still get a notification in time;
+- after the last day the card says **course ended** (grey). Archive it when you are done; what is left stays as stock.
 
 ### Trip
 
@@ -189,6 +201,43 @@ work the same in automations and dashboards, but have no device, cannot be renam
 up to 15 minutes after a Home Assistant restart.
 
 Example automation trigger: `numeric_state` of the sensor below 7.
+
+**Dashboard example** with the summary sensors (no medication names, so fine on a shared wall tablet). Add a card
+with **Edit dashboard › Add card › Manual** and adjust the profile names:
+
+```yaml
+type: vertical-stack
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: gauge
+        entity: sensor.medstock_husband_days_left
+        name: Husband
+        min: 0
+        max: 60
+        severity: { green: 28, yellow: 14, red: 0 }
+      - type: gauge
+        entity: sensor.medstock_wife_days_left
+        name: Wife
+        min: 0
+        max: 60
+        severity: { green: 28, yellow: 14, red: 0 }
+  - type: conditional
+    conditions:
+      - condition: numeric_state
+        entity: sensor.medstock_husband_days_left
+        below: 14
+    card:
+      type: markdown
+      content: >-
+        {% set s = states.sensor.medstock_husband_days_left %}
+        **Husband**: {{ s.attributes.low }} medication(s) almost out, {{ s.attributes.warning }} soon.
+        Open MedStock to see which.
+```
+
+The gauges show the lowest days left per person; the message only appears when something drops below 14 days.
+With the per-medication sensors you can use an `entities` card with `sensor.medstock_<medication>_<profile>` in the
+same way.
 
 ### To-do list
 

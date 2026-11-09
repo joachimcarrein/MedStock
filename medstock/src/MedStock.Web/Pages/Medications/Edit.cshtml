@@ -156,6 +156,12 @@
         </fieldset>
     }
 
+    <label>
+        @L["Med_EndDate"]
+        <input type="date" name="Input.EndDate" value="@Model.Input.EndDate?.ToString("yyyy-MM-dd", inv)" />
+        <small class="muted">@L["Med_EndDate_Help"]</small>
+    </label>
+
     <details class="advanced" open="@(Model.Input.AlertDays is not null || Model.Input.CoverageDays is not null || !Model.Input.NotificationsEnabled)">
         <summary>@L["Tab_Settings"]</summary>
         <label>

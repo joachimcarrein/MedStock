@@ -136,6 +136,10 @@
   <data name="Badge_Days_Other" xml:space="preserve"><value>{0} days left</value></data>
   <data name="Badge_AsNeeded" xml:space="preserve"><value>as needed · {0} left</value></data>
   <data name="Badge_Paused" xml:space="preserve"><value>paused</value></data>
+  <data name="Badge_CourseCovered" xml:space="preserve"><value>enough until the course ends</value></data>
+  <data name="Badge_CourseEnded" xml:space="preserve"><value>course ended</value></data>
+  <data name="Med_EndDate" xml:space="preserve"><value>End of course (optional)</value></data>
+  <data name="Med_EndDate_Help" xml:space="preserve"><value>Last day of a course, e.g. antibiotics. After that MedStock stops counting down. With enough stock until that day there are no notifications.</value></data>
   <data name="Badge_Cap" xml:space="preserve"><value>&gt; 10 years</value></data>
   <data name="LastDose" xml:space="preserve"><value>last dose {0}</value></data>
   <data name="CoverageDays" xml:space="preserve"><value>Coverage days</value></data>
@@ -265,6 +269,8 @@
   <data name="Scan_Hint" xml:space="preserve"><value>Starting the camera… If it does not work, tap Photo.</value></data>
   <data name="Scan_LiveHint" xml:space="preserve"><value>Point the camera at the barcode.</value></data>
   <data name="Scan_Black" xml:space="preserve"><value>No camera picture? Tap Photo to take a picture of the barcode.</value></data>
+  <data name="Scan_Torch" xml:space="preserve"><value>Lamp</value></data>
+  <data name="Scan_Zoom" xml:space="preserve"><value>Zoom</value></data>
   <data name="Scan_Photo" xml:space="preserve"><value>Photo</value></data>
   <data name="Scan_Live" xml:space="preserve"><value>Live camera</value></data>
   <data name="Scan_Looking" xml:space="preserve"><value>Looking for a barcode…</value></data>

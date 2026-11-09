@@ -12,7 +12,7 @@ public sealed record MedicationRow(Medication Medication, Profile Profile, Snaps
     {
         StockState.Empty or StockState.LastDay or StockState.Critical or StockState.AsNeededLow => "red",
         StockState.Warning => "orange",
-        StockState.Ok => "green",
+        StockState.Ok or StockState.CourseCovered => "green",
         _ => "grey",
     };
 
@@ -21,6 +21,8 @@ public sealed record MedicationRow(Medication Medication, Profile Profile, Snaps
         StockState.Empty => Texts.Get("Badge_Empty", c),
         StockState.LastDay => Texts.Get("Badge_LastDay", c),
         StockState.Paused => Texts.Get("Badge_Paused", c),
+        StockState.CourseCovered => Texts.Get("Badge_CourseCovered", c),
+        StockState.CourseEnded => Texts.Get("Badge_CourseEnded", c),
         StockState.AsNeededLow or StockState.AsNeededOk =>
             Texts.Format("Badge_AsNeeded", c, Texts.UnitsCount(Medication.Type, Stock.Remaining, c)),
         _ when Stock.CapReached => Texts.Get("Badge_Cap", c),

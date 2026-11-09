@@ -151,6 +151,7 @@ public sealed class MedicationInput
     public MedicationType Type { get; set; } = MedicationType.Pill;
     public decimal? UnitsPerPackage { get; set; }
     public decimal? TakeAlongUnits { get; set; }
+    public DateOnly? EndDate { get; set; }
     /// <summary>Only for a new medication created from a scan of an unknown code.</summary>
     public string? Barcode { get; set; }
     public UsageMode UsageMode { get; set; } = UsageMode.PerDay;
@@ -168,7 +169,7 @@ public sealed class MedicationInput
     public static MedicationInput From(Medication m, int latestSnapshotId) => new()
     {
         Id = m.Id, ExpectedSnapshotId = latestSnapshotId, Profile = m.ProfileId.ToString(), Name = m.Name,
-        Strength = m.Strength, Type = m.Type, UnitsPerPackage = m.UnitsPerPackage, TakeAlongUnits = m.TakeAlongUnits, UsageMode = m.UsageMode,
+        Strength = m.Strength, Type = m.Type, UnitsPerPackage = m.UnitsPerPackage, TakeAlongUnits = m.TakeAlongUnits, EndDate = m.EndDate, UsageMode = m.UsageMode,
         PerDay = m.PerDay, Weekly = (decimal[])m.Weekly.Clone(), MinStockUnits = m.MinStockUnits, AlertDays = m.AlertDays,
         CoverageDays = m.CoverageDays, NotificationsEnabled = m.NotificationsEnabled,
     };
@@ -180,6 +181,7 @@ public sealed class MedicationInput
         m.Type = Type;
         m.UnitsPerPackage = UnitsPerPackage!.Value;
         m.TakeAlongUnits = TakeAlongUnits;
+        m.EndDate = UsageMode == UsageMode.AsNeeded ? null : EndDate;
         m.UsageMode = UsageMode;
         // Only the active mode's values are kept, so switching modes back and forth leaves no stale usage behind.
         m.PerDay = UsageMode == UsageMode.PerDay ? PerDay : 0;

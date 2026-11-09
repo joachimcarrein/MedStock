@@ -80,6 +80,9 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("HasPhoto")
                         .HasColumnType("INTEGER");
 
