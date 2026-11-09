@@ -288,4 +288,7 @@
   <data name="Doctor_OverTheCounter" xml:space="preserve"><value>Zonder recept, zelf kopen ({0})</value></data>
   <data name="Doctor_Buy" xml:space="preserve"><value>koop {0} {1}</value></data>
   <data name="Share_ToText" xml:space="preserve"><value>Naar de tekst ↓</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Zoek medicatie</value></data>
+  <data name="Search_Clear" xml:space="preserve"><value>Zoekterm wissen</value></data>
+  <data name="Search_NoMatch" xml:space="preserve"><value>Geen medicatie gevonden.</value></data>
 </root>
