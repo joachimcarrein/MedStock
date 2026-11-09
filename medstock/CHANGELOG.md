@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- "+" on the overview preselects the profile you are filtered on.
+
 ## 1.2.2
 
 - No changes in the app: new release process and contribution guidelines for the repository.

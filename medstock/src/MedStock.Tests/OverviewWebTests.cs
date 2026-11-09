@@ -79,12 +79,21 @@ public class OverviewWebTests : IClassFixture<AddonWebFactory>
         Assert.Equal(HttpStatusCode.Redirect, resp.StatusCode);
         Assert.EndsWith("/", resp.Headers.Location!.ToString()); // ingress root needs the trailing slash
 
-        Assert.Equal(["Paracetamol"], Names(await c.GetStringAsync("/")));
+        var filtered = await c.GetStringAsync("/");
+        Assert.Equal(["Paracetamol"], Names(filtered));
         Assert.Equal(3, Names(await Nl("ov-3").GetStringAsync("/")).Count); // another user still sees everything
+
+        // "+" preselects the filtered profile in the new-medication form.
+        var fab = Regex.Match(filtered, "<a class=\"fab\" href=\"([^\"]+)\"").Groups[1].Value;
+        Assert.EndsWith($"?profileId={_wife}", WebUtility.HtmlDecode(fab));
+        var form = await c.GetStringAsync(WebUtility.HtmlDecode(fab));
+        Assert.Matches($"<option value=\"{_wife}\" selected=\"selected\">", form);
 
         await c.PostAsync("/?handler=Filter", new FormUrlEncodedContent(
             [new("__RequestVerificationToken", token), new("profileId", "")]));
-        Assert.Equal(3, Names(await c.GetStringAsync("/")).Count);
+        var all = await c.GetStringAsync("/");
+        Assert.Equal(3, Names(all).Count);
+        Assert.DoesNotContain("profileId=", Regex.Match(all, "<a class=\"fab\" href=\"([^\"]+)\"").Groups[1].Value);
     }
 
     [Fact]

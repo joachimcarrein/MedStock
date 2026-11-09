@@ -73,5 +73,5 @@ else
             }
         </ul>
     }
-    <a class="fab" href="@Url.Page("/Medications/Edit")" aria-label="@L["Med_New"]">+</a>
+    <a class="fab" href="@Url.Page("/Medications/Edit", new { profileId = Model.Filter })" aria-label="@L["Med_New"]">+</a>
 }
