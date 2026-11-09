@@ -22,25 +22,7 @@ public static class SensorMessages
     {
         var m = r.Medication;
         var name = string.IsNullOrWhiteSpace(m.Strength) ? m.Name : $"{m.Name} {m.Strength}";
-        var json = new JsonObject
-        {
-            ["name"] = $"{name} ({r.Profile.Name})",
-            ["unique_id"] = $"medstock_med_{m.Id}",
-            ["state_topic"] = StateTopic(m.Id),
-            ["value_template"] = "{{ value_json.days }}",
-            ["json_attributes_topic"] = StateTopic(m.Id),
-            ["unit_of_measurement"] = "d",
-            ["icon"] = "mdi:pill",
-            ["availability_topic"] = AvailabilityTopic,
-            ["device"] = new JsonObject
-            {
-                ["identifiers"] = new JsonArray("medstock"),
-                ["name"] = "MedStock",
-                ["manufacturer"] = "MedStock",
-                ["model"] = "Home Assistant app",
-                ["sw_version"] = version,
-            },
-        };
+        var json = Config($"{name} ({r.Profile.Name})", $"medstock_med_{m.Id}", StateTopic(m.Id), version, "mdi:pill");
         return new MqttMessage(ConfigTopic(m.Id), json.ToJsonString(), Retain: true);
     }
 
@@ -66,12 +48,129 @@ public static class SensorMessages
     public static IEnumerable<MqttMessage> Remove(int id) =>
         [new(ConfigTopic(id), "", true), new(StateTopic(id), "", true)];
 
-    public static string FormatIds(IEnumerable<int> ids) => string.Join(",", ids.Order());
+    // ---- Per-profile summary (no medication names) ----
 
-    public static HashSet<int> ParseIds(string? raw) =>
-        (raw ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => int.TryParse(x, NumberStyles.None, CultureInfo.InvariantCulture, out var i) ? i : 0).Where(i => i > 0).ToHashSet();
+    public static string ProfileConfigTopic(int id) => $"homeassistant/sensor/medstock/profile_{id}/config";
+    public static string ProfileStateTopic(int id) => $"medstock/profile/{id}";
+
+    public static MqttMessage ProfileConfig(ProfileSummary s, string version)
+    {
+        var json = Config(SummaryName(s.Profile), $"medstock_profile_{s.Profile.Id}", ProfileStateTopic(s.Profile.Id), version, "mdi:account-heart");
+        return new MqttMessage(ProfileConfigTopic(s.Profile.Id), json.ToJsonString(), Retain: true);
+    }
+
+    public static MqttMessage ProfileState(ProfileSummary s) =>
+        new(ProfileStateTopic(s.Profile.Id), SummaryAttributes(s).ToJsonString(), Retain: true);
+
+    public static IEnumerable<MqttMessage> RemoveProfile(int id) =>
+        [new(ProfileConfigTopic(id), "", true), new(ProfileStateTopic(id), "", true)];
+
+    public static string SummaryName(Profile p) => $"{p.Name} days left";
+
+    /// <summary>One summary per profile: lowest days of the medication with a daily/weekly use, and counts per colour.</summary>
+    public static List<ProfileSummary> Summaries(IEnumerable<Profile> profiles, IReadOnlyCollection<MedicationRow> rows) =>
+        profiles.Select(p =>
+        {
+            var mine = rows.Where(r => r.Medication.ProfileId == p.Id).ToList();
+            var days = mine.Where(r => r.Stock.State != StockState.Paused && r.Medication.UsageMode != UsageMode.AsNeeded)
+                .Select(r => r.Stock.State == StockState.Empty ? 0 : r.Stock.DaysRemaining).Where(d => d is not null).ToList();
+            return new ProfileSummary(p, days.Count == 0 ? null : days.Min(), mine.Count,
+                mine.Count(r => r.ColorClass == "red"), mine.Count(r => r.ColorClass == "orange"));
+        }).ToList();
+
+    private static JsonObject SummaryAttributes(ProfileSummary s) => new()
+    {
+        ["days"] = s.MinDays,
+        ["medications"] = s.Count,
+        ["low"] = s.Low,
+        ["warning"] = s.Warning,
+        ["profile"] = s.Profile.Name,
+    };
+
+    private static JsonObject Config(string name, string uniqueId, string stateTopic, string version, string icon) => new()
+    {
+        ["name"] = name,
+        ["unique_id"] = uniqueId,
+        ["state_topic"] = stateTopic,
+        ["value_template"] = "{{ value_json.days }}",
+        ["json_attributes_topic"] = stateTopic,
+        ["unit_of_measurement"] = "d",
+        ["icon"] = icon,
+        ["availability_topic"] = AvailabilityTopic,
+        ["device"] = new JsonObject
+        {
+            ["identifiers"] = new JsonArray("medstock"),
+            ["name"] = "MedStock",
+            ["manufacturer"] = "MedStock",
+            ["model"] = "Home Assistant app",
+            ["sw_version"] = version,
+        },
+    };
+
+    // ---- Without MQTT: plain states through the REST API (lost at a Home Assistant restart until the next sync) ----
+
+    /// <summary>The states to write when there is no MQTT broker; entity ids follow the MQTT naming (sensor.medstock_…).</summary>
+    public static List<StateSensor> StateSensors(IEnumerable<MedicationRow> meds, IEnumerable<ProfileSummary> summaries)
+    {
+        var list = new List<StateSensor>();
+        var used = new HashSet<string>();
+        string Unique(string id, int key) => used.Add(id) ? id : Unique($"{id}_{key}", key);
+
+        foreach (var r in meds)
+        {
+            var m = r.Medication;
+            var name = string.IsNullOrWhiteSpace(m.Strength) ? m.Name : $"{m.Name} {m.Strength}";
+            var attrs = JsonNode.Parse(State(r).Payload)!.AsObject();
+            var days = attrs["days"]?.ToJsonString();
+            attrs.Remove("days");
+            attrs.Remove("state"); // HA would drop it anyway: "state" is not an attribute name
+            attrs["friendly_name"] = $"MedStock {name} ({r.Profile.Name})";
+            attrs["unit_of_measurement"] = "d";
+            attrs["icon"] = "mdi:pill";
+            list.Add(new StateSensor(Unique($"sensor.medstock_{Slug(name)}_{Slug(r.Profile.Name)}", m.Id), days ?? "unknown", attrs));
+        }
+        foreach (var s in summaries)
+        {
+            var attrs = SummaryAttributes(s);
+            attrs.Remove("days");
+            attrs["friendly_name"] = $"MedStock {SummaryName(s.Profile)}";
+            attrs["unit_of_measurement"] = "d";
+            attrs["icon"] = "mdi:account-heart";
+            list.Add(new StateSensor(Unique($"sensor.medstock_{Slug(SummaryName(s.Profile))}", s.Profile.Id),
+                s.MinDays?.ToString(CultureInfo.InvariantCulture) ?? "unknown", attrs));
+        }
+        return list;
+    }
+
+    /// <summary>Home Assistant style object id: lower-case ASCII letters and digits separated by single underscores.</summary>
+    public static string Slug(string text)
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var ch in text.Normalize(System.Text.NormalizationForm.FormKD))
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(ch) == UnicodeCategory.NonSpacingMark) continue;
+            var c = ch is 'μ' or 'µ' ? 'u' : char.ToLowerInvariant(ch); // "µg" → "ug", as Home Assistant does
+            if (c is (>= 'a' and <= 'z') or (>= '0' and <= '9')) sb.Append(c);
+            else if (sb.Length > 0 && sb[^1] != '_') sb.Append('_');
+        }
+        var slug = sb.ToString().Trim('_');
+        return slug.Length == 0 ? "x" : slug;
+    }
+
+    public static string FormatKeys(IEnumerable<string> keys) => string.Join(",", keys.Order(StringComparer.Ordinal));
+
+    /// <summary>"12" = medication 12, "p3" = summary of profile 3 (older versions only stored medication ids).</summary>
+    public static HashSet<string> ParseKeys(string? raw) =>
+        (raw ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet();
+
+    public static string MedKey(int id) => id.ToString(CultureInfo.InvariantCulture);
+    public static string ProfileKey(int id) => "p" + id.ToString(CultureInfo.InvariantCulture);
 }
+
+public sealed record ProfileSummary(Profile Profile, int? MinDays, int Count, int Low, int Warning);
+
+/// <summary>A state written with POST /api/states/&lt;entity id&gt;.</summary>
+public sealed record StateSensor(string EntityId, string State, JsonObject Attributes);
 
 /// <summary>Minimal MQTT connection, swappable in tests.</summary>
 public interface IMqttConnection : IAsyncDisposable
@@ -129,7 +228,9 @@ public sealed class SensorStatus
     public DateTime? LastPublishedAt { get; set; }
     public int Count { get; set; }
     public string? Broker { get; set; }
-    /// <summary>"no-broker", "connect-failed" or null.</summary>
+    /// <summary>"mqtt" (discovery, survives HA restarts) or "states" (REST API, no broker).</summary>
+    public string? Mode { get; set; }
+    /// <summary>"connect-failed", "ha-failed" or null.</summary>
     public string? Problem { get; set; }
 }
 
@@ -146,16 +247,18 @@ public sealed class SensorSignal
 
 /// <summary>
 /// Publishes (or removes) the sensors: after every change, at startup and every 15 minutes (the days go down by
-/// themselves at midnight). Only when enabled in the global settings; logs ids only.
+/// themselves at midnight). Uses MQTT discovery when the Supervisor offers a broker, otherwise plain states through the
+/// REST API. Only when enabled in the global settings; logs ids only.
 /// </summary>
 public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, SensorStatus status, ILogger<SensorSync> log)
 {
     public async Task SyncAsync(IMqttConnection mqtt, CancellationToken ct)
     {
         var global = await db.GlobalSettings.SingleAsync(ct);
-        var published = SensorMessages.ParseIds(global.PublishedSensorIds);
-        var rows = global.SensorsEnabled ? await MedicationQueries.LoadAsync(db, clock.Today) : [];
-        if (!global.SensorsEnabled && published.Count == 0)
+        bool any = global.SensorsEnabled || global.SummarySensorsEnabled;
+        var published = SensorMessages.ParseKeys(global.PublishedSensorIds);
+        var publishedStates = SensorMessages.ParseKeys(global.PublishedStateEntities);
+        if (!any && published.Count == 0 && publishedStates.Count == 0)
         {
             status.Problem = null;
             status.Count = 0;
@@ -163,37 +266,61 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
             return;
         }
 
+        var rows = any ? await MedicationQueries.LoadAsync(db, clock.Today) : [];
+        var meds = global.SensorsEnabled ? rows : [];
+        var profiles = global.SummarySensorsEnabled
+            ? await db.Profiles.AsNoTracking().OrderBy(p => p.SortOrder).ThenBy(p => p.Id).ToListAsync(ct)
+            : [];
+        var summaries = SensorMessages.Summaries(profiles, rows);
+
         if (!mqtt.IsConnected)
         {
             var broker = await ha.GetMqttBrokerAsync(ct);
-            if (broker is null)
+            if (broker is not null)
             {
-                status.Problem = "no-broker";
-                return;
+                try { await mqtt.ConnectAsync(broker, ct); }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    status.Problem = "connect-failed";
+                    log.LogWarning("MQTT connection to the broker failed: {Error}", ex.GetType().Name);
+                    return;
+                }
+                status.Broker = $"{broker.Host}:{broker.Port}";
             }
-            try { await mqtt.ConnectAsync(broker, ct); }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                status.Problem = "connect-failed";
-                log.LogWarning("MQTT connection to the broker failed: {Error}", ex.GetType().Name);
-                return;
-            }
-            status.Broker = $"{broker.Host}:{broker.Port}";
         }
 
-        var version = DbInitializer.AppVersion;
-        var current = rows.Select(r => r.Medication.Id).ToHashSet();
-        foreach (var id in published.Except(current))
-            foreach (var msg in SensorMessages.Remove(id)) await mqtt.PublishAsync(msg, ct);
+        if (mqtt.IsConnected) await PublishMqttAsync(mqtt, global, published, publishedStates, meds, summaries, any, ct);
+        else await WriteStatesAsync(global, publishedStates, meds, summaries, ct);
+    }
 
-        if (global.SensorsEnabled)
+    private async Task PublishMqttAsync(IMqttConnection mqtt, GlobalSettings global, HashSet<string> published, HashSet<string> publishedStates,
+        List<MedicationRow> meds, List<ProfileSummary> summaries, bool any, CancellationToken ct)
+    {
+        var current = meds.Select(r => SensorMessages.MedKey(r.Medication.Id))
+            .Concat(summaries.Select(s => SensorMessages.ProfileKey(s.Profile.Id))).ToHashSet();
+        var removed = published.Except(current).ToList();
+        foreach (var key in removed)
         {
+            var messages = key.StartsWith('p')
+                ? SensorMessages.RemoveProfile(int.Parse(key[1..], CultureInfo.InvariantCulture))
+                : SensorMessages.Remove(int.Parse(key, CultureInfo.InvariantCulture));
+            foreach (var msg in messages) await mqtt.PublishAsync(msg, ct);
+        }
+
+        if (any)
+        {
+            var version = DbInitializer.AppVersion;
             await mqtt.PublishAsync(new MqttMessage(SensorMessages.AvailabilityTopic, "online", true), ct);
             // Configs are re-sent on every sync (retained, idempotent in HA) so renamed medication or profiles follow.
-            foreach (var r in rows)
+            foreach (var r in meds)
             {
                 await mqtt.PublishAsync(SensorMessages.Config(r, version), ct);
                 await mqtt.PublishAsync(SensorMessages.State(r), ct);
+            }
+            foreach (var s in summaries)
+            {
+                await mqtt.PublishAsync(SensorMessages.ProfileConfig(s, version), ct);
+                await mqtt.PublishAsync(SensorMessages.ProfileState(s), ct);
             }
         }
         else
@@ -201,13 +328,47 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
             await mqtt.PublishAsync(new MqttMessage(SensorMessages.AvailabilityTopic, "", true), ct);
         }
 
-        global.PublishedSensorIds = SensorMessages.FormatIds(current);
+        // A broker appeared after states were written through the REST API: remove those duplicates.
+        foreach (var entity in publishedStates.ToList())
+            if (await ha.DeleteStateAsync(entity, ct)) publishedStates.Remove(entity);
+
+        global.PublishedSensorIds = SensorMessages.FormatKeys(current);
+        global.PublishedStateEntities = SensorMessages.FormatKeys(publishedStates);
         await db.SaveChangesAsync(ct);
+        status.Mode = "mqtt";
         status.Problem = null;
         status.Count = current.Count;
         status.LastPublishedAt = clock.Now;
-        log.LogInformation("Sensors synced: {Count} published, {Removed} removed", current.Count, published.Except(current).Count());
-        if (!global.SensorsEnabled) await mqtt.DisconnectAsync(ct);
+        log.LogInformation("Sensors synced over MQTT: {Count} published, {Removed} removed", current.Count, removed.Count);
+        if (!any) await mqtt.DisconnectAsync(ct);
+    }
+
+    private async Task WriteStatesAsync(GlobalSettings global, HashSet<string> publishedStates,
+        List<MedicationRow> meds, List<ProfileSummary> summaries, CancellationToken ct)
+    {
+        var sensors = SensorMessages.StateSensors(meds, summaries);
+        var wanted = sensors.Select(s => s.EntityId).ToHashSet();
+        var written = new HashSet<string>(publishedStates);
+        int failed = 0, removed = 0;
+        foreach (var entity in publishedStates.Except(wanted))
+        {
+            if (await ha.DeleteStateAsync(entity, ct)) { written.Remove(entity); removed++; }
+            else failed++;
+        }
+        foreach (var s in sensors)
+        {
+            if (await ha.SetStateAsync(s.EntityId, s.State, s.Attributes, ct)) written.Add(s.EntityId);
+            else failed++;
+        }
+
+        global.PublishedStateEntities = SensorMessages.FormatKeys(written);
+        await db.SaveChangesAsync(ct);
+        status.Mode = "states";
+        status.Problem = failed > 0 ? "ha-failed" : null;
+        status.Count = sensors.Count;
+        if (failed == 0) status.LastPublishedAt = clock.Now;
+        if (failed > 0) log.LogWarning("Sensors through the states API: {Failed} of {Count} writes failed", failed, sensors.Count + removed);
+        else log.LogInformation("Sensors synced through the states API: {Count} written, {Removed} removed", sensors.Count, removed);
     }
 }
 

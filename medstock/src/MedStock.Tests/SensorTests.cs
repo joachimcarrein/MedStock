@@ -145,18 +145,90 @@ public class SensorTests
     }
 
     [Fact]
-    public async Task No_broker_or_failed_connection_is_reported_not_thrown()
+    public async Task Failed_connection_is_reported_not_thrown()
+    {
+        using var e = new Env();
+        e.Mqtt.FailConnect = true;
+        await e.SyncAsync();
+        Assert.Equal("connect-failed", e.F.Services.GetRequiredService<SensorStatus>().Problem);
+        Assert.Empty(e.F.Ha.States);
+    }
+
+    [Fact]
+    public async Task Without_a_broker_the_sensors_are_written_as_states_and_removed_again()
     {
         using var e = new Env();
         e.F.Ha.Broker = null;
         await e.SyncAsync();
-        Assert.Equal("no-broker", e.F.Services.GetRequiredService<SensorStatus>().Problem);
+        var status = e.F.Services.GetRequiredService<SensorStatus>();
+        Assert.Equal("states", status.Mode);
+        Assert.Null(status.Problem);
+        Assert.Null(e.Mqtt.ConnectedTo);
 
-        e.F.Ha.Broker = new MqttBroker("core-mosquitto", 1883, false, null, null);
-        e.Mqtt.FailConnect = true;
+        var (state, attrs) = e.F.Ha.States["sensor.medstock_nasalix_50_ug_husband"];
+        Assert.Equal("20", state);
+        Assert.Equal("d", (string?)attrs["unit_of_measurement"]);
+        Assert.Equal("MedStock Nasalix 50 µg (Husband)", (string?)attrs["friendly_name"]);
+        Assert.Equal(160m, (decimal?)attrs["remaining_units"]);
+        Assert.Equal("unknown", e.F.Ha.States["sensor.medstock_paracetamol_husband"].State); // as needed: no days
+
+        e.F.WithDb(db =>
+        {
+            db.Medications.Single(m => m.Id == e.Paracetamol).Archived = true;
+            return db.SaveChanges();
+        });
         await e.SyncAsync();
-        Assert.Equal("connect-failed", e.F.Services.GetRequiredService<SensorStatus>().Problem);
+        Assert.False(e.F.Ha.States.ContainsKey("sensor.medstock_paracetamol_husband"));
+        Assert.True(e.F.Ha.States.ContainsKey("sensor.medstock_nasalix_50_ug_husband"));
+
+        // A broker shows up: MQTT takes over and the plain states are deleted.
+        e.F.Ha.Broker = new MqttBroker("core-mosquitto", 1883, false, null, null);
+        await e.SyncAsync();
+        Assert.Equal("mqtt", status.Mode);
+        Assert.Empty(e.F.Ha.States);
+        Assert.True(string.IsNullOrEmpty(e.F.WithDb(db => db.GlobalSettings.Single().PublishedStateEntities)));
     }
+
+    [Fact]
+    public async Task Summary_sensor_per_profile_has_no_medication_names()
+    {
+        using var e = new Env(enabled: false);
+        var profileId = e.F.WithDb(db =>
+        {
+            db.GlobalSettings.Single().SummarySensorsEnabled = true;
+            db.SaveChanges();
+            return db.Profiles.Single().Id;
+        });
+        await e.SyncAsync();
+        Assert.DoesNotContain(e.Mqtt.Published, m => m.Topic == SensorMessages.ConfigTopic(e.Nasalix));
+        var config = e.Payload(SensorMessages.ProfileConfigTopic(profileId));
+        Assert.Equal("Husband days left", (string?)config["name"]);
+        var state = e.Payload(SensorMessages.ProfileStateTopic(profileId));
+        Assert.Equal(20, (int?)state["days"]); // Nasalix; Paracetamol (as needed) has no days
+        Assert.Equal(2, (int?)state["medications"]);
+        Assert.Equal(0, (int?)state["low"]);
+        Assert.Equal(1, (int?)state["warning"]);
+        Assert.DoesNotContain(e.Mqtt.Published, m => m.Payload.Contains("Nasalix") || m.Payload.Contains("Paracetamol"));
+
+        e.F.Ha.Broker = null;
+        await e.Mqtt.DisconnectAsync(CancellationToken.None);
+        await e.SyncAsync();
+        Assert.Equal("20", e.F.Ha.States["sensor.medstock_husband_days_left"].State);
+
+        e.F.WithDb(db =>
+        {
+            db.GlobalSettings.Single().SummarySensorsEnabled = false;
+            return db.SaveChanges();
+        });
+        await e.SyncAsync();
+        Assert.Empty(e.F.Ha.States);
+    }
+
+    [Theory]
+    [InlineData("Nasalix 50 µg", "nasalix_50_ug")]
+    [InlineData("Émile's  crème", "emile_s_creme")]
+    [InlineData("---", "x")]
+    public void Slug_follows_home_assistant(string text, string slug) => Assert.Equal(slug, SensorMessages.Slug(text));
 
     [Fact]
     public async Task Sensor_logs_contain_no_names()

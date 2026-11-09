@@ -9,7 +9,7 @@ You only act when you buy more ("+1 box") or when you want to correct the count 
 
 - Home Assistant OS or Supervised (an installation with the Supervisor and apps).
 - For push notifications: the Home Assistant Companion app on the phones that should receive them.
-- Optional: the Mosquitto broker app (for sensors) and a to-do list such as "Local To-do" (for the to-do extra).
+- Optional: the Mosquitto broker app (sensors that survive restarts) and a to-do list such as "Local To-do" (for the to-do extra).
 
 ## Install and update
 
@@ -132,16 +132,29 @@ next ones.
 
 ### Sensors in Home Assistant
 
-**Settings › For everyone › Show the days remaining as sensors**. Requires an MQTT broker (the Mosquitto broker
-app; MedStock gets its credentials from the Supervisor). One device **MedStock** appears under
-**Settings › Devices & services › MQTT**, with one sensor per medication:
+**Settings › For everyone › Sensors in Home Assistant** has two independent options:
+
+**A "days remaining" sensor per medication**
 
 - Entity: `sensor.medstock_<medication>_<profile>`, for example `sensor.medstock_nasalix_husband` (the strength is
   part of the name when you filled it in). You can rename entities in Home Assistant as usual.
 - State: days remaining (unit `d`); *unknown* for as-needed or paused medication.
 - Attributes: `remaining_units`, `packages`, `unit`, `last_dose_date`, `medication`, `profile`.
-- Updated after every change in MedStock and at least every 15 minutes. Archiving or deleting a medication, or
-  turning the option off, removes its sensor again.
+
+**A summary sensor per profile** (no medication names, for automations or a shared dashboard)
+
+- Entity: `sensor.medstock_<profile>_days_left`, for example `sensor.medstock_husband_days_left`.
+- State: the lowest days remaining of that profile's medication (as-needed and paused medication do not count).
+- Attributes: `medications` (how many), `low` (red), `warning` (orange), `profile`.
+
+Both are updated after every change in MedStock and at least every 15 minutes. Archiving or deleting a medication,
+or turning an option off, removes its sensor again.
+
+**With or without MQTT.** When the Mosquitto broker app is installed, MedStock uses MQTT discovery (it gets the
+credentials from the Supervisor): one device **MedStock** appears under **Settings › Devices & services › MQTT**
+and the sensors survive Home Assistant restarts. Without a broker the sensors are written as plain states: they
+work the same in automations and dashboards, but have no device, cannot be renamed in the UI, and are missing for
+up to 15 minutes after a Home Assistant restart.
 
 Example automation trigger: `numeric_state` of the sensor below 7.
 
@@ -168,7 +181,8 @@ included. There is no import yet; the file is meant for keeping or moving your d
 |---|---|
 | Everything you enter, photos | Only in the app's own folder (`/data`), part of your Home Assistant backups. |
 | Notification texts (medication and profile names) | To the devices chosen by each user, via Home Assistant. |
-| Sensors (optional) | Medication and profile names become visible in Home Assistant's history, logbook and dashboards, to every Home Assistant user. |
+| Sensors per medication (optional) | Medication and profile names become visible in Home Assistant's history, logbook and dashboards, to every Home Assistant user. |
+| Summary sensors (optional) | Profile names and numbers only. |
 | To-do list (optional) | "Name strength (profile)" on the chosen Home Assistant list. |
 | Picture search (optional) | Only when you tap **Search**: the search text to Wikimedia Commons or DailyMed; your phone loads the previews from there. |
 | App log | Identifiers and counts only, never medication or profile names (at `info` level). |
@@ -200,7 +214,7 @@ All other settings are in the app itself (**Settings**).
 | I receive no notifications | Open **Settings › My notifications**, tick your phone and tap **Save**; then **Send test notification**. Check that the profile is ticked and that the medication has notifications on (edit › settings). A step that was already sent is not sent again until the stock is sufficient. |
 | "Device not found anymore; choose again" | The phone was renamed or removed in Home Assistant. Tick the new device and save. |
 | "Home Assistant not reachable" in Settings | Home Assistant is restarting or busy; reload after a minute. Notifications are retried every minute. |
-| "No MQTT broker found" | Install and start the Mosquitto broker app, then save the settings again. |
+| Sensors are missing right after a Home Assistant restart | Without the Mosquitto broker app they come back within 15 minutes. Install the broker to keep them across restarts. |
 | The medication is still red after buying | Use **+1** / **+ n** (or **Recount**) so MedStock knows; it calculates from the last count. |
 | The days look one day off | Days are rounded down and today's dose counts as taken. When you recount, use the "already taken today" tick box. |
 | "Session expired – tap to reload" | The Home Assistant session ended after inactivity; tap the banner. |

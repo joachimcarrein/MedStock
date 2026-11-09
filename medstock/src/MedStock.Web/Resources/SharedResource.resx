@@ -187,11 +187,15 @@
   <data name="Doctor_Text" xml:space="preserve"><value>Text for the doctor</value></data>
   <data name="Doctor_Share" xml:space="preserve"><value>Share</value></data>
   <data name="Doctor_Copied" xml:space="preserve"><value>Copied</value></data>
-  <data name="Settings_Sensors" xml:space="preserve"><value>Show the days remaining as sensors in Home Assistant (MQTT)</value></data>
+  <data name="Settings_Sensors" xml:space="preserve"><value>A "days remaining" sensor per medication</value></data>
   <data name="Settings_Sensors_Privacy" xml:space="preserve"><value>Medication and profile names then appear in Home Assistant: in history, the logbook and dashboards, for every Home Assistant user.</value></data>
-  <data name="Settings_Sensors_NoBroker" xml:space="preserve"><value>No MQTT broker found. Install and start the Mosquitto broker app.</value></data>
+  <data name="Settings_Sensors_NoBroker" xml:space="preserve"><value>No MQTT broker: the sensors are written as plain states. After a Home Assistant restart they are back within 15 minutes. With the Mosquitto broker app they survive restarts and get a MedStock device.</value></data>
   <data name="Settings_Sensors_ConnectFailed" xml:space="preserve"><value>Could not connect to the MQTT broker; retrying.</value></data>
   <data name="Settings_Sensors_Status" xml:space="preserve"><value>{0} sensors published at {1}</value></data>
+  <data name="Settings_SensorsTitle" xml:space="preserve"><value>Sensors in Home Assistant</value></data>
+  <data name="Settings_SummarySensors" xml:space="preserve"><value>A summary sensor per profile (lowest days remaining, no medication names)</value></data>
+  <data name="Settings_SummarySensors_Help" xml:space="preserve"><value>Useful for an automation or a dashboard without showing what someone takes. Attributes: number of medications, how many are red (low) and orange.</value></data>
+  <data name="Settings_Sensors_HaFailed" xml:space="preserve"><value>Some sensors could not be written to Home Assistant; retrying.</value></data>
   <data name="Settings_Todo" xml:space="preserve"><value>Add medication that runs low to this to-do list</value></data>
   <data name="Settings_Todo_None" xml:space="preserve"><value>(none)</value></data>
   <data name="Settings_Todo_Hint" xml:space="preserve"><value>No to-do lists in Home Assistant yet. Add the "Local To-do" integration (or the shopping list) to use this.</value></data>

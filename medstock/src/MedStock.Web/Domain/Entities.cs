@@ -98,8 +98,15 @@ public class GlobalSettings
     public string WrittenByVersion { get; set; } = "";
     /// <summary>Opt-in: publish a "days remaining" sensor per medication to Home Assistant via MQTT discovery.</summary>
     public bool SensorsEnabled { get; set; }
-    /// <summary>Medication ids that currently have a retained discovery config (comma separated), so removed ones get cleaned up.</summary>
+    /// <summary>
+    /// Sensors that currently have a retained MQTT discovery config (comma separated: "12" = medication 12, "p3" = summary of
+    /// profile 3), so removed ones get cleaned up.
+    /// </summary>
     public string? PublishedSensorIds { get; set; }
+    /// <summary>Opt-in: one sensor per profile with the lowest days remaining and counts, without medication names.</summary>
+    public bool SummarySensorsEnabled { get; set; }
+    /// <summary>Entity ids written through the REST states API (no MQTT broker), comma separated, so removed ones get deleted.</summary>
+    public string? PublishedStateEntities { get; set; }
     /// <summary>Optional todo.* entity: medication that runs low is added to this list (once while it is open).</summary>
     public string? TodoEntityId { get; set; }
 }

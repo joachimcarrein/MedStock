@@ -37,7 +37,13 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<string>("PublishedSensorIds")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PublishedStateEntities")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("SensorsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SummarySensorsEnabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TodoEntityId")

@@ -135,21 +135,28 @@
             <p class="small muted">@L["Settings_Todo_Hint"]</p>
         }
         <fieldset>
+            <legend>@L["Settings_SensorsTitle"]</legend>
             <label class="inline"><input type="checkbox" name="sensorsEnabled" value="true" checked="@Model.Global.SensorsEnabled" /> @L["Settings_Sensors"]</label>
             <p class="small muted">@L["Settings_Sensors_Privacy"]</p>
-            @if (Model.Global.SensorsEnabled)
+            <label class="inline"><input type="checkbox" name="summarySensorsEnabled" value="true" checked="@Model.Global.SummarySensorsEnabled" /> @L["Settings_SummarySensors"]</label>
+            <p class="small muted">@L["Settings_SummarySensors_Help"]</p>
+            @if (Model.Global.SensorsEnabled || Model.Global.SummarySensorsEnabled)
             {
-                @if (Model.Sensors.Problem == "no-broker")
-                {
-                    <p class="error small">@L["Settings_Sensors_NoBroker"]</p>
-                }
-                else if (Model.Sensors.Problem == "connect-failed")
+                @if (Model.Sensors.Problem == "connect-failed")
                 {
                     <p class="error small">@L["Settings_Sensors_ConnectFailed"]</p>
+                }
+                else if (Model.Sensors.Problem == "ha-failed")
+                {
+                    <p class="error small">@L["Settings_Sensors_HaFailed"]</p>
                 }
                 else if (Model.Sensors.LastPublishedAt is { } at)
                 {
                     <p class="small ok">@L["Settings_Sensors_Status", Model.Sensors.Count, at.ToString("t", System.Globalization.CultureInfo.CurrentUICulture)]</p>
+                }
+                @if (Model.Sensors.Mode == "states")
+                {
+                    <p class="small muted">@L["Settings_Sensors_NoBroker"]</p>
                 }
             }
         </fieldset>

@@ -28,7 +28,7 @@ The UI is available in English and Dutch.
 Optional extras (off by default, in **Settings**):
 
 - a **"+1 box" button** in every notification;
-- **sensors** in Home Assistant with the days remaining per medication (MQTT discovery; requires the Mosquitto broker app);
+- **sensors** in Home Assistant with the days remaining per medication, and a summary per profile without medication names (MQTT discovery when the Mosquitto broker app is installed, plain states otherwise);
 - a **to-do list** entry when something runs low.
 
 ## Installation

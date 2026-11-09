@@ -182,11 +182,15 @@ Doctor_Others	Nothing needed ({0})	Niets nodig ({0})
 Doctor_Text	Text for the doctor	Tekst voor de dokter
 Doctor_Share	Share	Delen
 Doctor_Copied	Copied	Gekopieerd
-Settings_Sensors	Show the days remaining as sensors in Home Assistant (MQTT)	Dagen resterend als sensoren in Home Assistant tonen (MQTT)
+Settings_Sensors	A "days remaining" sensor per medication	Een sensor "dagen resterend" per medicatie
 Settings_Sensors_Privacy	Medication and profile names then appear in Home Assistant: in history, the logbook and dashboards, for every Home Assistant user.	Medicatie- en profielnamen komen dan in Home Assistant terecht: in de geschiedenis, het logboek en dashboards, voor elke Home Assistant-gebruiker.
-Settings_Sensors_NoBroker	No MQTT broker found. Install and start the Mosquitto broker app.	Geen MQTT-broker gevonden. Installeer en start de app Mosquitto broker.
+Settings_Sensors_NoBroker	No MQTT broker: the sensors are written as plain states. After a Home Assistant restart they are back within 15 minutes. With the Mosquitto broker app they survive restarts and get a MedStock device.	Geen MQTT-broker: de sensoren worden als gewone toestanden geschreven. Na een herstart van Home Assistant zijn ze binnen 15 minuten terug. Met de app Mosquitto broker overleven ze een herstart en krijgen ze een MedStock-apparaat.
 Settings_Sensors_ConnectFailed	Could not connect to the MQTT broker; retrying.	Kon niet verbinden met de MQTT-broker; nieuwe poging volgt.
 Settings_Sensors_Status	{0} sensors published at {1}	{0} sensoren gepubliceerd om {1}
+Settings_SensorsTitle	Sensors in Home Assistant	Sensoren in Home Assistant
+Settings_SummarySensors	A summary sensor per profile (lowest days remaining, no medication names)	Een samenvattingssensor per profiel (laagste aantal dagen, zonder medicatienamen)
+Settings_SummarySensors_Help	Useful for an automation or a dashboard without showing what someone takes. Attributes: number of medications, how many are red (low) and orange.	Handig voor een automatisering of dashboard zonder te tonen wat iemand neemt. Attributen: aantal medicaties, hoeveel rood (laag) en oranje.
+Settings_Sensors_HaFailed	Some sensors could not be written to Home Assistant; retrying.	Sommige sensoren konden niet naar Home Assistant geschreven worden; nieuwe poging volgt.
 Settings_Todo	Add medication that runs low to this to-do list	Medicatie die bijna op is op deze to-do-lijst zetten
 Settings_Todo_None	(none)	(geen)
 Settings_Todo_Hint	No to-do lists in Home Assistant yet. Add the "Local To-do" integration (or the shopping list) to use this.	Nog geen to-do-lijsten in Home Assistant. Voeg de integratie "Local To-do" (of de boodschappenlijst) toe om dit te gebruiken.

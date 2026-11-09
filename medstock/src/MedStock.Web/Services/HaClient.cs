@@ -29,6 +29,12 @@ public interface IHaClient
 
     /// <summary>Adds an item unless an open item with the same text exists. Returns false on any failure.</summary>
     Task<bool> AddTodoItemIfMissingAsync(string entityId, string item, CancellationToken ct = default);
+
+    /// <summary>POST /api/states/&lt;entity&gt; (sensors without MQTT). Returns false on any failure.</summary>
+    Task<bool> SetStateAsync(string entityId, string state, JsonObject attributes, CancellationToken ct = default);
+
+    /// <summary>DELETE /api/states/&lt;entity&gt;; an entity that does not exist counts as deleted. Returns false on failure.</summary>
+    Task<bool> DeleteStateAsync(string entityId, CancellationToken ct = default);
 }
 
 public sealed record MqttBroker(string Host, int Port, bool Ssl, string? Username, string? Password);
@@ -143,6 +149,37 @@ public sealed class HaClient(HttpClient http, ILogger<HaClient> logger) : IHaCli
         }
     }
 
+    public async Task<bool> SetStateAsync(string entityId, string state, JsonObject attributes, CancellationToken ct = default)
+    {
+        try
+        {
+            using var resp = await http.PostAsJsonAsync(CoreBase + "states/" + Uri.EscapeDataString(entityId),
+                new JsonObject { ["state"] = state, ["attributes"] = attributes.DeepClone() }, ct);
+            logger.LogDebug("set state {Entity} -> {Status}", entityId, (int)resp.StatusCode);
+            return resp.IsSuccessStatusCode;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            logger.LogWarning("Could not write a sensor state: {Error}", ex.GetType().Name);
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteStateAsync(string entityId, CancellationToken ct = default)
+    {
+        try
+        {
+            using var resp = await http.DeleteAsync(CoreBase + "states/" + Uri.EscapeDataString(entityId), ct);
+            logger.LogDebug("delete state {Entity} -> {Status}", entityId, (int)resp.StatusCode);
+            return resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NotFound;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            logger.LogWarning("Could not delete a sensor state: {Error}", ex.GetType().Name);
+            return false;
+        }
+    }
+
     public async Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default)
     {
         try
@@ -212,4 +249,20 @@ public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
         return Task.FromResult(true);
     }
     public Task<MqttBroker?> GetMqttBrokerAsync(CancellationToken ct = default) => Task.FromResult(Broker);
+
+    public Dictionary<string, (string State, JsonObject Attributes)> States { get; } = [];
+
+    public Task<bool> SetStateAsync(string entityId, string state, JsonObject attributes, CancellationToken ct = default)
+    {
+        if (Unavailable) return Task.FromResult(false);
+        lock (States) States[entityId] = (state, attributes.DeepClone().AsObject());
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> DeleteStateAsync(string entityId, CancellationToken ct = default)
+    {
+        if (Unavailable) return Task.FromResult(false);
+        lock (States) States.Remove(entityId);
+        return Task.FromResult(true);
+    }
 }
