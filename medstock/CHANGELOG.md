@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Docs: dashboard example says where to paste it (a card, not the view YAML) and also comes as a whole view; examples use the same generic profile names everywhere (Husband, Wife).
+
 ## 2026.11.0
 
 - Barcode field: ✕ only empties the field; tap Save to remove the code (a mis-tap loses nothing).

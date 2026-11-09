@@ -20,3 +20,4 @@ TestResults/
 .DS_Store
 Thumbs.db
 .playwright-mcp/
+__pycache__/

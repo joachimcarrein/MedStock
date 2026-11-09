@@ -182,7 +182,7 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
         Assert.Contains("/Settings/Profiles", resp.Headers.Location!.ToString());
 
         var token = await TokenAsync(c, "/Settings/Profiles?next=new");
-        var add = await c.PostAsync("/Settings/Profiles?handler=Add&next=new", Form(token, ("name", "Alex"), ("color", "#1e88e5")));
+        var add = await c.PostAsync("/Settings/Profiles?handler=Add&next=new", Form(token, ("name", "Husband"), ("color", "#1e88e5")));
         Assert.Equal(HttpStatusCode.Redirect, add.StatusCode);
         Assert.Contains("/Medications/Edit?profileId=", add.Headers.Location!.ToString());
         Assert.Contains("class=\"fab\"", await c.GetStringAsync("/"));

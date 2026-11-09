@@ -202,8 +202,11 @@ up to 15 minutes after a Home Assistant restart.
 
 Example automation trigger: `numeric_state` of the sensor below 7.
 
-**Dashboard example** with the summary sensors (no medication names, so fine on a shared wall tablet). Add a card
-with **Edit dashboard › Add card › Manual** and adjust the profile names:
+**Dashboard example** with the summary sensors (no medication names, so fine on a shared wall tablet). This is the
+YAML of one **card**: open the dashboard, **Edit dashboard › Add card**, scroll down to **Manual**, paste it and adjust
+the profile names (the entity ids follow your profile names). Do not paste it into the YAML of a whole view (the view's
+pencil › ⋮ › **Edit in YAML**): that gives "Configuration error", because a view expects a list of cards. To use it as
+a view anyway, put it under `cards:` there (see below).
 
 ```yaml
 type: vertical-stack
@@ -233,6 +236,40 @@ cards:
         {% set s = states.sensor.medstock_husband_days_left %}
         **Husband**: {{ s.attributes.low }} medication(s) almost out, {{ s.attributes.warning }} soon.
         Open MedStock to see which.
+```
+
+As a whole view (view YAML):
+
+```yaml
+title: Medication
+cards:
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: gauge
+            entity: sensor.medstock_husband_days_left
+            name: Husband
+            min: 0
+            max: 60
+            severity: { green: 28, yellow: 14, red: 0 }
+          - type: gauge
+            entity: sensor.medstock_wife_days_left
+            name: Wife
+            min: 0
+            max: 60
+            severity: { green: 28, yellow: 14, red: 0 }
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: sensor.medstock_husband_days_left
+            below: 14
+        card:
+          type: markdown
+          content: >-
+            {% set s = states.sensor.medstock_husband_days_left %}
+            **Husband**: {{ s.attributes.low }} medication(s) almost out, {{ s.attributes.warning }} soon.
+            Open MedStock to see which.
 ```
 
 The gauges show the lowest days left per person; the message only appears when something drops below 14 days.
