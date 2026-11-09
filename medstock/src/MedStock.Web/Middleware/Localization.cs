@@ -9,7 +9,29 @@ namespace MedStock.Web.Middleware;
 
 public static class LocalizationSetup
 {
-    public static readonly CultureInfo[] UiCultures = [new("en"), new("nl")];
+    /// <summary>
+    /// English (the neutral resx) plus every language that has a SharedResource.&lt;code&gt;.resx: each one is built into a
+    /// satellite assembly &lt;code&gt;/MedStock.Web.resources.dll next to the app, so adding a resx is all a new language needs.
+    /// </summary>
+    public static readonly CultureInfo[] UiCultures = DiscoverUiCultures(AppContext.BaseDirectory);
+
+    public static CultureInfo[] DiscoverUiCultures(string baseDirectory)
+    {
+        var satellite = typeof(SharedResource).Assembly.GetName().Name + ".resources.dll";
+        var found = Directory.Exists(baseDirectory)
+            ? Directory.EnumerateDirectories(baseDirectory)
+                .Where(d => File.Exists(Path.Combine(d, satellite)))
+                .Select(d => TryCulture(Path.GetFileName(d)))
+                .OfType<CultureInfo>()
+            : [];
+        return [new CultureInfo("en"), .. found.Where(c => c.Name != "en").OrderBy(c => c.Name, StringComparer.Ordinal)];
+    }
+
+    private static CultureInfo? TryCulture(string name)
+    {
+        try { return CultureInfo.GetCultureInfo(name); }
+        catch (CultureNotFoundException) { return null; }
+    }
 
     public static string LanguageCacheKey(string userId) => "lang:" + userId;
 

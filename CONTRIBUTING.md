@@ -26,8 +26,8 @@ prefix makes missing path prefixes visible right away.
 
 - **UI texts:** add every key to `medstock/src/MedStock.Web/Resources/SharedResource.resx` (English) and to each
   language file (`SharedResource.nl.resx`, ...). A test fails when a language misses a key or a placeholder (`{0}`).
-- **A new language:** copy `SharedResource.nl.resx` to `SharedResource.<code>.resx`, translate it and add the code to
-  `UiCultures` in `Middleware/Localization.cs`; it then appears in Settings › Language.
+- **A new language:** copy `SharedResource.nl.resx` to `SharedResource.<code>.resx` and translate it. That is all: the
+  app finds the language when it starts and offers it in Settings › Language.
 - **Database changes:** add an EF Core migration in the same pull request
   (`dotnet ef migrations add <Name> --project medstock/src/MedStock.Web --output-dir Data/Migrations`). Migrations
   must be additive (new tables/columns with defaults), so an older version can still open a newer database.
