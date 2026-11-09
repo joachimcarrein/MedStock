@@ -96,7 +96,7 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
     {
         var t = Row.Medication.Type;
         var n = N ?? 1;
-        return Done switch
+        return (Done switch
         {
             "added" => l["Flash_Added", n, Texts.Package(t, n, c)],
             "taken" => l["Flash_Taken", n, Texts.Unit(t, n, c)],
@@ -108,6 +108,6 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
             "barcode" => l["Flash_Barcode"],
             "barcode-removed" => l["Flash_BarcodeRemoved"],
             _ => null,
-        };
+        })?.Value;
     }
 }
