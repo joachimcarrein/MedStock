@@ -131,6 +131,10 @@ label.inline input { margin: 0; flex: none; }
 .qty-form { display: grid; grid-template-columns: 1fr 9.5rem; margin-bottom: 0.5rem; }
 .qty-form button { width: 100%; }
 .scanner .scan-close { width: 100%; }
+/* "Photo" is a label around the file input; give it exactly the height of the real buttons next to and below it. */
+.scanner .grid-2 { margin-bottom: 0.75rem; }
+.scanner .grid-2 > label, .scanner .grid-2 > button, .scanner .scan-close {
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: 3.125rem; margin: 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .dayparts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; font-size: 0.8rem; }
 .helper summary, .advanced summary { font-size: 0.9rem; }
