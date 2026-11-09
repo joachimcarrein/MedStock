@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.0
+
 - Trip planner: take along whole strips or bottles instead of "≈ n boxes". New optional field per medication: smallest amount to take along (e.g. a strip of 10).
 - Scanning an unknown box offers "New medication with this barcode".
 - Settings: checkboxes with a long label no longer shrink.
