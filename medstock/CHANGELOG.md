@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2026.11.0
+
 - Barcode field: ✕ only empties the field; tap Save to remove the code (a mis-tap loses nothing).
 - Versions now follow the date like Home Assistant: YEAR.MONTH.N.
 
