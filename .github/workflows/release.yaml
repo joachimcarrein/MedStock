@@ -1,4 +1,6 @@
-# One-click release (Actions › Release › Run workflow, or `gh workflow run release.yaml -f version=1.2.3`).
+# One-click release (Actions › Release › Run workflow, or `gh workflow run release.yaml`).
+# Versions follow the date like Home Assistant: YEAR.MONTH.N (2026.11.0, 2026.11.1, ..., 2026.12.0), counted from the
+# existing tags of that month (Europe/Brussels). A version can still be given explicitly with `-f version=...`.
 # Only people with write access can start it. Order matters: Home Assistant offers an update as soon as main has a
 # new version, so main is only updated after the image exists and can be pulled anonymously.
 #   1. prepare  bump version (config.yaml, csproj), turn "## Unreleased" in CHANGELOG.md into "## <version>",
@@ -14,8 +16,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: New version (e.g. 1.2.3)
-        required: true
+        description: New version (leave empty for YEAR.MONTH.N)
+        required: false
         type: string
 
 permissions:
@@ -27,20 +29,35 @@ concurrency:
 
 jobs:
   prepare:
-    name: Prepare release/${{ inputs.version }}
+    name: Prepare release
     runs-on: ubuntu-latest
     permissions:
       contents: write # push the release branch
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
 
+      - name: Work out the version
+        id: version
+        env:
+          REQUESTED: ${{ inputs.version }}
+        run: |
+          VERSION="$REQUESTED"
+          if [ -z "$VERSION" ]; then
+            prefix=$(TZ=Europe/Brussels date +%Y.%-m)
+            last=$(git ls-remote --tags origin "refs/tags/$prefix.*" | sed -n "s#.*refs/tags/$prefix\.\([0-9]*\)\$#\1#p" | sort -n | tail -1)
+            VERSION="$prefix.$(( ${last:--1} + 1 ))"
+          fi
+          echo "Version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Validate the version
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::Version must look like 1.2.3"; exit 1
@@ -63,17 +80,17 @@ jobs:
 
       - name: Bump version and changelog
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           sed -i "s/^version: .*/version: \"$VERSION\"/" medstock/config.yaml
           sed -i "s#<Version>[^<]*</Version>#<Version>$VERSION</Version>#" medstock/src/MedStock.Web/MedStock.Web.csproj
           sed -i "0,/^## Unreleased/s//## Unreleased\n\n## $VERSION/" medstock/CHANGELOG.md
           git diff --stat
 
-      - name: Commit on release/${{ inputs.version }}
+      - name: Commit on the release branch
         id: commit
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -106,11 +123,11 @@ jobs:
       packages: write
     uses: ./.github/workflows/build.yaml
     with:
-      version: ${{ inputs.version }}
+      version: ${{ needs.prepare.outputs.version }}
       ref: ${{ needs.prepare.outputs.sha }}
 
   publish:
-    name: Publish ${{ inputs.version }}
+    name: Publish ${{ needs.prepare.outputs.version }}
     needs: [prepare, build]
     runs-on: ubuntu-latest
     permissions:
@@ -118,7 +135,7 @@ jobs:
     steps:
       - name: The image can be pulled anonymously
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           token=$(curl -fsS "https://ghcr.io/token?scope=repository:${GITHUB_REPOSITORY_OWNER}/medstock:pull" | jq -r .token)
           curl -fsS -o manifest.json -H "Authorization: Bearer $token" \
@@ -137,7 +154,7 @@ jobs:
 
       - name: Fast-forward main, tag and release
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ needs.prepare.outputs.version }}
           SHA: ${{ needs.prepare.outputs.sha }}
           GH_TOKEN: ${{ github.token }}
         run: |

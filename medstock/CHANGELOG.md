@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Barcode field: ✕ only empties the field; tap Save to remove the code (a mis-tap loses nothing).
+- Versions now follow the date like Home Assistant: YEAR.MONTH.N.
+
 ## 1.5.0
 
 - Course with an end date (e.g. antibiotics): no use after the last day, "enough until the course ends" without countdown or notifications, "course ended" afterwards.

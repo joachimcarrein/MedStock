@@ -160,13 +160,19 @@
     else close();
   });
 
-  // The ✕ in the barcode field empties it and saves (= remove the code).
+  // The ✕ in the barcode field only empties it; Save removes the code (a mis-tap loses nothing).
   document.addEventListener('click', function (e) {
-    var x = e.target.closest && e.target.closest('[data-clear-submit]');
+    var x = e.target.closest && e.target.closest('[data-clear]');
     if (!x) return;
-    var form = x.closest('form');
-    form.querySelector('input[name="barcode"]').value = '';
-    form.requestSubmit ? form.requestSubmit() : form.submit();
+    var input = x.closest('form').querySelector('input[name="barcode"]');
+    input.value = '';
+    x.hidden = true;
+    input.focus();
+  });
+  document.addEventListener('input', function (e) {
+    if (!e.target.matches || !e.target.matches('input[name="barcode"]')) return;
+    var x = e.target.closest('form').querySelector('[data-clear]');
+    if (x) x.hidden = e.target.value === '';
   });
 
   document.addEventListener('change', function (e) {

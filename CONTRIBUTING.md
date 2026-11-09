@@ -42,7 +42,9 @@ prefix makes missing path prefixes visible right away.
 
 ## Releases (maintainer)
 
-**Actions › Release › Run workflow** with the new version (or `gh workflow run release.yaml -f version=1.2.3`). The
+**Actions › Release › Run workflow** (or `gh workflow run release.yaml`). Versions follow the date like Home
+Assistant: `YEAR.MONTH.N` (2026.11.0, 2026.11.1, then 2026.12.0 next month); the workflow picks the next number
+itself. A version can still be given with `-f version=...` (it must be higher than the current one). The
 workflow bumps the version, turns `## Unreleased` into the release notes, tests, builds and signs the images, checks
 that they can be pulled, and only then updates `main` and creates the tag and GitHub release. Home Assistant offers
 the update as soon as `main` has the new version.
