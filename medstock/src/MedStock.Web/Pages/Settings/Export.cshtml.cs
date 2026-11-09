@@ -17,8 +17,9 @@ public class ExportModel(MedStockDb db, IClock clock, ILogger<ExportModel> log) 
 {
     public const int FormatVersion = 1;
 
-    private static readonly JsonSerializerOptions Json = new()
+    public static readonly JsonSerializerOptions Json = new()
     {
+        PropertyNameCaseInsensitive = true,
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters = { new JsonStringEnumConverter() },
@@ -53,7 +54,8 @@ public class ExportModel(MedStockDb db, IClock clock, ILogger<ExportModel> log) 
                 m.Weekly, m.MinStockUnits, m.AlertDays, m.CoverageDays, m.NotificationsEnabled, m.Paused, m.Archived,
                 snapshots.TryGetValue(m.Id, out var s)
                     ? new ExportStock(s.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TotalUnits)
-                    : null)).ToList());
+                    : null,
+                m.Barcode)).ToList());
     }
 }
 
@@ -67,6 +69,6 @@ public sealed record ExportProfile(int Id, string Name, string Color, int SortOr
 /// <summary>Weekly: units per weekday, Monday first. Stock: total units at the END of that date.</summary>
 public sealed record ExportMedication(int Id, int ProfileId, string Name, string? Strength, string Type, decimal UnitsPerPackage,
     string UsageMode, decimal PerDay, decimal[] Weekly, decimal MinStockUnits, int? AlertDays, int? CoverageDays,
-    bool NotificationsEnabled, bool Paused, bool Archived, ExportStock? Stock);
+    bool NotificationsEnabled, bool Paused, bool Archived, ExportStock? Stock, string? Barcode = null);
 
 public sealed record ExportStock(string Date, decimal TotalUnits);

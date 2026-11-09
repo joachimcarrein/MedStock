@@ -236,4 +236,17 @@
   <data name="Vacation_ShareTitle" xml:space="preserve"><value>Trip from {0}, {1} days</value></data>
   <data name="Vacation_Text" xml:space="preserve"><value>Shopping list</value></data>
   <data name="Vacation_Invalid" xml:space="preserve"><value>Choose a departure from today on and 1 to 365 days.</value></data>
+  <data name="Import_Link" xml:space="preserve"><value>Import data (JSON)</value></data>
+  <data name="Import_Title" xml:space="preserve"><value>Import</value></data>
+  <data name="Import_Help" xml:space="preserve"><value>Choose a file made with "Export data". Importing only adds: profiles are matched by name, medication that already exists in the same profile (same name and strength) is skipped, nothing is overwritten or deleted. The exported stock becomes the first count. Photos are not part of an export.</value></data>
+  <data name="Import_File" xml:space="preserve"><value>Export file</value></data>
+  <data name="Import_ApplySettings" xml:space="preserve"><value>Also take over the general settings (coverage period, alert threshold, notification time)</value></data>
+  <data name="Import_Button" xml:space="preserve"><value>Import</value></data>
+  <data name="Import_Done" xml:space="preserve"><value>{0} medications imported, {1} profiles created.</value></data>
+  <data name="Import_Skipped" xml:space="preserve"><value>{0} skipped because they already exist.</value></data>
+  <data name="Import_Invalid" xml:space="preserve"><value>{0} entries skipped because they are incomplete or invalid.</value></data>
+  <data name="Import_SettingsApplied" xml:space="preserve"><value>The general settings were taken over.</value></data>
+  <data name="Import_NoFile" xml:space="preserve"><value>Choose an export file (at most 2 MB).</value></data>
+  <data name="Import_NotAnExport" xml:space="preserve"><value>This file is not a MedStock export.</value></data>
+  <data name="Import_UnknownFormat" xml:space="preserve"><value>This export was made by a newer MedStock version. Update MedStock first.</value></data>
 </root>

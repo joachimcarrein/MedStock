@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Import of a JSON export (adds profiles and medication, never overwrites). The export now includes the barcode.
 - Trip planner (Prescription › Going away?): what to buy before leaving and what to take along.
 - Discreet notifications (per user): without the medication name.
 - Sensors also work without an MQTT broker (written as plain Home Assistant states).

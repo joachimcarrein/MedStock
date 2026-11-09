@@ -1,0 +1,37 @@
+@page
+@model MedStock.Web.Pages.Settings.ImportModel
+@{
+    ViewData["Tab"] = "settings";
+}
+<partial name="_SubHeader" model="@((L["Import_Title"].Value, Url.Page("/Settings/Index")!))" />
+
+@if (Model.Result is { Error: { } error })
+{
+    <p class="error" role="alert">@L[error]</p>
+}
+else if (Model.Result is { } r)
+{
+    <div class="flash ok" role="status">
+        <p>@L["Import_Done", r.MedicationsImported, r.ProfilesCreated]</p>
+        @if (r.Skipped > 0)
+        {
+            <p class="small">@L["Import_Skipped", r.Skipped]</p>
+        }
+        @if (r.Invalid > 0)
+        {
+            <p class="small error">@L["Import_Invalid", r.Invalid]</p>
+        }
+        @if (r.SettingsApplied)
+        {
+            <p class="small">@L["Import_SettingsApplied"]</p>
+        }
+    </div>
+    <p><a href="@Url.Content("~/")" role="button">@L["Tab_Overview"]</a></p>
+}
+
+<p>@L["Import_Help"]</p>
+<form method="post" enctype="multipart/form-data" hx-boost="false">
+    <label>@L["Import_File"] <input type="file" name="file" accept="application/json,.json" required /></label>
+    <label class="inline"><input type="checkbox" name="applySettings" value="true" /> @L["Import_ApplySettings"]</label>
+    <button type="submit">@L["Import_Button"]</button>
+</form>

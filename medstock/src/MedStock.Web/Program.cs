@@ -38,6 +38,7 @@ builder.Services.AddSingleton(new AppMode(addonMode));
 builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddScoped<MedicationService>();
+builder.Services.AddScoped<ImportService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton<NotificationState>();
 builder.Services.AddHostedService<NotificationWorker>();

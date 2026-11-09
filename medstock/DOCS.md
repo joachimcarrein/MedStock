@@ -182,11 +182,22 @@ Example automation trigger: `numeric_state` of the sensor below 7.
 
 Check it off when you have bought it. If the stock is still low, it comes back at the next notification step.
 
-### Export
+### Export and import
 
 **Settings › Export data (JSON)** downloads `medstock-export-<date>.json` with the profiles, all medication (archived
-included) with their current stock, and the general settings. Photos and personal notification settings are not
-included. There is no import yet; the file is meant for keeping or moving your data.
+included) with their current stock and barcode, and the general settings. Photos and personal notification settings
+are not included.
+
+**Settings › Import data (JSON)** reads such a file, for example to move to another Home Assistant. Importing only
+adds:
+
+- profiles are matched by name; missing ones are created;
+- medication that already exists in the same profile (same name and strength) is skipped, so importing the same
+  file twice changes nothing;
+- the exported stock becomes the first count, so the days remaining continue from the export date;
+- the general settings are only taken over when you tick the box.
+
+Nothing is overwritten or deleted. Add the photos again afterwards.
 
 ## Privacy
 

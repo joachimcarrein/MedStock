@@ -231,3 +231,16 @@ Vacation_AsNeeded	As needed or paused, check yourself: {0}	Zo nodig of gepauzeer
 Vacation_ShareTitle	Trip from {0}, {1} days	Reis vanaf {0}, {1} dagen
 Vacation_Text	Shopping list	Boodschappenlijst
 Vacation_Invalid	Choose a departure from today on and 1 to 365 days.	Kies een vertrek vanaf vandaag en 1 tot 365 dagen.
+Import_Link	Import data (JSON)	Gegevens importeren (JSON)
+Import_Title	Import	Importeren
+Import_Help	Choose a file made with "Export data". Importing only adds: profiles are matched by name, medication that already exists in the same profile (same name and strength) is skipped, nothing is overwritten or deleted. The exported stock becomes the first count. Photos are not part of an export.	Kies een bestand gemaakt met "Gegevens exporteren". Importeren voegt enkel toe: profielen worden op naam gekoppeld, medicatie die al bestaat in hetzelfde profiel (zelfde naam en sterkte) wordt overgeslagen, niets wordt overschreven of verwijderd. De geëxporteerde voorraad wordt de eerste telling. Foto's zitten niet in een export.
+Import_File	Export file	Exportbestand
+Import_ApplySettings	Also take over the general settings (coverage period, alert threshold, notification time)	Ook de algemene instellingen overnemen (dekkingsperiode, drempel, meldingstijd)
+Import_Button	Import	Importeren
+Import_Done	{0} medications imported, {1} profiles created.	{0} medicaties geïmporteerd, {1} profielen aangemaakt.
+Import_Skipped	{0} skipped because they already exist.	{0} overgeslagen omdat ze al bestaan.
+Import_Invalid	{0} entries skipped because they are incomplete or invalid.	{0} items overgeslagen omdat ze onvolledig of ongeldig zijn.
+Import_SettingsApplied	The general settings were taken over.	De algemene instellingen zijn overgenomen.
+Import_NoFile	Choose an export file (at most 2 MB).	Kies een exportbestand (maximaal 2 MB).
+Import_NotAnExport	This file is not a MedStock export.	Dit bestand is geen MedStock-export.
+Import_UnknownFormat	This export was made by a newer MedStock version. Update MedStock first.	Deze export komt van een nieuwere MedStock-versie. Werk MedStock eerst bij.

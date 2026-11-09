@@ -14,7 +14,7 @@ and tells you **how many days you have left**, without logging every single inta
 - A trip planner: what to buy before you leave and what to take along.
 - Works inside the Home Assistant sidebar and Companion app via ingress. No extra ports, no cloud. The only
   external call is the optional picture search (Wikimedia Commons or DailyMed), when you tap it. Data is part of your Home
-  Assistant backups and can be exported as JSON.
+  Assistant backups and can be exported and imported as JSON.
 
 The UI is available in English and Dutch.
 
