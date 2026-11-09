@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.5.0
+
 - Course with an end date (e.g. antibiotics): no use after the last day, "enough until the course ends" without countdown or notifications, "course ended" afterwards.
 - Live camera: lamp and zoom when the phone supports them.
 - Docs: dashboard example with the summary sensors.

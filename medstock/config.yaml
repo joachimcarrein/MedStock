@@ -1,5 +1,5 @@
 name: MedStock
-version: "1.4.2"
+version: "1.5.0"
 slug: medstock
 description: Household medication stock tracker – know how many days you have left
 url: https://github.com/joachimcarrein/MedStock
