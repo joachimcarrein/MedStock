@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2026.11.2
+
 - French UI. The language follows the browser or the choice in Settings › Language.
 - Settings › Language lists every available language automatically.
 
