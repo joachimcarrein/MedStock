@@ -112,6 +112,8 @@ deleted when it has no medication left, archived included.
 - **Tap** the notification to open MedStock. Its **+1** button (e.g. "+1 bottle") books one package without
   opening the app.
 - **Language**: your language setting, or the language of your last visit when it is set to *Automatic*.
+- **Discreet notifications** (per user, Settings › My notifications): the text leaves out the medication name, e.g.
+  "Husband: a medication has 12 days left". Handy on a lock screen or a shared tablet; tap it to see which one.
 - **Send test notification** sends a test to your own saved devices. **Run the daily check now** (Settings › For
   everyone) runs the real check immediately and lists what it did; it never sends the same step twice.
 
@@ -180,7 +182,7 @@ included. There is no import yet; the file is meant for keeping or moving your d
 | What | Where it goes |
 |---|---|
 | Everything you enter, photos | Only in the app's own folder (`/data`), part of your Home Assistant backups. |
-| Notification texts (medication and profile names) | To the devices chosen by each user, via Home Assistant. |
+| Notification texts (medication and profile names; only the profile name with discreet notifications) | To the devices chosen by each user, via Home Assistant. |
 | Sensors per medication (optional) | Medication and profile names become visible in Home Assistant's history, logbook and dashboards, to every Home Assistant user. |
 | Summary sensors (optional) | Profile names and numbers only. |
 | To-do list (optional) | "Name strength (profile)" on the chosen Home Assistant list. |

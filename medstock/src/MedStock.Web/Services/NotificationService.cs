@@ -132,7 +132,9 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
                     {
                         var user = users.First(u => u.UserId == userId);
                         var culture = CultureFor(user);
-                        var text = Texts.NotificationMessage(m.Name, row.Profile.Name, m.Type, m.UsageMode, row.Stock, culture);
+                        var text = user.DiscreetNotifications
+                            ? Texts.DiscreetMessage(row.Profile.Name, m.UsageMode, row.Stock, culture)
+                            : Texts.NotificationMessage(m.Name, row.Profile.Name, m.Type, m.UsageMode, row.Stock, culture);
                         var outcome = await ha.NotifyAsync(service, Texts.Get("Notify_Title", culture), text, deepLink, $"medstock-{m.Id}",
                             [NotificationActions.Purchase(m, culture)], ct);
                         switch (outcome)

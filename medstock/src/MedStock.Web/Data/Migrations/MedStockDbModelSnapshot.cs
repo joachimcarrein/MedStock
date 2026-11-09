@@ -245,6 +245,9 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<bool>("DevicesInitialized")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("DiscreetNotifications")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Language")
                         .HasColumnType("TEXT");
 

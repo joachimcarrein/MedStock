@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Discreet notifications (per user): without the medication name.
 - Sensors also work without an MQTT broker (written as plain Home Assistant states).
 - New option: a summary sensor per profile (lowest days remaining, counts; no medication names).
 - "+" on the overview preselects the profile you are filtered on.

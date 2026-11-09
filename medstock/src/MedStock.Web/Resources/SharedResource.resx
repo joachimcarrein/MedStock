@@ -214,4 +214,11 @@
   <data name="ImageSearch_Source" xml:space="preserve"><value>Source</value></data>
   <data name="ImageSearch_DailyMed" xml:space="preserve"><value>DailyMed (US packaging)</value></data>
   <data name="ImageSearch_License_DailyMed" xml:space="preserve"><value>Official US packaging and label pictures from DailyMed (US National Library of Medicine). Tap a picture to use it.</value></data>
+  <data name="Settings_Discreet" xml:space="preserve"><value>Discreet notifications</value></data>
+  <data name="Settings_Discreet_Help" xml:space="preserve"><value>Without the medication name, e.g. "Husband: a medication has 12 days left". Tap the notification to see which one.</value></data>
+  <data name="Notify_Discreet_Days" xml:space="preserve"><value>{0}: a medication has {1} days left</value></data>
+  <data name="Notify_Discreet_Day" xml:space="preserve"><value>{0}: a medication has 1 day left</value></data>
+  <data name="Notify_Discreet_LastDay" xml:space="preserve"><value>{0}: last dose of a medication today</value></data>
+  <data name="Notify_Discreet_Low" xml:space="preserve"><value>{0}: a medication is running low</value></data>
+  <data name="Notify_Discreet_Empty" xml:space="preserve"><value>{0}: a medication is out of stock</value></data>
 </root>

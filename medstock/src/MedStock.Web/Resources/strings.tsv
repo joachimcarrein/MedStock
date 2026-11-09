@@ -209,3 +209,10 @@ ImageSearch_DownloadFailed	The picture could not be downloaded; choose another o
 ImageSearch_Source	Source	Bron
 ImageSearch_DailyMed	DailyMed (US packaging)	DailyMed (Amerikaanse verpakkingen)
 ImageSearch_License_DailyMed	Official US packaging and label pictures from DailyMed (US National Library of Medicine). Tap a picture to use it.	Officiële Amerikaanse verpakkings- en etiketfoto's van DailyMed (Amerikaanse National Library of Medicine). Tik op een afbeelding om ze te gebruiken.
+Settings_Discreet	Discreet notifications	Discrete meldingen
+Settings_Discreet_Help	Without the medication name, e.g. "Husband: a medication has 12 days left". Tap the notification to see which one.	Zonder de naam van de medicatie, bv. "Husband: een medicatie heeft nog 12 dagen". Tik op de melding om te zien welke.
+Notify_Discreet_Days	{0}: a medication has {1} days left	{0}: een medicatie heeft nog {1} dagen
+Notify_Discreet_Day	{0}: a medication has 1 day left	{0}: een medicatie heeft nog 1 dag
+Notify_Discreet_LastDay	{0}: last dose of a medication today	{0}: vandaag laatste dosis van een medicatie
+Notify_Discreet_Low	{0}: a medication is running low	{0}: een medicatie raakt op
+Notify_Discreet_Empty	{0}: a medication is out of stock	{0}: een medicatie is op

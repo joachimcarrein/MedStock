@@ -50,4 +50,13 @@ public static class Texts
             return Format("Notify_Weekly", c, head, UnitsCount(type, r.Remaining, c), ShortDate(ld, c));
         return Format("Notify_Days", c, head, r.DaysRemaining);
     }
+
+    /// <summary>Discreet notification body without the medication name, e.g. "Husband: a medication has 12 days left".</summary>
+    public static string DiscreetMessage(string profile, UsageMode mode, StockResult r, CultureInfo c)
+    {
+        if (r.State == StockState.Empty) return Format("Notify_Discreet_Empty", c, profile);
+        if (mode == UsageMode.AsNeeded) return Format("Notify_Discreet_Low", c, profile);
+        if (r.State == StockState.LastDay) return Format("Notify_Discreet_LastDay", c, profile);
+        return r.DaysRemaining == 1 ? Format("Notify_Discreet_Day", c, profile) : Format("Notify_Discreet_Days", c, profile, r.DaysRemaining);
+    }
 }

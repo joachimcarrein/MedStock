@@ -46,7 +46,7 @@ public class IndexModel(
 
     public Task OnGetAsync() => LoadAsync();
 
-    public async Task<IActionResult> OnPostUserAsync(bool notificationsEnabled, string[] services, int[] profiles, string? language)
+    public async Task<IActionResult> OnPostUserAsync(bool notificationsEnabled, string[] services, int[] profiles, string? language, bool discreetNotifications)
     {
         var s = await db.UserSettings.FirstAsync(x => x.UserId == user.Id);
         s.NotificationsEnabled = notificationsEnabled;
@@ -56,6 +56,7 @@ public class IndexModel(
         var chosen = profiles.Where(known.Contains).Distinct().ToList();
         s.NotifyProfileIds = chosen.Count == known.Count ? [] : chosen; // all ticked = "all", so new profiles are included
         s.Language = language is "nl" or "en" ? language : null;
+        s.DiscreetNotifications = discreetNotifications;
         s.DevicesInitialized = true;
         await db.SaveChangesAsync();
         cache.Remove(LocalizationSetup.LanguageCacheKey(user.Id));

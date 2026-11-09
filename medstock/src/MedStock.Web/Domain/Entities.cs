@@ -31,6 +31,8 @@ public class UserSettings
     public bool DevicesInitialized { get; set; }
     /// <summary>UI culture of the user's last request ("nl"/"en"): the language of notifications when <see cref="Language"/> is automatic.</summary>
     public string? LastCulture { get; set; }
+    /// <summary>Notifications say "a medication of &lt;profile&gt;" instead of its name (lock screens, shared devices).</summary>
+    public bool DiscreetNotifications { get; set; }
 }
 
 public class Profile

@@ -177,6 +177,31 @@ public class NotificationServiceTests
     }
 
     [Fact]
+    public async Task Discreet_notifications_leave_out_the_medication_name()
+    {
+        using var e = new Env();
+        e.F.WithDb(db =>
+        {
+            db.UserSettings.Single(s => s.UserId == "u1").DiscreetNotifications = true;
+            return db.SaveChanges();
+        });
+        e.Day(6); // 20 − 6 = 14 days
+        await e.RunAsync();
+        Assert.Equal(["Husband: een medicatie heeft nog 14 dagen"], e.Messages);
+        Assert.Single(e.F.Ha.SentActions.Single()!); // the +1 button stays
+    }
+
+    [Theory]
+    [InlineData(0, "en", "Husband: a medication is out of stock")]
+    [InlineData(1, "en", "Husband: a medication has 1 day left")]
+    [InlineData(1, "nl", "Husband: een medicatie heeft nog 1 dag")]
+    public void Discreet_texts(decimal units, string lang, string expected)
+    {
+        var r = StockCalculator.Calculate(new StockInput(UsageMode.PerDay, 1, new decimal[7], false, 0, 140, T.D("2026-11-17"), units), T.D("2026-11-17"), 14);
+        Assert.Equal(expected, Texts.DiscreetMessage("Husband", UsageMode.PerDay, r, new System.Globalization.CultureInfo(lang)));
+    }
+
+    [Fact]
     public async Task Notification_carries_a_purchase_button_and_a_tap_books_one_package()
     {
         using var e = new Env();

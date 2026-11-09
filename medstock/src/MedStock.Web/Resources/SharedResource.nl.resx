@@ -214,4 +214,11 @@
   <data name="ImageSearch_Source" xml:space="preserve"><value>Bron</value></data>
   <data name="ImageSearch_DailyMed" xml:space="preserve"><value>DailyMed (Amerikaanse verpakkingen)</value></data>
   <data name="ImageSearch_License_DailyMed" xml:space="preserve"><value>Officiële Amerikaanse verpakkings- en etiketfoto's van DailyMed (Amerikaanse National Library of Medicine). Tik op een afbeelding om ze te gebruiken.</value></data>
+  <data name="Settings_Discreet" xml:space="preserve"><value>Discrete meldingen</value></data>
+  <data name="Settings_Discreet_Help" xml:space="preserve"><value>Zonder de naam van de medicatie, bv. "Husband: een medicatie heeft nog 12 dagen". Tik op de melding om te zien welke.</value></data>
+  <data name="Notify_Discreet_Days" xml:space="preserve"><value>{0}: een medicatie heeft nog {1} dagen</value></data>
+  <data name="Notify_Discreet_Day" xml:space="preserve"><value>{0}: een medicatie heeft nog 1 dag</value></data>
+  <data name="Notify_Discreet_LastDay" xml:space="preserve"><value>{0}: vandaag laatste dosis van een medicatie</value></data>
+  <data name="Notify_Discreet_Low" xml:space="preserve"><value>{0}: een medicatie raakt op</value></data>
+  <data name="Notify_Discreet_Empty" xml:space="preserve"><value>{0}: een medicatie is op</value></data>
 </root>
