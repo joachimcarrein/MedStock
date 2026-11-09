@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Detail: the "+ n boxes" and "− n pills" buttons have the same width; Cancel in the scanner spans the full width.
+
 - Prescription: "All" shows every profile; the text for the doctor then has one block per person.
 - New per medication: "Over the counter". It stays off the prescription and is listed apart, to buy yourself.
 
