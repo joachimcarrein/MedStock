@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2026.11.6
+
 - Overview: search box that filters the cards while you type (within the chosen profile), with ✕ to clear it.
 
 ## 2026.11.5
