@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Scanning starts the live camera at once; when it shows no picture, the panel points to Photo.
+
 ## 1.4.0
 
 - Trip planner: take along whole strips or bottles instead of "≈ n boxes". New optional field per medication: smallest amount to take along (e.g. a strip of 10).

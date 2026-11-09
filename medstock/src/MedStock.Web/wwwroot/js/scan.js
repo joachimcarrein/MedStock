@@ -1,6 +1,7 @@
 // Barcode scanning on the device with zxing-wasm (vendored, no network): from a photo, or live from the camera.
 // A button with data-scan="fill" fills the barcode field of its form and submits it; data-scan="go" opens
-// data-scan-url?code=<code>. The decoder (wasm, ~1 MB) is only loaded when a scan starts.
+// data-scan-url?code=<code>. The decoder (wasm, ~1 MB) is only loaded when a scan starts. The live camera starts at
+// once; when it gives no picture (black), the panel points to Photo.
 (function () {
   if (window.medstockScan) return;
   window.medstockScan = true;
@@ -73,6 +74,14 @@
     b.hidden = false;
     status(b.dataset.hint);
     b.scrollIntoView({ block: 'nearest' });
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) live();
+  }
+
+  // True when a frame is (nearly) all black: some webviews give a stream without a picture.
+  function isBlack(data) {
+    var sum = 0, n = 0;
+    for (var i = 0; i < data.length; i += 4 * 97) { sum += data[i] + data[i + 1] + data[i + 2]; n++; }
+    return n === 0 || sum / (n * 3) < 8;
   }
 
   function live() {
@@ -89,16 +98,20 @@
         video.muted = true;
         video.srcObject = stream;
         return video.play().then(function () {
-          status(b.dataset.looking);
+          status(b.dataset.liveHint);
+          var started = Date.now(), seen = false, warned = false;
           var canvas = document.createElement('canvas');
           var ctx = canvas.getContext('2d', { willReadFrequently: true });
           function tick() {
             if (!state || !state.stream) return;
+            if (!seen && !warned && Date.now() - started > 3000) { warned = true; status(b.dataset.black); }
             if (video.videoWidth > 0) {
               canvas.width = video.videoWidth;
               canvas.height = video.videoHeight;
               ctx.drawImage(video, 0, 0);
-              read(ctx.getImageData(0, 0, canvas.width, canvas.height)).then(function (code) {
+              var frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              if (!seen && !isBlack(frame.data)) { seen = true; if (warned) status(b.dataset.liveHint); }
+              read(frame).then(function (code) {
                 if (code) found(code); else if (state) state.timer = setTimeout(tick, 250);
               }, function () { if (state) state.timer = setTimeout(tick, 500); });
             } else {
@@ -112,6 +125,9 @@
   }
 
   document.addEventListener('click', function (e) {
+    // Release the live camera before the photo picker opens the camera app.
+    var label = e.target.closest && e.target.closest('label');
+    if (label && label.querySelector('.scan-photo')) { stopLive(); return; }
     var t = e.target.closest && e.target.closest('[data-scan], .scan-live, .scan-close');
     if (!t) return;
     if (t.matches('[data-scan]')) { e.preventDefault(); open(t); }

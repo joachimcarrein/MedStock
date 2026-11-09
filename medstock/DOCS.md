@@ -91,9 +91,9 @@ Link a barcode once per medication (detail › **Barcode › Scan**, or scan an 
 the medication, or choose **New medication with this barcode**). After that, the round **barcode** button above **+** on the overview opens the right medication
 directly, with a reminder to tap **+1** when you just bought it.
 
+- The **live camera** starts at once and reads the code from the camera image. Whether this works depends on the
+  Companion app and the phone; when there is no picture after a few seconds, MedStock says so: use **Photo**.
 - **Photo** takes a picture of the code and reads it on your phone. This always works.
-- **Live camera** reads the code from the camera image. Whether this works depends on the Companion app and the
-  phone; if the picture stays black, use **Photo**.
 - European medicine boxes carry a square DataMatrix code with a serial number per box. MedStock keeps only the
   product number (GTIN) from it, so every new box of the same product is recognised. Ordinary barcodes (EAN) work too.
 - When two profiles use the same product, MedStock asks which one you mean.

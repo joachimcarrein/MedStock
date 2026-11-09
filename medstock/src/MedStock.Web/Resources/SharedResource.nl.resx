@@ -261,7 +261,9 @@
   <data name="Barcode_Help" xml:space="preserve"><value>Scan de code op de doos: dan opent de scanknop op het overzicht deze medicatie. Van de vierkante code op Europese medicijndozen wordt enkel het productnummer bewaard, zodat elke nieuwe doos herkend wordt.</value></data>
   <data name="Scan_Button" xml:space="preserve"><value>Scannen</value></data>
   <data name="Scan_Title" xml:space="preserve"><value>Gescande code</value></data>
-  <data name="Scan_Hint" xml:space="preserve"><value>Neem een foto van de barcode, of probeer de live camera.</value></data>
+  <data name="Scan_Hint" xml:space="preserve"><value>Camera starten… Lukt het niet, tik dan op Foto.</value></data>
+  <data name="Scan_LiveHint" xml:space="preserve"><value>Richt de camera op de barcode.</value></data>
+  <data name="Scan_Black" xml:space="preserve"><value>Geen camerabeeld? Tik op Foto om een foto van de barcode te nemen.</value></data>
   <data name="Scan_Photo" xml:space="preserve"><value>Foto</value></data>
   <data name="Scan_Live" xml:space="preserve"><value>Live camera</value></data>
   <data name="Scan_Looking" xml:space="preserve"><value>Barcode zoeken…</value></data>

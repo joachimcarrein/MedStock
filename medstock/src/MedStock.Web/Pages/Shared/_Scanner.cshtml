@@ -1,7 +1,8 @@
 @* Barcode scanner panel (one per page), driven by wwwroot/js/scan.js. Include the scripts in the page's Scripts section. *@
 <div id="scanner" class="scanner" hidden
      data-wasm-url="@Url.Content("~/lib/zxing/zxing_reader.wasm")"
-     data-hint="@L["Scan_Hint"]" data-looking="@L["Scan_Looking"]" data-not-found="@L["Scan_NotFound"]" data-no-camera="@L["Scan_NoCamera"]">
+     data-hint="@L["Scan_Hint"]" data-looking="@L["Scan_Looking"]" data-not-found="@L["Scan_NotFound"]" data-no-camera="@L["Scan_NoCamera"]"
+     data-live-hint="@L["Scan_LiveHint"]" data-black="@L["Scan_Black"]">
     <video playsinline muted autoplay hidden></video>
     <p class="scanner-status small" role="status"></p>
     <div class="grid-2">
