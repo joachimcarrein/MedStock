@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2026.11.3
+
 - Dutch now comes in two variants: standard Dutch ("Recept") and Belgian Dutch ("Voorschrift"), chosen from the phone's language and region or in Settings › Language.
 
 ## 2026.11.2
