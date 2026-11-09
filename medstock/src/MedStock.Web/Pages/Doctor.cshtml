@@ -29,6 +29,11 @@ else
         </nav>
     }
 
+    <div class="share-bar">
+        <button type="button" data-share-text="@Model.ShareText" data-copied="@L["Doctor_Copied"]">@L["Doctor_Share"]</button>
+        <a href="#text">@L["Doctor_Text"] ↓</a>
+    </div>
+
     var top = Model.Lines.Where(l => l.Expanded).ToList();
     var rest = Model.Lines.Where(l => !l.Expanded).ToList();
     @if (Model.Lines.Count == 0)
@@ -79,9 +84,9 @@ else
         </details>
     }
 
-    <h2>@L["Doctor_Text"]</h2>
+    <h2 id="text">@L["Doctor_Text"]</h2>
     <textarea id="share-text" readonly rows="@(Math.Max(3, Model.ShareText.Split('\n').Length + 1))">@Model.ShareText</textarea>
-    <button type="button" id="share" data-share-text="@Model.ShareText" data-copied="@L["Doctor_Copied"]">@L["Doctor_Share"]</button>
+    <button type="button" data-share-text="@Model.ShareText" data-copied="@L["Doctor_Copied"]">@L["Doctor_Share"]</button>
 }
 
 @section Scripts {
