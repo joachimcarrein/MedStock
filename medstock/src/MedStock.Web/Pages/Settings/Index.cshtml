@@ -94,8 +94,10 @@
             @L["Settings_Language"]
             <select name="language">
                 <option value="" selected="@(Model.Mine.Language is null)">@L["Settings_Language_Auto"]</option>
-                <option value="nl" selected="@(Model.Mine.Language == "nl")">Nederlands</option>
-                <option value="en" selected="@(Model.Mine.Language == "en")">English</option>
+                @foreach (var c in MedStock.Web.Middleware.LocalizationSetup.UiCultures.OrderBy(c => c.NativeName))
+                {
+                    <option value="@c.Name" selected="@(Model.Mine.Language == c.Name)">@(char.ToUpper(c.NativeName[0], c) + c.NativeName[1..])</option>
+                }
             </select>
         </label>
         <button type="submit">@L["Save"]</button>

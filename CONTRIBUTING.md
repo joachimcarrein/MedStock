@@ -24,8 +24,10 @@ Open <http://localhost:5289/api/hassio_ingress/dev/>. In development the app use
 SQLite database under `%LOCALAPPDATA%\MedStock\dev` (or `$MEDSTOCK_DATA_DIR`) and the user `dev`. The fake ingress
 prefix makes missing path prefixes visible right away.
 
-- **UI texts:** add them to `medstock/src/MedStock.Web/Resources/strings.tsv` (key, English, Dutch) and run
-  `python tools/gen_resx.py`.
+- **UI texts:** add every key to `medstock/src/MedStock.Web/Resources/SharedResource.resx` (English) and to each
+  language file (`SharedResource.nl.resx`, ...). A test fails when a language misses a key or a placeholder (`{0}`).
+- **A new language:** copy `SharedResource.nl.resx` to `SharedResource.<code>.resx`, translate it and add the code to
+  `UiCultures` in `Middleware/Localization.cs`; it then appears in Settings › Language.
 - **Database changes:** add an EF Core migration in the same pull request
   (`dotnet ef migrations add <Name> --project medstock/src/MedStock.Web --output-dir Data/Migrations`). Migrations
   must be additive (new tables/columns with defaults), so an older version can still open a newer database.

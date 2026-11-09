@@ -55,7 +55,7 @@ public class IndexModel(
         var known = await db.Profiles.Select(p => p.Id).ToListAsync();
         var chosen = profiles.Where(known.Contains).Distinct().ToList();
         s.NotifyProfileIds = chosen.Count == known.Count ? [] : chosen; // all ticked = "all", so new profiles are included
-        s.Language = language is "nl" or "en" ? language : null;
+        s.Language = MedStock.Web.Middleware.LocalizationSetup.UiCultures.Any(c => c.Name == language) ? language : null;
         s.DiscreetNotifications = discreetNotifications;
         s.DevicesInitialized = true;
         await db.SaveChangesAsync();
