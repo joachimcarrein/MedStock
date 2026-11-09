@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace MedStock.Web.Pages.Settings;
 
 /// <summary>Import of a JSON export (adds, never overwrites). GET shows the form, POST imports and shows the result.</summary>
+/// <remarks>The size limits sit on the class: Razor Pages ignores them on a handler method.</remarks>
+[RequestSizeLimit(ImportService.MaxBytes + 100_000)]
+[RequestFormLimits(MultipartBodyLengthLimit = ImportService.MaxBytes + 100_000)]
 public class ImportModel(ImportService import, CurrentUser user) : PageModel
 {
     public ImportResult? Result { get; private set; }
 
     public void OnGet() { }
 
-    [RequestSizeLimit(ImportService.MaxBytes + 100_000)]
-    [RequestFormLimits(MultipartBodyLengthLimit = ImportService.MaxBytes + 100_000)]
     public async Task<IActionResult> OnPostAsync(IFormFile? file, bool applySettings)
     {
         if (file is null || file.Length == 0 || file.Length > ImportService.MaxBytes)
