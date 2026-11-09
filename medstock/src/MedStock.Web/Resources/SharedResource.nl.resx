@@ -257,6 +257,7 @@
   <data name="Import_NotAnExport" xml:space="preserve"><value>Dit bestand is geen MedStock-export.</value></data>
   <data name="Import_UnknownFormat" xml:space="preserve"><value>Deze export komt van een nieuwere MedStock-versie. Werk MedStock eerst bij.</value></data>
   <data name="Barcode" xml:space="preserve"><value>Barcode</value></data>
+  <data name="Barcode_Clear" xml:space="preserve"><value>Barcode wissen</value></data>
   <data name="Barcode_None" xml:space="preserve"><value>geen</value></data>
   <data name="Barcode_Help" xml:space="preserve"><value>Scan de code op de doos: dan opent de scanknop op het overzicht deze medicatie. Van de vierkante code op Europese medicijndozen wordt enkel het productnummer bewaard, zodat elke nieuwe doos herkend wordt.</value></data>
   <data name="Scan_Button" xml:space="preserve"><value>Scannen</value></data>

@@ -257,6 +257,7 @@
   <data name="Import_NotAnExport" xml:space="preserve"><value>This file is not a MedStock export.</value></data>
   <data name="Import_UnknownFormat" xml:space="preserve"><value>This export was made by a newer MedStock version. Update MedStock first.</value></data>
   <data name="Barcode" xml:space="preserve"><value>Barcode</value></data>
+  <data name="Barcode_Clear" xml:space="preserve"><value>Clear barcode</value></data>
   <data name="Barcode_None" xml:space="preserve"><value>none</value></data>
   <data name="Barcode_Help" xml:space="preserve"><value>Scan the code on the box: then the scan button on the overview opens this medication. For the square code on European medicine boxes only the product number is kept, so every new box matches.</value></data>
   <data name="Scan_Button" xml:space="preserve"><value>Scan</value></data>

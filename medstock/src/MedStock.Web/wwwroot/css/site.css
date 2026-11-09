@@ -130,6 +130,10 @@ label.inline input { margin: 0; flex: none; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .dayparts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; font-size: 0.8rem; }
 .helper summary, .advanced summary { font-size: 0.9rem; }
+.clearable { position: relative; flex: 1; display: flex; }
+.clearable input { padding-right: 2.4rem; }
+.inline-form .clear-x { position: absolute; right: 0.25rem; top: 50%; transform: translateY(-50%); width: 2rem; height: 2rem; padding: 0;
+  border: 0; background: transparent; color: var(--pico-muted-color, #888); font-size: 1rem; line-height: 1; }
 .inline-form span { align-self: center; font-size: 0.85rem; white-space: nowrap; }
 /* Show only the block of the chosen usage mode (without JS when :has() is unsupported, all blocks stay visible). */
 .usage:has(input[value="PerDay"]:checked) :is(.mode-weekly, .mode-asneeded),

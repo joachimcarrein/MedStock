@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Barcode field: ✕ to clear the code in one tap.
+
 ## 1.4.1
 
 - Scanning starts the live camera at once; when it shows no picture, the panel points to Photo.

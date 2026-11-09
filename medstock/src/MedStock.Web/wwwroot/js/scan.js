@@ -135,6 +135,15 @@
     else close();
   });
 
+  // The ✕ in the barcode field empties it and saves (= remove the code).
+  document.addEventListener('click', function (e) {
+    var x = e.target.closest && e.target.closest('[data-clear-submit]');
+    if (!x) return;
+    var form = x.closest('form');
+    form.querySelector('input[name="barcode"]').value = '';
+    form.requestSubmit ? form.requestSubmit() : form.submit();
+  });
+
   document.addEventListener('change', function (e) {
     if (!e.target.matches || !e.target.matches('.scan-photo') || !e.target.files || !e.target.files[0]) return;
     var b = box();
