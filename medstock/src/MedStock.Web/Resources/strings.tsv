@@ -244,3 +244,22 @@ Import_SettingsApplied	The general settings were taken over.	De algemene instell
 Import_NoFile	Choose an export file (at most 2 MB).	Kies een exportbestand (maximaal 2 MB).
 Import_NotAnExport	This file is not a MedStock export.	Dit bestand is geen MedStock-export.
 Import_UnknownFormat	This export was made by a newer MedStock version. Update MedStock first.	Deze export komt van een nieuwere MedStock-versie. Werk MedStock eerst bij.
+Barcode	Barcode	Barcode
+Barcode_None	none	geen
+Barcode_Help	Scan the code on the box: then the scan button on the overview opens this medication. For the square code on European medicine boxes only the product number is kept, so every new box matches.	Scan de code op de doos: dan opent de scanknop op het overzicht deze medicatie. Van de vierkante code op Europese medicijndozen wordt enkel het productnummer bewaard, zodat elke nieuwe doos herkend wordt.
+Scan_Button	Scan	Scannen
+Scan_Title	Scanned code	Gescande code
+Scan_Hint	Take a photo of the barcode, or try the live camera.	Neem een foto van de barcode, of probeer de live camera.
+Scan_Photo	Photo	Foto
+Scan_Live	Live camera	Live camera
+Scan_Looking	Looking for a barcode…	Barcode zoeken…
+Scan_NotFound	No barcode found. Try again closer and sharper, with good light.	Geen barcode gevonden. Probeer opnieuw, dichterbij en scherper, met goed licht.
+Scan_NoCamera	The live camera is not available here; use Photo.	De live camera is hier niet beschikbaar; gebruik Foto.
+Scan_Several	This code belongs to several medications. Which one?	Deze code hoort bij meerdere medicaties. Welke?
+Scan_Unknown	Code {0} is not linked yet. Which medication is it?	Code {0} is nog niet gekoppeld. Welke medicatie is het?
+Scan_Link	This one	Deze
+Scan_HasOther	has another code	heeft een andere code
+Flash_Scanned	Scanned. Bought one? Tap +1 {0}.	Gescand. Eén gekocht? Tik op +1 {0}.
+Flash_Linked	Barcode linked	Barcode gekoppeld
+Flash_Barcode	Barcode saved	Barcode bewaard
+Flash_BarcodeRemoved	Barcode removed	Barcode verwijderd

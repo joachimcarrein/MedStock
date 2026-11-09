@@ -81,8 +81,23 @@ dose already counts as taken. More than ten years of stock shows as "> 10 years"
 - **−1** / **− n** (as-needed medication only): you used some.
 - Icons next to the name: **✏ edit**, **⏸ pause / ▶ resume**, and the red **archive** icon (asks for confirmation).
 - **Photo**: take one, choose one from the gallery, or **search a picture by name** (see *Optional extras*).
+- **Barcode**: tap **Scan** to link the code on the box (see *Scanning a box* below), or type it.
 - A change in usage (via edit) applies **from tomorrow**. If someone else changed the same medication in the
   meantime, MedStock shows "Someone else just changed this" and asks you to check and try again.
+
+### Scanning a box
+
+Link a barcode once per medication (detail › **Barcode › Scan**, or scan an unknown box from the overview and pick
+the medication). After that, the round **barcode** button above **+** on the overview opens the right medication
+directly, with a reminder to tap **+1** when you just bought it.
+
+- **Photo** takes a picture of the code and reads it on your phone. This always works.
+- **Live camera** reads the code from the camera image. Whether this works depends on the Companion app and the
+  phone; if the picture stays black, use **Photo**.
+- European medicine boxes carry a square DataMatrix code with a serial number per box. MedStock keeps only the
+  product number (GTIN) from it, so every new box of the same product is recognised. Ordinary barcodes (EAN) work too.
+- When two profiles use the same product, MedStock asks which one you mean.
+- Reading happens entirely on your phone; nothing is sent anywhere.
 
 ### Prescription
 
@@ -256,6 +271,5 @@ All other settings are in the app itself (**Settings**).
 ## Limitations
 
 - Android: taking a photo with the camera may open the gallery instead; choose a photo there.
-- No import of an export file yet.
 - If a schema upgrade fails, the app stops and logs the path of the database copy in `/data/backup`. Restore a Home
   Assistant backup, or open an issue with the log (it contains no medication names).

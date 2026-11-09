@@ -1,0 +1,44 @@
+@page
+@model MedStock.Web.Pages.Medications.ScanModel
+@{
+    ViewData["Tab"] = "overview";
+}
+<partial name="_SubHeader" model="@((L["Scan_Title"].Value, Url.Content("~/")))" />
+
+@if (Model.Matches.Count > 1)
+{
+    <p>@L["Scan_Several"]</p>
+    <ul class="profile-list">
+        @foreach (var r in Model.Matches)
+        {
+            <li><a href="@Url.Page("/Medications/Details", new { id = r.Medication.Id, done = "scanned" })"><span class="profile-dot" style="background:@r.Profile.Color"></span>@r.Profile.Name · @r.Medication.Name @r.Medication.Strength</a></li>
+        }
+    </ul>
+}
+else
+{
+    <p>@L["Scan_Unknown", Model.Code!]</p>
+    @if (Model.All.Count == 0)
+    {
+        <p class="empty-state muted">@L["Empty_NoMedication"]</p>
+    }
+    <ul class="profile-list">
+        @foreach (var r in Model.All)
+        {
+            var m = r.Medication;
+            <li>
+                <form method="post" asp-page-handler="Link" class="scan-link">
+                    <input type="hidden" name="id" value="@m.Id" />
+                    <input type="hidden" name="code" value="@Model.Code" />
+                    <span><span class="profile-dot" style="background:@r.Profile.Color"></span>@m.Name <span class="muted">@m.Strength</span>
+                        @if (!string.IsNullOrEmpty(m.Barcode))
+                        {
+                            <span class="small muted">· @L["Scan_HasOther"]</span>
+                        }
+                    </span>
+                    <button type="submit" class="secondary">@L["Scan_Link"]</button>
+                </form>
+            </li>
+        }
+    </ul>
+}

@@ -12,6 +12,7 @@ and tells you **how many days you have left**, without logging every single inta
 - Push notifications through the Home Assistant Companion app when something runs low (optionally discreet, without the medication name).
 - A doctor screen that tells you what to ask for, and how many boxes, to cover the next 90 days.
 - A trip planner: what to buy before you leave and what to take along.
+- Scan the barcode on a box to open the right medication (read on the phone, no lookup online).
 - Works inside the Home Assistant sidebar and Companion app via ingress. No extra ports, no cloud. The only
   external call is the optional picture search (Wikimedia Commons or DailyMed), when you tap it. Data is part of your Home
   Assistant backups and can be exported and imported as JSON.

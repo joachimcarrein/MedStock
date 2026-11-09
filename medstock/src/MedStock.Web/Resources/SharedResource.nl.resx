@@ -249,4 +249,23 @@
   <data name="Import_NoFile" xml:space="preserve"><value>Kies een exportbestand (maximaal 2 MB).</value></data>
   <data name="Import_NotAnExport" xml:space="preserve"><value>Dit bestand is geen MedStock-export.</value></data>
   <data name="Import_UnknownFormat" xml:space="preserve"><value>Deze export komt van een nieuwere MedStock-versie. Werk MedStock eerst bij.</value></data>
+  <data name="Barcode" xml:space="preserve"><value>Barcode</value></data>
+  <data name="Barcode_None" xml:space="preserve"><value>geen</value></data>
+  <data name="Barcode_Help" xml:space="preserve"><value>Scan de code op de doos: dan opent de scanknop op het overzicht deze medicatie. Van de vierkante code op Europese medicijndozen wordt enkel het productnummer bewaard, zodat elke nieuwe doos herkend wordt.</value></data>
+  <data name="Scan_Button" xml:space="preserve"><value>Scannen</value></data>
+  <data name="Scan_Title" xml:space="preserve"><value>Gescande code</value></data>
+  <data name="Scan_Hint" xml:space="preserve"><value>Neem een foto van de barcode, of probeer de live camera.</value></data>
+  <data name="Scan_Photo" xml:space="preserve"><value>Foto</value></data>
+  <data name="Scan_Live" xml:space="preserve"><value>Live camera</value></data>
+  <data name="Scan_Looking" xml:space="preserve"><value>Barcode zoeken…</value></data>
+  <data name="Scan_NotFound" xml:space="preserve"><value>Geen barcode gevonden. Probeer opnieuw, dichterbij en scherper, met goed licht.</value></data>
+  <data name="Scan_NoCamera" xml:space="preserve"><value>De live camera is hier niet beschikbaar; gebruik Foto.</value></data>
+  <data name="Scan_Several" xml:space="preserve"><value>Deze code hoort bij meerdere medicaties. Welke?</value></data>
+  <data name="Scan_Unknown" xml:space="preserve"><value>Code {0} is nog niet gekoppeld. Welke medicatie is het?</value></data>
+  <data name="Scan_Link" xml:space="preserve"><value>Deze</value></data>
+  <data name="Scan_HasOther" xml:space="preserve"><value>heeft een andere code</value></data>
+  <data name="Flash_Scanned" xml:space="preserve"><value>Gescand. Eén gekocht? Tik op +1 {0}.</value></data>
+  <data name="Flash_Linked" xml:space="preserve"><value>Barcode gekoppeld</value></data>
+  <data name="Flash_Barcode" xml:space="preserve"><value>Barcode bewaard</value></data>
+  <data name="Flash_BarcodeRemoved" xml:space="preserve"><value>Barcode verwijderd</value></data>
 </root>

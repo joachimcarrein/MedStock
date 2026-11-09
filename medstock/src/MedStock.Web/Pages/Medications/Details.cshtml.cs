@@ -42,6 +42,16 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
     public Task<IActionResult> OnPostPauseAsync(int id, int expectedSnapshotId, bool paused) =>
         Run(id, () => service.SetPausedAsync(id, expectedSnapshotId, paused), paused ? "paused" : "resumed");
 
+    /// <summary>Links (or with an empty value removes) the barcode; stored as the product number (see <see cref="Barcodes"/>).</summary>
+    public async Task<IActionResult> OnPostBarcodeAsync(int id, string? barcode)
+    {
+        var m = await db.Medications.FindAsync(id);
+        if (m is null) return NotFound();
+        m.Barcode = Barcodes.Normalize(barcode);
+        await db.SaveChangesAsync();
+        return RedirectToPage(new { id, done = m.Barcode is null ? "barcode-removed" : "barcode" });
+    }
+
     public async Task<IActionResult> OnPostArchiveAsync(int id)
     {
         try { await service.SetArchivedAsync(id, true); }
@@ -93,6 +103,10 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
             "recounted" => l["Flash_Recounted"],
             "paused" => l["Badge_Paused"],
             "resumed" => l["Flash_Resumed"],
+            "scanned" => l["Flash_Scanned", Texts.Package(t, 1, c)],
+            "linked" => l["Flash_Linked"],
+            "barcode" => l["Flash_Barcode"],
+            "barcode-removed" => l["Flash_BarcodeRemoved"],
             _ => null,
         };
     }

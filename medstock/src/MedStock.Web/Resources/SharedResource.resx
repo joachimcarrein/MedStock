@@ -249,4 +249,23 @@
   <data name="Import_NoFile" xml:space="preserve"><value>Choose an export file (at most 2 MB).</value></data>
   <data name="Import_NotAnExport" xml:space="preserve"><value>This file is not a MedStock export.</value></data>
   <data name="Import_UnknownFormat" xml:space="preserve"><value>This export was made by a newer MedStock version. Update MedStock first.</value></data>
+  <data name="Barcode" xml:space="preserve"><value>Barcode</value></data>
+  <data name="Barcode_None" xml:space="preserve"><value>none</value></data>
+  <data name="Barcode_Help" xml:space="preserve"><value>Scan the code on the box: then the scan button on the overview opens this medication. For the square code on European medicine boxes only the product number is kept, so every new box matches.</value></data>
+  <data name="Scan_Button" xml:space="preserve"><value>Scan</value></data>
+  <data name="Scan_Title" xml:space="preserve"><value>Scanned code</value></data>
+  <data name="Scan_Hint" xml:space="preserve"><value>Take a photo of the barcode, or try the live camera.</value></data>
+  <data name="Scan_Photo" xml:space="preserve"><value>Photo</value></data>
+  <data name="Scan_Live" xml:space="preserve"><value>Live camera</value></data>
+  <data name="Scan_Looking" xml:space="preserve"><value>Looking for a barcode…</value></data>
+  <data name="Scan_NotFound" xml:space="preserve"><value>No barcode found. Try again closer and sharper, with good light.</value></data>
+  <data name="Scan_NoCamera" xml:space="preserve"><value>The live camera is not available here; use Photo.</value></data>
+  <data name="Scan_Several" xml:space="preserve"><value>This code belongs to several medications. Which one?</value></data>
+  <data name="Scan_Unknown" xml:space="preserve"><value>Code {0} is not linked yet. Which medication is it?</value></data>
+  <data name="Scan_Link" xml:space="preserve"><value>This one</value></data>
+  <data name="Scan_HasOther" xml:space="preserve"><value>has another code</value></data>
+  <data name="Flash_Scanned" xml:space="preserve"><value>Scanned. Bought one? Tap +1 {0}.</value></data>
+  <data name="Flash_Linked" xml:space="preserve"><value>Barcode linked</value></data>
+  <data name="Flash_Barcode" xml:space="preserve"><value>Barcode saved</value></data>
+  <data name="Flash_BarcodeRemoved" xml:space="preserve"><value>Barcode removed</value></data>
 </root>

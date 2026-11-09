@@ -140,8 +140,21 @@
         }
     </section>
 
+    <section class="barcode">
+        <h2>@L["Barcode"]</h2>
+        <form method="post" asp-page-handler="Barcode" asp-route-id="@m.Id" class="inline-form">
+            <input type="text" name="barcode" value="@m.Barcode" inputmode="numeric" maxlength="200" autocomplete="off" aria-label="@L["Barcode"]" placeholder="@L["Barcode_None"]" />
+            <button type="button" class="secondary" data-scan="fill">@L["Scan_Button"]</button>
+            <button type="submit">@L["Save"]</button>
+        </form>
+        <p class="small muted">@L["Barcode_Help"]</p>
+    </section>
+    <partial name="_Scanner" />
+
 </div>
 
 @section Scripts {
     <script src="~/js/photo.js" asp-append-version="true"></script>
+    <script src="~/lib/zxing/zxing-reader.js" asp-append-version="true"></script>
+    <script src="~/js/scan.js" asp-append-version="true"></script>
 }
