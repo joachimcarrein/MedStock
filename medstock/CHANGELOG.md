@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- French UI. The language follows the browser or the choice in Settings › Language.
+- Settings › Language lists every available language automatically.
+
 ## 2026.11.1
 
 - Docs: dashboard example says where to paste it (a card, not the view YAML) and also comes as a whole view; examples use the same generic profile names everywhere (Husband, Wife).

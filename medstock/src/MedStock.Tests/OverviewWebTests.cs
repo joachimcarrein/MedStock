@@ -66,6 +66,18 @@ public class OverviewWebTests : IClassFixture<AddonWebFactory>
     }
 
     [Fact]
+    public async Task French_browser_gets_the_french_ui_and_language_choice()
+    {
+        var c = _f.Client("fr-user", ingressPath: null);
+        c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("fr-BE");
+        var html = System.Net.WebUtility.HtmlDecode(await c.GetStringAsync("/"));
+        Assert.Contains("Aperçu", html);
+        Assert.Contains("<html lang=\"fr\"", html);
+        var settings = System.Net.WebUtility.HtmlDecode(await c.GetStringAsync("/Settings"));
+        Assert.Contains(">Français</option>", settings);
+    }
+
+    [Fact]
     public async Task Profile_filter_is_remembered_per_user()
     {
         var c = Nl("ov-2");
