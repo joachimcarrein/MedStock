@@ -28,6 +28,11 @@ prefix makes missing path prefixes visible right away.
   language file (`SharedResource.nl.resx`, ...). A test fails when a language misses a key or a placeholder (`{0}`).
 - **A new language:** copy `SharedResource.nl.resx` to `SharedResource.<code>.resx` and translate it. That is all: the
   app finds the language when it starts and offers it in Settings › Language.
+- **Language vs regional variant:** `SharedResource.nl.resx` is standard Dutch and has every key.
+  `SharedResource.nl-BE.resx` holds only the words that differ in Belgium (e.g. *Voorschrift* instead of *Recept*);
+  every other text falls back to `nl`. So: change a text in the language file; put a word in a regional file only when
+  that region really says it differently. A regional file needs its language file (`fr-CA` needs `fr`) and may not
+  contain keys the English file lacks; the tests check both.
 - **Database changes:** add an EF Core migration in the same pull request
   (`dotnet ef migrations add <Name> --project medstock/src/MedStock.Web --output-dir Data/Migrations`). Migrations
   must be additive (new tables/columns with defaults), so an older version can still open a newer database.

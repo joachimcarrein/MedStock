@@ -31,15 +31,25 @@ public partial class ResourceTests
 
     public static TheoryData<string> Languages() => [.. LanguageCodes()];
 
+    /// <summary>
+    /// A language (nl, fr) has every key. A regional variant (nl-BE) only holds the words that differ from its language;
+    /// the rest falls back to that language, which must exist.
+    /// </summary>
     [Theory]
     [MemberData(nameof(Languages))]
     public void Every_language_has_the_english_keys_and_placeholders(string lang)
     {
         var en = Load(Path.Combine(Dir, "SharedResource.resx"));
         var other = Load(Path.Combine(Dir, $"SharedResource.{lang}.resx"));
-        Assert.Empty(en.Keys.Except(other.Keys));   // missing translations
+        if (lang.Contains('-'))
+        {
+            var parent = lang.Split('-')[0];
+            Assert.True(parent == "en" || File.Exists(Path.Combine(Dir, $"SharedResource.{parent}.resx")), $"{lang} needs {parent}");
+            Assert.NotEmpty(other);
+        }
+        else Assert.Empty(en.Keys.Except(other.Keys));   // missing translations
         Assert.Empty(other.Keys.Except(en.Keys));   // leftovers
-        Assert.Empty(en.Where(kv => !Placeholders(kv.Value).SetEquals(Placeholders(other[kv.Key]))).Select(kv => kv.Key));
+        Assert.Empty(other.Where(kv => !Placeholders(kv.Value).SetEquals(Placeholders(en[kv.Key]))).Select(kv => kv.Key));
         Assert.Empty(other.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key));
     }
 

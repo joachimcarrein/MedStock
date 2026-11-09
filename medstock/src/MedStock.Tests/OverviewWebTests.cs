@@ -77,6 +77,22 @@ public class OverviewWebTests : IClassFixture<AddonWebFactory>
         Assert.Contains(">Français</option>", settings);
     }
 
+    [Theory]
+    [InlineData("nl-BE", "Voorschrift")] // Belgian variant (SharedResource.nl-BE.resx)
+    [InlineData("nl-NL", "Recept")]      // no nl-NL file: falls back to nl
+    [InlineData("nl", "Recept")]
+    public async Task Regional_variant_only_overrides_its_own_words(string lang, string tab)
+    {
+        var c = _f.Client("region-" + lang, ingressPath: null);
+        c.DefaultRequestHeaders.AcceptLanguage.ParseAdd(lang);
+        var html = System.Net.WebUtility.HtmlDecode(await c.GetStringAsync("/"));
+        Assert.Contains(tab, html);
+        Assert.DoesNotContain(tab == "Recept" ? "Voorschrift" : "Recept", html);
+        Assert.Contains("Overzicht", html); // everything else from nl
+        var settings = System.Net.WebUtility.HtmlDecode(await c.GetStringAsync("/Settings"));
+        Assert.Contains(">Nederlands (België)</option>", settings);
+    }
+
     [Fact]
     public async Task Profile_filter_is_remembered_per_user()
     {

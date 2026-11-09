@@ -57,7 +57,7 @@
   <data name="Notify_Empty" xml:space="preserve"><value>{0}: is op</value></data>
   <data name="Notify_Test" xml:space="preserve"><value>Testmelding van MedStock</value></data>
   <data name="Tab_Overview" xml:space="preserve"><value>Overzicht</value></data>
-  <data name="Tab_Prescription" xml:space="preserve"><value>Voorschrift</value></data>
+  <data name="Tab_Prescription" xml:space="preserve"><value>Recept</value></data>
   <data name="Tab_Settings" xml:space="preserve"><value>Instellingen</value></data>
   <data name="Back" xml:space="preserve"><value>Terug</value></data>
   <data name="Close" xml:space="preserve"><value>Sluiten</value></data>
@@ -108,7 +108,7 @@
   <data name="Weekly_SameEveryDay" xml:space="preserve"><value>Elke dag gelijk</value></data>
   <data name="Med_MinStock" xml:space="preserve"><value>Minimumvoorraad in eenheden (0 = enkel bij leeg)</value></data>
   <data name="Med_AlertDays" xml:space="preserve"><value>Meldingsdrempel in dagen (leeg = {0})</value></data>
-  <data name="Med_CoverageDays" xml:space="preserve"><value>Dekkingsdagen voor het voorschrift (leeg = {0})</value></data>
+  <data name="Med_CoverageDays" xml:space="preserve"><value>Dekkingsdagen voor het recept (leeg = {0})</value></data>
   <data name="Med_Notifications" xml:space="preserve"><value>Meldingen voor deze medicatie</value></data>
   <data name="Med_InitialStock" xml:space="preserve"><value>Huidige voorraad</value></data>
   <data name="Stock_OpenUnits" xml:space="preserve"><value>Eenheden in de open verpakking</value></data>
@@ -183,7 +183,7 @@
   <data name="Settings_WhoAreYou_Help" xml:space="preserve"><value>Home Assistant gaf niet door wie je bent. Kies jezelf om meldingen te krijgen.</value></data>
   <data name="Settings_ExistingUser" xml:space="preserve"><value>Bestaande gebruiker</value></data>
   <data name="Settings_OrNewName" xml:space="preserve"><value>Of typ je naam</value></data>
-  <data name="Doctor_ShareTitle" xml:space="preserve"><value>Voorschrift {0} – {1}</value></data>
+  <data name="Doctor_ShareTitle" xml:space="preserve"><value>Recept {0} – {1}</value></data>
   <data name="Doctor_Ask" xml:space="preserve"><value>vraag {0} {1}</value></data>
   <data name="Doctor_None" xml:space="preserve"><value>geen</value></data>
   <data name="Doctor_Paused" xml:space="preserve"><value>(gepauzeerd)</value></data>
