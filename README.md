@@ -17,7 +17,7 @@ and tells you **how many days you have left**, without logging every single inta
   external call is the optional picture search (Wikimedia Commons or DailyMed), when you tap it. Data is part of your Home
   Assistant backups and can be exported and imported as JSON.
 
-The UI is available in English and Dutch.
+The UI is available in English, Dutch and French.
 
 <p>
   <img src="docs/screenshots/overview.png" alt="Overview: medication sorted by urgency" width="260">
