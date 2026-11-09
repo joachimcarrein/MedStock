@@ -67,6 +67,8 @@ public class Medication
     public decimal? TakeAlongUnits { get; set; }
     /// <summary>Last day of a course (e.g. antibiotics); no use after it. Null = ongoing.</summary>
     public DateOnly? EndDate { get; set; }
+    /// <summary>Available without a prescription: left off the prescription for the doctor (bought yourself).</summary>
+    public bool OverTheCounter { get; set; }
     public bool HasPhoto { get; set; }
     public bool Paused { get; set; }
     public bool Archived { get; set; }

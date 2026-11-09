@@ -156,6 +156,7 @@
         </fieldset>
     }
 
+    <label class="inline"><input type="checkbox" asp-for="Input.OverTheCounter" /> @L["Med_OverTheCounter"]</label>
     <label>
         @L["Med_EndDate"]
         <input type="date" name="Input.EndDate" value="@Model.Input.EndDate?.ToString("yyyy-MM-dd", inv)" />

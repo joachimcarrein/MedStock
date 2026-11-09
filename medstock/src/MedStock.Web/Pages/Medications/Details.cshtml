@@ -90,15 +90,15 @@
         }
     </div>
 
-    <form method="post" asp-page-handler="Purchase" asp-route-id="@m.Id" class="inline-form" hx-disabled-elt="find button">
+    <form method="post" asp-page-handler="Purchase" asp-route-id="@m.Id" class="inline-form qty-form" hx-disabled-elt="find button">
         <input type="number" name="packages" min="1" max="1000" step="1" inputmode="numeric" placeholder="n" aria-label="@L["Action_Packages"]" required />
-        <button type="submit">+ @Texts.Package(m.Type, 2, ui)</button>
+        <button type="submit">+ n @Texts.Package(m.Type, 2, ui)</button>
     </form>
     @if (asNeeded)
     {
-        <form method="post" asp-page-handler="Intake" asp-route-id="@m.Id" class="inline-form" hx-disabled-elt="find button">
+        <form method="post" asp-page-handler="Intake" asp-route-id="@m.Id" class="inline-form qty-form" hx-disabled-elt="find button">
             <input type="number" name="units" min="1" step="1" inputmode="numeric" placeholder="n" aria-label="@L["Action_Units"]" required />
-            <button type="submit" class="secondary">− @Texts.Unit(m.Type, 2, ui)</button>
+            <button type="submit" class="secondary">− n @Texts.Unit(m.Type, 2, ui)</button>
         </form>
     }
 

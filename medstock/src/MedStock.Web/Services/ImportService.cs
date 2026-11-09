@@ -132,6 +132,7 @@ public sealed class ImportService(MedStockDb db, IClock clock, SensorSignal sens
             Barcode = string.IsNullOrWhiteSpace(e.Barcode) ? null : e.Barcode.Trim(),
             TakeAlongUnits = e.TakeAlongUnits,
             EndDate = endDate,
+            OverTheCounter = e.OverTheCounter,
         };
         return true;
     }

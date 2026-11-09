@@ -24,15 +24,16 @@ public class DoctorWebTests : IClassFixture<AddonWebFactory>
             Add(j, "Vitamin D", null, MedicationType.Capsule, 90, UsageMode.PerDay, 1, new decimal[7], "2026-11-17", 400);
             Add(j, "Paused", null, MedicationType.Pill, 28, UsageMode.PerDay, 1, new decimal[7], "2026-11-17", 1, paused: true);
             Add(o, "Nasalix", null, MedicationType.NasalSpray, 140, UsageMode.PerDay, 8, new decimal[7], "2026-11-07", 240);
+            Add(o, "Painkiller", null, MedicationType.Pill, 20, UsageMode.PerDay, 1, new decimal[7], "2026-11-17", 5, otc: true);
             db.SaveChanges();
             return (j.Id, o.Id);
 
             void Add(Profile p, string name, string? strength, MedicationType type, decimal upp, UsageMode mode, decimal perDay,
-                decimal[] weekly, string date, decimal units, bool paused = false) =>
+                decimal[] weekly, string date, decimal units, bool paused = false, bool otc = false) =>
                 db.Medications.Add(new Medication
                 {
                     Profile = p, Name = name, Strength = strength, Type = type, UnitsPerPackage = upp, UsageMode = mode, PerDay = perDay,
-                    Weekly = weekly, Paused = paused,
+                    Weekly = weekly, Paused = paused, OverTheCounter = otc,
                     Snapshots = [new Snapshot { Date = T.D(date), TotalUnits = units, Reason = SnapshotReason.Initial }],
                 });
         });
@@ -69,10 +70,28 @@ public class DoctorWebTests : IClassFixture<AddonWebFactory>
     }
 
     [Fact]
-    public async Task Default_profile_is_the_first_without_a_remembered_filter()
+    public async Task All_profiles_is_the_default_without_a_remembered_filter_with_one_block_per_profile()
     {
-        var html = await GetAsync("/Doctor");
-        Assert.Contains("Voorschrift Husband", html);
+        foreach (var url in new[] { "/Doctor", "/Doctor?profile=all" })
+        {
+            var html = await GetAsync(url);
+            var date = Texts.LongDate(new DateOnly(2026, 11, 17), new CultureInfo("nl"));
+            var text = html.Split("<textarea")[1].Split("</textarea>")[0];
+            Assert.Contains($"Voorschrift Husband – {date}\n- Weekject", text);
+            Assert.Contains($"(nog 20 dagen)\n\nVoorschrift Other – {date}\n- Nasalix: 1 flesje", text); // blank line between profiles
+            Assert.Contains("aria-current=\"page\">Alles</a>", html);
+        }
+    }
+
+    [Fact]
+    public async Task Over_the_counter_is_not_asked_for_but_listed_to_buy()
+    {
+        var html = await GetAsync($"/Doctor?profile={_other}");
+        var text = html.Split("<textarea")[1].Split("</textarea>")[0];
+        Assert.DoesNotContain("Painkiller", text);
+        Assert.Contains("Vrij verkrijgbaar, zelf kopen (1)", html);
+        Assert.Contains("Painkiller", html);
+        Assert.Contains("koop 2 dozen", html); // 30 days × 1 − 5 = 25 → 2 boxes of 20
     }
 
     [Fact]

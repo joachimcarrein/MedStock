@@ -55,7 +55,7 @@ public class ExportModel(MedStockDb db, IClock clock, ILogger<ExportModel> log) 
                 snapshots.TryGetValue(m.Id, out var s)
                     ? new ExportStock(s.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TotalUnits)
                     : null,
-                m.Barcode, m.TakeAlongUnits, m.EndDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))).ToList());
+                m.Barcode, m.TakeAlongUnits, m.EndDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), m.OverTheCounter)).ToList());
     }
 }
 
@@ -70,6 +70,6 @@ public sealed record ExportProfile(int Id, string Name, string Color, int SortOr
 public sealed record ExportMedication(int Id, int ProfileId, string Name, string? Strength, string Type, decimal UnitsPerPackage,
     string UsageMode, decimal PerDay, decimal[] Weekly, decimal MinStockUnits, int? AlertDays, int? CoverageDays,
     bool NotificationsEnabled, bool Paused, bool Archived, ExportStock? Stock, string? Barcode = null,
-    decimal? TakeAlongUnits = null, string? EndDate = null);
+    decimal? TakeAlongUnits = null, string? EndDate = null, bool OverTheCounter = false);
 
 public sealed record ExportStock(string Date, decimal TotalUnits);
