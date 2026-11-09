@@ -4,6 +4,8 @@
 
 - Dutch now comes in two variants: standard Dutch ("Recept") and Belgian Dutch ("Voorschrift"), chosen from the phone's language and region or in Settings › Language.
 
+## 2026.11.2
+
 - French UI. The language follows the browser or the choice in Settings › Language.
 - Settings › Language lists every available language automatically.
 
