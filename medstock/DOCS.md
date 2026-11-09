@@ -109,6 +109,11 @@ taken from the medication, else the profile, else the global setting (default 90
 top; **Share** sends the list via the share sheet, or copies it when sharing is not available (for example when
 Home Assistant is opened over plain http at home). The text also stays selectable in the box below the list.
 
+- **All** shows every profile at once (the default when the overview shows everyone). The text then has one block per
+  person that needs something, separated by an empty line, so one visit covers the whole household.
+- Medication marked **Over the counter** (on the medication's edit screen) is never in the text for the doctor. It is
+  listed apart under **Over the counter, buy yourself**, with how many packages to buy.
+
 ### Course with an end date
 
 For a course such as antibiotics, fill in **End of course** when adding or editing the medication. MedStock then

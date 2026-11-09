@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Prescription: "All" shows every profile; the text for the doctor then has one block per person.
+- New per medication: "Over the counter". It stays off the prescription and is listed apart, to buy yourself.
+
 - Import: the upload size limit (about 2 MB) is now actually enforced; before, the server read up to 30 MB before refusing.
 
 ## 2026.11.3

@@ -99,6 +99,9 @@ namespace MedStock.Web.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("OverTheCounter")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("Paused")
                         .HasColumnType("INTEGER");
 

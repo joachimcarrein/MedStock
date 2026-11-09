@@ -8,4 +8,6 @@
   <data name="Tab_Prescription" xml:space="preserve"><value>Voorschrift</value></data>
   <data name="Med_CoverageDays" xml:space="preserve"><value>Dekkingsdagen voor het voorschrift (leeg = {0})</value></data>
   <data name="Doctor_ShareTitle" xml:space="preserve"><value>Voorschrift {0} – {1}</value></data>
+  <data name="Med_OverTheCounter" xml:space="preserve"><value>Vrij verkrijgbaar (zonder voorschrift)</value></data>
+  <data name="Doctor_OverTheCounter" xml:space="preserve"><value>Vrij verkrijgbaar, zelf kopen ({0})</value></data>
 </root>

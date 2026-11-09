@@ -284,4 +284,7 @@
   <data name="Flash_Linked" xml:space="preserve"><value>Barcode linked</value></data>
   <data name="Flash_Barcode" xml:space="preserve"><value>Barcode saved</value></data>
   <data name="Flash_BarcodeRemoved" xml:space="preserve"><value>Barcode removed</value></data>
+  <data name="Med_OverTheCounter" xml:space="preserve"><value>Over the counter (no prescription needed)</value></data>
+  <data name="Doctor_OverTheCounter" xml:space="preserve"><value>Over the counter, buy yourself ({0})</value></data>
+  <data name="Doctor_Buy" xml:space="preserve"><value>buy {0} {1}</value></data>
 </root>

@@ -8,7 +8,7 @@
 <h1>@L["Tab_Prescription"]</h1>
 <p><a href="@Url.Page("/Vacation")">@L["Vacation_Link"]</a></p>
 
-@if (Model.Profile is null)
+@if (Model.Profiles.Count == 0)
 {
     <div class="empty-state">
         <p>@L["Empty_NoProfiles"]</p>
@@ -20,9 +20,10 @@ else
     @if (Model.Profiles.Count > 1)
     {
         <nav class="chips" aria-label="@L["Med_Profile"]">
+            <a href="@Url.Page("/Doctor", new { profile = DoctorModel.AllValue })" class="@(Model.All ? "active" : null)" aria-current="@(Model.All ? "page" : null)">@L["Filter_All"]</a>
             @foreach (var p in Model.Profiles)
             {
-                var active = p.Id == Model.Profile.Id;
+                var active = p.Id == Model.Profile?.Id;
                 <a href="@Url.Page("/Doctor", new { profile = p.Id })" class="@(active ? "active" : null)" aria-current="@(active ? "page" : null)"><span class="profile-dot" style="background:@p.Color"></span>@p.Name</a>
             }
         </nav>
@@ -39,7 +40,12 @@ else
         {
             var m = l.Medication;
             <li class="state-@l.Row.ColorClass">
-                <div class="rx-name">@m.Name <span class="muted">@m.Strength</span></div>
+                <div class="rx-name">@m.Name <span class="muted">@m.Strength</span>
+                    @if (Model.All)
+                    {
+                        <span class="small muted"><span class="profile-dot" style="background:@l.Row.Profile.Color"></span>@l.Row.Profile.Name</span>
+                    }
+                </div>
                 <div class="rx-ask">@(l.Packages > 0 ? L["Doctor_Ask", l.Packages, Texts.Package(m.Type, l.Packages, ui)] : L["Doctor_None"])</div>
                 <div class="small"><span class="badge @l.Row.ColorClass"><partial name="_StateIcon" model="l.Row.Stock.State" />@l.Row.Badge(ui)</span> @l.Row.LastDose(ui)</div>
             </li>
@@ -53,7 +59,21 @@ else
                 @foreach (var l in rest)
                 {
                     var m = l.Medication;
-                    <li>@m.Name <span class="muted">@m.Strength</span> · @(m.Paused ? L["Doctor_Paused"] : L["Doctor_None"])</li>
+                    <li>@m.Name <span class="muted">@m.Strength</span>@(Model.All ? $" ({l.Row.Profile.Name})" : "") · @(m.Paused ? L["Doctor_Paused"] : L["Doctor_None"])</li>
+                }
+            </ul>
+        </details>
+    }
+
+    @if (Model.OverTheCounter.Count > 0)
+    {
+        <details class="otc">
+            <summary>@L["Doctor_OverTheCounter", Model.OverTheCounter.Count]</summary>
+            <ul class="rx rx-rest">
+                @foreach (var l in Model.OverTheCounter)
+                {
+                    var m = l.Medication;
+                    <li>@m.Name <span class="muted">@m.Strength</span>@(Model.All ? $" ({l.Row.Profile.Name})" : "") · @L["Doctor_Buy", l.Packages, Texts.Package(m.Type, l.Packages, ui)]</li>
                 }
             </ul>
         </details>
