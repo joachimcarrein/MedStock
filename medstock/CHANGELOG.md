@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2026.11.4
+
 - Detail: the "+ n boxes" and "− n pills" buttons have the same width; the scanner buttons (Photo, Live camera, Cancel) have the same height.
 
 - Prescription: "All" shows every profile; the text for the doctor then has one block per person.
