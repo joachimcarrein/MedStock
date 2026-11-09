@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.2
+
 - Barcode field: ✕ to clear the code in one tap.
 
 ## 1.4.1
