@@ -287,4 +287,5 @@
   <data name="Med_OverTheCounter" xml:space="preserve"><value>Zonder recept verkrijgbaar</value></data>
   <data name="Doctor_OverTheCounter" xml:space="preserve"><value>Zonder recept, zelf kopen ({0})</value></data>
   <data name="Doctor_Buy" xml:space="preserve"><value>koop {0} {1}</value></data>
+  <data name="Share_ToText" xml:space="preserve"><value>Naar de tekst ↓</value></data>
 </root>
