@@ -49,7 +49,8 @@ public class VacationModel(MedStockDb db, IClock clock, CurrentUser user) : Page
         var length = Days;
         Lines = (await MedicationQueries.LoadAsync(db, today))
             .Where(r => ProfileId is null || r.Medication.ProfileId == ProfileId)
-            .Select(r => new VacationLine(r, PrescriptionCalculator.Vacation(StockInput.From(r.Medication, r.Snapshot), today, departure, length)))
+            .Select(r => new VacationLine(r, PrescriptionCalculator.Vacation(StockInput.From(r.Medication, r.Snapshot), today, departure, length,
+                PrescriptionCalculator.TakePortion(r.Medication))))
             .OrderBy(l => l.Need is null ? 1 : 0).ThenByDescending(l => l.Need?.BuyPackages ?? 0)
             .ThenBy(l => l.Row.Medication.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
@@ -58,15 +59,17 @@ public class VacationModel(MedStockDb db, IClock clock, CurrentUser user) : Page
 
     public static string Name(Medication m) => string.IsNullOrWhiteSpace(m.Strength) ? m.Name : $"{m.Name} {m.Strength}";
 
-    /// <summary>"take 112 doses (≈ 1 bottle)".</summary>
+    /// <summary>"take 7 pills", "take 2 bottles (112 doses needed)" or "take 1 strip of 10 (7 pills needed)".</summary>
     public static string Take(VacationLine l, CultureInfo c)
     {
         var m = l.Row.Medication;
         var n = l.Need!;
-        var units = Texts.Format("Vacation_Take", c, Texts.UnitsCount(m.Type, Math.Ceiling(n.NeedUnits), c));
-        return n.NeedPackages > 0
-            ? $"{units} {Texts.Format("Vacation_TakePackages", c, n.NeedPackages, Texts.Package(m.Type, n.NeedPackages, c))}"
-            : units;
+        var units = Texts.UnitsCount(m.Type, Math.Ceiling(n.NeedUnits), c);
+        if (n.Portion == 1) return Texts.Format("Vacation_Take", c, units);
+        var what = n.Portion == m.UnitsPerPackage
+            ? $"{n.TakePortions} {Texts.Package(m.Type, n.TakePortions, c)}"
+            : $"{n.TakePortions} {Texts.Format(n.TakePortions == 1 ? "Strip_One" : "Strip_Other", c, n.Portion.ToString("0.##", c))}";
+        return Texts.Format("Vacation_TakePortion", c, what, units);
     }
 
     /// <summary>"buy 1 bottle before Sat 20 Dec" or "enough in stock".</summary>

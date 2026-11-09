@@ -108,6 +108,7 @@ public sealed class ImportService(MedStockDb db, IClock clock, SensorSignal sens
         if (e.Weekly is not { Length: 7 } || e.Weekly.Any(w => w < 0)) return false;
         if (e.AlertDays is < 0 or > 3650 || e.CoverageDays is < 0 or > 3650) return false;
         if (e.Barcode?.Length > 64) return false;
+        if (e.TakeAlongUnits is <= 0 || e.TakeAlongUnits > e.UnitsPerPackage) return false;
 
         if (e.Stock is { } s)
         {
@@ -123,6 +124,7 @@ public sealed class ImportService(MedStockDb db, IClock clock, SensorSignal sens
             Weekly = [.. e.Weekly], MinStockUnits = e.MinStockUnits, AlertDays = e.AlertDays, CoverageDays = e.CoverageDays,
             NotificationsEnabled = e.NotificationsEnabled, Paused = e.Paused, Archived = e.Archived,
             Barcode = string.IsNullOrWhiteSpace(e.Barcode) ? null : e.Barcode.Trim(),
+            TakeAlongUnits = e.TakeAlongUnits,
         };
         return true;
     }

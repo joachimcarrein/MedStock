@@ -63,6 +63,8 @@ public class Medication
     public int? CoverageDays { get; set; }
     public bool NotificationsEnabled { get; set; } = true;
     public string? Barcode { get; set; }
+    /// <summary>Smallest amount to take along on a trip (e.g. a strip of 10). Null = the default for the type.</summary>
+    public decimal? TakeAlongUnits { get; set; }
     public bool HasPhoto { get; set; }
     public bool Paused { get; set; }
     public bool Archived { get; set; }

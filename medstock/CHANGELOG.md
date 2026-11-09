@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Trip planner: take along whole strips or bottles instead of "≈ n boxes". New optional field per medication: smallest amount to take along (e.g. a strip of 10).
+- Scanning an unknown box offers "New medication with this barcode".
+- Settings: checkboxes with a long label no longer shrink.
+
 ## 1.3.0
 
 - Barcode: link the code on the box and open the medication by scanning it from the overview (photo or live camera; read on the phone). For European medicine boxes only the product number is kept.

@@ -109,6 +109,9 @@ namespace MedStock.Web.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("TakeAlongUnits")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(20)

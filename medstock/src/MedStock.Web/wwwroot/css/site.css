@@ -126,7 +126,7 @@ dl.kv dd { margin: 0; word-break: break-all; }
 
 /* Forms */
 label.inline { display: flex; align-items: center; gap: 0.5rem; }
-label.inline input { margin: 0; }
+label.inline input { margin: 0; flex: none; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .dayparts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; font-size: 0.8rem; }
 .helper summary, .advanced summary { font-size: 0.9rem; }

@@ -88,7 +88,7 @@ dose already counts as taken. More than ten years of stock shows as "> 10 years"
 ### Scanning a box
 
 Link a barcode once per medication (detail › **Barcode › Scan**, or scan an unknown box from the overview and pick
-the medication). After that, the round **barcode** button above **+** on the overview opens the right medication
+the medication, or choose **New medication with this barcode**). After that, the round **barcode** button above **+** on the overview opens the right medication
 directly, with a reminder to tap **+1** when you just bought it.
 
 - **Photo** takes a picture of the code and reads it on your phone. This always works.
@@ -97,7 +97,8 @@ directly, with a reminder to tap **+1** when you just bought it.
 - European medicine boxes carry a square DataMatrix code with a serial number per box. MedStock keeps only the
   product number (GTIN) from it, so every new box of the same product is recognised. Ordinary barcodes (EAN) work too.
 - When two profiles use the same product, MedStock asks which one you mean.
-- Reading happens entirely on your phone; nothing is sent anywhere.
+- Reading happens entirely on your phone; nothing is sent anywhere. MedStock does not look the code up: there is no
+  free public database of Belgian medicine barcodes, so you enter the name once.
 
 ### Prescription
 
@@ -113,7 +114,10 @@ Per medication you see:
 
 - **buy n packages before <departure>** when the stock does not last until the last day of the trip (counting all
   use from today), or **enough in stock**;
-- **take n units along** (about how many packages) for the trip itself, and what is left the evening before you leave.
+- **take along** what the trip itself needs, in the smallest amount you can take: per unit, a whole bottle for sprays,
+  inhalers, drops and liquids, or what you set as **Smallest amount to take along** on the medication (e.g. 10 for a
+  strip of 10 pills). The opened strip or bottle counts first: 56 doses left in the bottle and 112 needed → that bottle
+  plus a new one. Also shown: what is left the evening before you leave.
 
 As-needed and paused medication is listed separately: check those yourself. **Share** sends the list as text.
 

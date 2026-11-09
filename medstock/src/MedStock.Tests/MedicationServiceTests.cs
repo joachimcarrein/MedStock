@@ -189,6 +189,26 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
     }
 
     [Fact]
+    public async Task New_medication_from_an_unknown_scan_gets_the_barcode_and_take_along_amount()
+    {
+        var c = _f.Client(ingressPath: null);
+        var profileId = await EnsureProfileAsync(c, "Scanned");
+        var html = await c.GetStringAsync($"/Medications/Edit?profileId={profileId}&barcode=5499999000017");
+        Assert.Contains("value=\"05499999000017\"", html);
+        var token = System.Text.RegularExpressions.Regex.Match(html, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
+        var fields = NasalixFields(profileId.ToString()).Where(f => f.Item1 != "Input.Name")
+            .Append(("Input.Name", "Paracetamol")).Append(("Input.Barcode", "05499999000017")).Append(("Input.TakeAlongUnits", "141")).ToArray();
+        var resp = await c.PostAsync("/Medications/Edit", Form(token, fields));
+        Assert.Equal(HttpStatusCode.OK, resp.StatusCode); // 141 > 140 per package
+        fields[^1] = ("Input.TakeAlongUnits", "10");
+        resp = await c.PostAsync("/Medications/Edit", Form(token, fields));
+        Assert.Equal(HttpStatusCode.Redirect, resp.StatusCode);
+        var med = _f.WithDb(db => db.Medications.Single(m => m.ProfileId == profileId));
+        Assert.Equal("05499999000017", med.Barcode);
+        Assert.Equal(10m, med.TakeAlongUnits);
+    }
+
+    [Fact]
     public async Task Create_medication_through_the_form()
     {
         var c = _f.Client(ingressPath: null);

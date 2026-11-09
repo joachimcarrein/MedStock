@@ -18,6 +18,7 @@
 else
 {
     <p>@L["Scan_Unknown", Model.Code!]</p>
+    <p><a role="button" href="@Url.Page("/Medications/Edit", new { barcode = Model.Code })">@L["Scan_New"]</a></p>
     @if (Model.All.Count == 0)
     {
         <p class="empty-state muted">@L["Empty_NoMedication"]</p>

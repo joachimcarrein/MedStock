@@ -228,7 +228,14 @@
   <data name="Vacation_Calculate" xml:space="preserve"><value>Calculate</value></data>
   <data name="Vacation_All" xml:space="preserve"><value>Everyone</value></data>
   <data name="Vacation_Take" xml:space="preserve"><value>take {0}</value></data>
-  <data name="Vacation_TakePackages" xml:space="preserve"><value>(≈ {0} {1})</value></data>
+  <data name="Vacation_TakePortion" xml:space="preserve"><value>take {0} ({1} needed)</value></data>
+  <data name="Strip_One" xml:space="preserve"><value>strip of {0}</value></data>
+  <data name="Strip_Other" xml:space="preserve"><value>strips of {0}</value></data>
+  <data name="Med_TakeAlong" xml:space="preserve"><value>Smallest amount to take along (optional)</value></data>
+  <data name="Med_TakeAlong_Help" xml:space="preserve"><value>For the trip planner: e.g. 10 for a strip of 10 pills. Empty = per unit; for bottles, inhalers and liquids a whole package.</value></data>
+  <data name="Val_TakeAlongMax" xml:space="preserve"><value>At most the number of units per package.</value></data>
+  <data name="Scan_New" xml:space="preserve"><value>New medication with this barcode</value></data>
+  <data name="Med_BarcodeWillLink" xml:space="preserve"><value>Barcode {0} will be linked to this medication.</value></data>
   <data name="Vacation_Buy" xml:space="preserve"><value>buy {0} {1} before {2}</value></data>
   <data name="Vacation_Enough" xml:space="preserve"><value>enough in stock</value></data>
   <data name="Vacation_AtDeparture" xml:space="preserve"><value>{0} left at departure</value></data>

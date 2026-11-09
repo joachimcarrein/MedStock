@@ -19,7 +19,7 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
     public bool IsNew => Input.Id == 0;
     public string? Conflict { get; private set; }
 
-    public async Task<IActionResult> OnGetAsync(int? id, int? profileId)
+    public async Task<IActionResult> OnGetAsync(int? id, int? profileId, string? barcode)
     {
         await LoadAsync();
         if (id is null)
@@ -29,6 +29,7 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
             {
                 Profile = (Profiles.FirstOrDefault(p => p.Id == profileId) ?? Profiles[0]).Id.ToString(),
                 TakenToday = MedicationService.DefaultTakenToday(clock.Now),
+                Barcode = Barcodes.Normalize(barcode),
             };
             return Page();
         }
@@ -67,6 +68,7 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
             var m = new Medication();
             SetProfile(m);
             Input.ApplyTo(m);
+            m.Barcode = Barcodes.Normalize(Input.Barcode);
             id = await service.CreateAsync(m, Input.OpenUnits ?? 0, Input.SealedPackages ?? 0, Input.TakenToday);
         }
         else
@@ -118,6 +120,8 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
         if (Input.Weekly.Length != 7) Input.Weekly = [.. Input.Weekly.Concat(new decimal[7]).Take(7)];
         for (var i = 0; i < 7; i++)
             if (Input.Weekly[i] < 0) Err($"{nameof(Input.Weekly)}[{i}]", "Val_NonNegative");
+        if (Input.TakeAlongUnits is <= 0) Err(nameof(Input.TakeAlongUnits), "Val_Positive");
+        else if (Input.TakeAlongUnits > Input.UnitsPerPackage) Err(nameof(Input.TakeAlongUnits), "Val_TakeAlongMax");
         if (Input.MinStockUnits < 0) Err(nameof(Input.MinStockUnits), "Val_NonNegative");
         if (Input.AlertDays is < 0 or > 3650) Err(nameof(Input.AlertDays), "Val_Range");
         if (Input.CoverageDays is < 0 or > 3650) Err(nameof(Input.CoverageDays), "Val_Range");
@@ -146,6 +150,9 @@ public sealed class MedicationInput
     public string? Strength { get; set; }
     public MedicationType Type { get; set; } = MedicationType.Pill;
     public decimal? UnitsPerPackage { get; set; }
+    public decimal? TakeAlongUnits { get; set; }
+    /// <summary>Only for a new medication created from a scan of an unknown code.</summary>
+    public string? Barcode { get; set; }
     public UsageMode UsageMode { get; set; } = UsageMode.PerDay;
     public decimal PerDay { get; set; }
     /// <summary>Index 0 = Monday, regardless of the UI order.</summary>
@@ -161,7 +168,7 @@ public sealed class MedicationInput
     public static MedicationInput From(Medication m, int latestSnapshotId) => new()
     {
         Id = m.Id, ExpectedSnapshotId = latestSnapshotId, Profile = m.ProfileId.ToString(), Name = m.Name,
-        Strength = m.Strength, Type = m.Type, UnitsPerPackage = m.UnitsPerPackage, UsageMode = m.UsageMode,
+        Strength = m.Strength, Type = m.Type, UnitsPerPackage = m.UnitsPerPackage, TakeAlongUnits = m.TakeAlongUnits, UsageMode = m.UsageMode,
         PerDay = m.PerDay, Weekly = (decimal[])m.Weekly.Clone(), MinStockUnits = m.MinStockUnits, AlertDays = m.AlertDays,
         CoverageDays = m.CoverageDays, NotificationsEnabled = m.NotificationsEnabled,
     };
@@ -172,6 +179,7 @@ public sealed class MedicationInput
         m.Strength = string.IsNullOrWhiteSpace(Strength) ? null : Strength.Trim();
         m.Type = Type;
         m.UnitsPerPackage = UnitsPerPackage!.Value;
+        m.TakeAlongUnits = TakeAlongUnits;
         m.UsageMode = UsageMode;
         // Only the active mode's values are kept, so switching modes back and forth leaves no stale usage behind.
         m.PerDay = UsageMode == UsageMode.PerDay ? PerDay : 0;

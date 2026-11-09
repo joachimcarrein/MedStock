@@ -64,6 +64,17 @@
         <input name="Input.UnitsPerPackage" value="@Num(Model.Input.UnitsPerPackage)" type="number" step="any" min="0" inputmode="decimal" required />
         <span asp-validation-for="Input.UnitsPerPackage" class="error small"></span>
     </label>
+    <label>
+        @L["Med_TakeAlong"]
+        <input name="Input.TakeAlongUnits" value="@Num(Model.Input.TakeAlongUnits)" type="number" step="any" min="0" inputmode="decimal" />
+        <small class="muted">@L["Med_TakeAlong_Help"]</small>
+        <span asp-validation-for="Input.TakeAlongUnits" class="error small"></span>
+    </label>
+    @if (Model.IsNew && !string.IsNullOrEmpty(Model.Input.Barcode))
+    {
+        <input type="hidden" name="Input.Barcode" value="@Model.Input.Barcode" />
+        <p class="small muted">@L["Med_BarcodeWillLink", Model.Input.Barcode]</p>
+    }
 
     <fieldset class="usage">
         <legend>@L["Med_Usage"]</legend>
