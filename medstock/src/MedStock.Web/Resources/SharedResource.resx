@@ -288,4 +288,7 @@
   <data name="Doctor_OverTheCounter" xml:space="preserve"><value>Over the counter, buy yourself ({0})</value></data>
   <data name="Doctor_Buy" xml:space="preserve"><value>buy {0} {1}</value></data>
   <data name="Share_ToText" xml:space="preserve"><value>To the text ↓</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Search medication</value></data>
+  <data name="Search_Clear" xml:space="preserve"><value>Clear search</value></data>
+  <data name="Search_NoMatch" xml:space="preserve"><value>No medication matches your search.</value></data>
 </root>

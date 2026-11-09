@@ -66,6 +66,16 @@ public class OverviewWebTests : IClassFixture<AddonWebFactory>
     }
 
     [Fact]
+    public async Task Search_box_filters_on_name_and_strength_of_the_shown_cards()
+    {
+        var html = WebUtility.HtmlDecode(await Nl("ov-search").GetStringAsync("/"));
+        Assert.Contains("placeholder=\"Zoek medicatie\"", html);
+        Assert.Contains("data-search-clear", html);
+        Assert.Contains("data-search-text=\"Nasalix", html);
+        Assert.Contains("js/search.js", html);
+    }
+
+    [Fact]
     public async Task French_browser_gets_the_french_ui_and_language_choice()
     {
         var c = _f.Client("fr-user", ingressPath: null);
