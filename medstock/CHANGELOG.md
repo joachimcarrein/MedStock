@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.3.0
+
 - Barcode: link the code on the box and open the medication by scanning it from the overview (photo or live camera; read on the phone). For European medicine boxes only the product number is kept.
 - Import of a JSON export (adds profiles and medication, never overwrites). The export now includes the barcode.
 - Trip planner (Prescription › Going away?): what to buy before leaving and what to take along.
