@@ -3,6 +3,9 @@
 ## Unreleased
 
 - Import: the upload size limit (about 2 MB) is now actually enforced; before, the server read up to 30 MB before refusing.
+
+## 2026.11.3
+
 - Dutch now comes in two variants: standard Dutch ("Recept") and Belgian Dutch ("Voorschrift"), chosen from the phone's language and region or in Settings › Language.
 
 ## 2026.11.2
