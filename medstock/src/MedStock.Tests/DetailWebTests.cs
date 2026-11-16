@@ -42,6 +42,36 @@ public class DetailWebTests : IClassFixture<AddonWebFactory>
         new([new("__RequestVerificationToken", token), .. fields.Select(f => new KeyValuePair<string, string>(f.Item1, f.Item2))]);
 
     [Fact]
+    public async Task Undo_takes_back_the_latest_purchase_and_shows_the_history()
+    {
+        var id = NewMed();
+        var (c, token) = await ClientAsync(id);
+        var resp = await c.PostAsync($"/Medications/Details?id={id}&handler=Purchase", Form(token, ("packages", "1")));
+        var html = WebUtility.HtmlDecode(await c.GetStringAsync(resp.Headers.Location!.ToString()));
+        Assert.Contains("Toegevoegd: +1 flesje", html);
+        Assert.Contains("Ongedaan maken", html);
+        Assert.Contains("Laatste wijzigingen", html);
+        Assert.Contains("Gekocht +140 doses", html);
+        Assert.Contains("Beginvoorraad → 160 doses", html);
+        var purchase = LatestId(id);
+
+        // A stale id (someone else changed it meanwhile) is refused.
+        resp = await c.PostAsync($"/Medications/Details?id={id}&handler=Undo", Form(token, ("snapshotId", (purchase - 1).ToString())));
+        Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+
+        resp = await c.PostAsync($"/Medications/Details?id={id}&handler=Undo", Form(token, ("snapshotId", purchase.ToString())));
+        Assert.Equal(HttpStatusCode.Redirect, resp.StatusCode);
+        Assert.Equal(160m, Units(id));
+        html = WebUtility.HtmlDecode(await c.GetStringAsync(resp.Headers.Location!.ToString()));
+        Assert.Contains("Ongedaan gemaakt", html);
+        Assert.DoesNotContain("name=\"snapshotId\"", html); // the first stock cannot be undone
+
+        resp = await c.PostAsync($"/Medications/Details?id={id}&handler=Undo", Form(token, ("snapshotId", LatestId(id).ToString())));
+        Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        Assert.Equal(160m, Units(id));
+    }
+
+    [Fact]
     public async Task Purchase_adds_packages_and_confirms()
     {
         var id = NewMed();

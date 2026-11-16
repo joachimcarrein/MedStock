@@ -313,4 +313,16 @@
   <data name="Med_Reminder_Never" xml:space="preserve"><value>Nooit</value></data>
   <data name="Med_Reminder_NoTime" xml:space="preserve"><value>Herinneringen hebben een innameuur nodig: stel er een in via bewerken.</value></data>
   <data name="Flash_Reminder" xml:space="preserve"><value>Keuze voor herinneringen opgeslagen</value></data>
+  <data name="Undo" xml:space="preserve"><value>Ongedaan maken</value></data>
+  <data name="Undo_Nothing" xml:space="preserve"><value>Er is niets om ongedaan te maken.</value></data>
+  <data name="Flash_Undone" xml:space="preserve"><value>Ongedaan gemaakt</value></data>
+  <data name="History_Title" xml:space="preserve"><value>Laatste wijzigingen</value></data>
+  <data name="History_ViaNotification" xml:space="preserve"><value>via melding</value></data>
+  <data name="Reason_Initial" xml:space="preserve"><value>Beginvoorraad</value></data>
+  <data name="Reason_Purchase" xml:space="preserve"><value>Gekocht</value></data>
+  <data name="Reason_Recount" xml:space="preserve"><value>Hertelling</value></data>
+  <data name="Reason_DoseChange" xml:space="preserve"><value>Verbruik gewijzigd</value></data>
+  <data name="Reason_Pause" xml:space="preserve"><value>Gepauzeerd</value></data>
+  <data name="Reason_Resume" xml:space="preserve"><value>Hervat</value></data>
+  <data name="Reason_Intake" xml:space="preserve"><value>Genomen</value></data>
 </root>

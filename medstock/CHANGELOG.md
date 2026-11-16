@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Detail: **Undo** for the last purchase, intake or recount (also +1 from a notification), and a list of the latest changes with who made them.
+
 ## 2026.11.7
 
 - Intake times: per medication one or more intake moments (time + amount); the units per day are their sum. Weekly
