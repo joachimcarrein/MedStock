@@ -5,9 +5,10 @@
 MedStock is a Home Assistant app (add-on) that tracks the medication stock of a household
 and tells you **how many days you have left**, without logging every single intake.
 
-- Stock goes down by itself, based on the usage you configure: per day, a weekly pattern
-  (e.g. one injection every Saturday) or "as needed".
-- Restocking is one tap: "+1 box", "+2".
+- Stock goes down by itself, based on the usage you configure: intake moments per day (e.g. 08:00 and 20:00), a
+  weekly pattern (e.g. one injection every Saturday), every N days or weeks, or "as needed".
+- Restocking is one tap: "+1 box", "+2". A mis-tap is undone with one tap.
+- Optional intake reminders at the intake time, with "Taken" and "Later" buttons; per user and per medication.
 - One list (profile) per person; everybody logged in to Home Assistant sees and edits everything.
 - Push notifications through the Home Assistant Companion app when something runs low (optionally discreet, without the medication name).
 - A doctor screen that tells you what to ask for, and how many boxes, to cover the next 90 days.
@@ -20,8 +21,9 @@ and tells you **how many days you have left**, without logging every single inta
 The UI is available in English, Dutch and French.
 
 <p>
-  <img src="docs/screenshots/overview.png" alt="Overview: medication sorted by urgency" width="260">
-  <img src="docs/screenshots/detail.png" alt="Detail: restock, recount, pause" width="260">
+  <img src="docs/screenshots/overview.png" alt="Overview: still to take today and medication sorted by urgency" width="260">
+  <img src="docs/screenshots/detail.png" alt="Detail: restock, recount with what will be recorded" width="260">
+  <img src="docs/screenshots/schedule.png" alt="Usage: intake moments with a time and an amount" width="260">
   <img src="docs/screenshots/prescription.png" alt="Prescription: what to ask the doctor" width="260">
 </p>
 

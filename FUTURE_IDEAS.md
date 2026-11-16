@@ -35,3 +35,11 @@ An in-between step with little work: run standalone but keep sending notificatio
 (its URL plus a long-lived token instead of the Supervisor). Login would still be needed.
 
 Why parked: no household without Home Assistant needs it yet.
+
+## Recount hint
+
+The stock goes down by itself, but a forgotten dose or a spilled pill does not, so the count drifts over time. The
+detail screen (and maybe the overview) could give a soft hint after a while without a count, e.g. "Last count 2 months
+ago, recount?", with the period as a setting (e.g. 60 days, 0 = off).
+
+Why parked: not needed yet; the intake reminders and undo cover the daily mistakes.
