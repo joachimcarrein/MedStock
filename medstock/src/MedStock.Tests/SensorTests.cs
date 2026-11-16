@@ -224,6 +224,48 @@ public class SensorTests
         Assert.Empty(e.F.Ha.States);
     }
 
+    [Fact]
+    public async Task Next_intake_sensor_per_profile_moves_on_and_only_names_with_medication_sensors()
+    {
+        using var e = new Env(enabled: false);
+        var profileId = e.F.WithDb(db =>
+        {
+            db.GlobalSettings.Single().NextIntakeSensorsEnabled = true;
+            var m = db.Medications.Single(x => x.Id == e.Nasalix);
+            m.Moments = [new(new TimeOnly(8, 0), 4), new(new TimeOnly(20, 0), 4)];
+            db.SaveChanges();
+            return db.Profiles.Single().Id;
+        });
+        e.F.Clock.Now = new DateTime(2026, 11, 17, 10, 0, 0);
+        await e.SyncAsync();
+        var config = e.Payload(SensorMessages.NextConfigTopic(profileId));
+        Assert.Equal("Husband next intake", (string?)config["name"]);
+        Assert.Equal("timestamp", (string?)config["device_class"]);
+        Assert.Null(config["unit_of_measurement"]);
+        var state = e.Payload(SensorMessages.NextStateTopic(profileId));
+        Assert.StartsWith("2026-11-17T20:00:00", (string?)state["next"]);
+        Assert.Equal(1, (int?)state["count"]);
+        Assert.Null(state["medications"]); // no names without the per-medication sensors
+        Assert.Equal(new DateTime(2026, 11, 17, 20, 0, 0), e.F.Services.GetRequiredService<SensorStatus>().NextRefreshAt);
+
+        e.F.WithDb(db => { db.GlobalSettings.Single().SensorsEnabled = true; return db.SaveChanges(); });
+        e.F.Clock.Now = new DateTime(2026, 11, 17, 20, 0, 5);
+        await e.SyncAsync();
+        state = e.Payload(SensorMessages.NextStateTopic(profileId));
+        Assert.StartsWith("2026-11-18T08:00:00", (string?)state["next"]);
+        Assert.Equal("Nasalix", (string?)state["medications"]![0]);
+
+        // Without a broker: a plain state; switched off: removed.
+        e.F.Ha.Broker = null;
+        await e.Mqtt.DisconnectAsync(CancellationToken.None);
+        await e.SyncAsync();
+        Assert.StartsWith("2026-11-18T08:00:00", e.F.Ha.States["sensor.medstock_husband_next_intake"].State);
+        Assert.Equal("timestamp", (string?)e.F.Ha.States["sensor.medstock_husband_next_intake"].Attributes["device_class"]);
+        e.F.WithDb(db => { db.GlobalSettings.Single().NextIntakeSensorsEnabled = false; return db.SaveChanges(); });
+        await e.SyncAsync();
+        Assert.False(e.F.Ha.States.ContainsKey("sensor.medstock_husband_next_intake"));
+    }
+
     [Theory]
     [InlineData("Nasalix 50 µg", "nasalix_50_ug")]
     [InlineData("Émile's  crème", "emile_s_creme")]

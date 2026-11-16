@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Optional sensor per profile with the next intake moment (timestamp), for automations; names only when the per-medication sensors are on.
+
 - Overview: "Still to take today" lists today's remaining intake moments (within the profile filter).
 
 - Detail: **Undo** for the last purchase, intake or recount (also +1 from a notification), and a list of the latest changes with who made them.

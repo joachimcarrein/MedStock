@@ -162,6 +162,8 @@ public class GlobalSettings
     public string? PublishedSensorIds { get; set; }
     /// <summary>Opt-in: one sensor per profile with the lowest days remaining and counts, without medication names.</summary>
     public bool SummarySensorsEnabled { get; set; }
+    /// <summary>Opt-in: one sensor per profile with the next intake moment (a timestamp), for automations.</summary>
+    public bool NextIntakeSensorsEnabled { get; set; }
     /// <summary>Entity ids written through the REST states API (no MQTT broker), comma separated, so removed ones get deleted.</summary>
     public string? PublishedStateEntities { get; set; }
     /// <summary>Optional todo.* entity: medication that runs low is added to this list (once while it is open).</summary>
