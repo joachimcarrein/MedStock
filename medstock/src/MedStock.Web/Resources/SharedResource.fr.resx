@@ -326,4 +326,6 @@
   <data name="Reason_Resume" xml:space="preserve"><value>Repris</value></data>
   <data name="Reason_Intake" xml:space="preserve"><value>Pris</value></data>
   <data name="Today_Title" xml:space="preserve"><value>Encore à prendre aujourd'hui</value></data>
+  <data name="Settings_NextIntakeSensors" xml:space="preserve"><value>Capteur prochaine prise par profil</value></data>
+  <data name="Settings_NextIntakeSensors_Help" xml:space="preserve"><value>Un capteur d'horodatage avec la prochaine prise (médicaments avec une heure), pour vos automatisations. Les noms des médicaments ne sont ajoutés que si le capteur par médicament est activé.</value></data>
 </root>

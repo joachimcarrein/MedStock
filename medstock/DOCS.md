@@ -213,7 +213,7 @@ next ones.
 
 ### Sensors in Home Assistant
 
-**Settings › For everyone › Sensors in Home Assistant** has two independent options:
+**Settings › For everyone › Sensors in Home Assistant** has three independent options:
 
 **A "days remaining" sensor per medication**
 
@@ -230,6 +230,26 @@ next ones.
 
 Both are updated after every change in MedStock and at least every 15 minutes. Archiving or deleting a medication,
 or turning an option off, removes its sensor again.
+
+**A next intake sensor per profile** (a timestamp, for your own automations)
+
+- `sensor.medstock_<profile>_next_intake`, e.g. `sensor.medstock_husband_next_intake`: the next intake moment of
+  that profile (medication with an intake time only), shown by Home Assistant as "in 2 hours".
+- Attributes: `profile`, `count` (how many medications at that moment) and, only when the sensor per medication is
+  also on, `medications` (their names).
+- It moves on right after each moment. Example automation: flash a lamp at the moment itself:
+
+  ```yaml
+  triggers:
+    - trigger: time
+      at: sensor.medstock_husband_next_intake
+  actions:
+    - action: light.turn_on
+      target:
+        entity_id: light.kitchen
+      data:
+        flash: short
+  ```
 
 **With or without MQTT.** When the Mosquitto broker app is installed, MedStock uses MQTT discovery (it gets the
 credentials from the Supervisor): one device **MedStock** appears under **Settings › Devices & services › MQTT**

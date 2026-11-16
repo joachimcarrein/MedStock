@@ -92,7 +92,8 @@ public class IndexModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostGlobalAsync(int? coverageDays, int? defaultAlertDays, string? notificationTime, bool sensorsEnabled, bool summarySensorsEnabled, string? todoEntityId, string? untimedTakenFrom)
+    public async Task<IActionResult> OnPostGlobalAsync(int? coverageDays, int? defaultAlertDays, string? notificationTime, bool sensorsEnabled, bool summarySensorsEnabled, string? todoEntityId, string? untimedTakenFrom,
+        bool nextIntakeSensorsEnabled = false)
     {
         TimeOnly untimed = default;
         if (coverageDays is not (>= 0 and <= 3650) || defaultAlertDays is not (>= 0 and <= 3650)
@@ -111,6 +112,7 @@ public class IndexModel(
         if (untimedTakenFrom is not null) g.UntimedTakenFrom = new TimeOnly(untimed.Hour, untimed.Minute);
         g.SensorsEnabled = sensorsEnabled;
         g.SummarySensorsEnabled = summarySensorsEnabled;
+        g.NextIntakeSensorsEnabled = nextIntakeSensorsEnabled;
         var todo = todoEntityId is { Length: > 5 and <= 255 } && todoEntityId.StartsWith("todo.", StringComparison.Ordinal) ? todoEntityId : null;
         if (todo != g.TodoEntityId) // another list: medication that is low now goes on it at the next check
             db.NotificationLogs.RemoveRange(db.NotificationLogs.Where(l => l.Level == NotificationService.TodoMarkerLevel));

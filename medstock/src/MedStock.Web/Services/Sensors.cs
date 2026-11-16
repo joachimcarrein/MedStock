@@ -67,6 +67,75 @@ public static class SensorMessages
 
     public static string SummaryName(Profile p) => $"{p.Name} days left";
 
+    // ---- Per-profile next intake (a timestamp) ----
+
+    public static string NextConfigTopic(int id) => $"homeassistant/sensor/medstock/next_{id}/config";
+    public static string NextStateTopic(int id) => $"medstock/next/{id}";
+    public static string NextName(Profile p) => $"{p.Name} next intake";
+
+    public static MqttMessage NextConfig(NextIntake n, string version)
+    {
+        var json = Config(NextName(n.Profile), $"medstock_next_{n.Profile.Id}", NextStateTopic(n.Profile.Id), version, "mdi:clock-outline");
+        json["value_template"] = "{{ value_json.next }}";
+        json.Remove("unit_of_measurement");
+        json["device_class"] = "timestamp";
+        return new MqttMessage(NextConfigTopic(n.Profile.Id), json.ToJsonString(), Retain: true);
+    }
+
+    public static MqttMessage NextState(NextIntake n) =>
+        new(NextStateTopic(n.Profile.Id), NextAttributes(n).ToJsonString(), Retain: true);
+
+    public static IEnumerable<MqttMessage> RemoveNext(int id) =>
+        [new(NextConfigTopic(id), "", true), new(NextStateTopic(id), "", true)];
+
+    /// <summary>How far ahead to look for the next moment (covers "every N weeks" up to 8 weeks).</summary>
+    public const int NextIntakeHorizonDays = 60;
+
+    /// <summary>
+    /// Per profile the first intake moment after <paramref name="now"/> (medication with a time only). Names are only
+    /// included when <paramref name="withNames"/> (the per-medication sensors already put them in Home Assistant).
+    /// </summary>
+    public static List<NextIntake> NextIntakes(IEnumerable<Profile> profiles, IReadOnlyCollection<Medication> meds, DateTime now, bool withNames)
+    {
+        var list = new List<NextIntake>();
+        var today = DateOnly.FromDateTime(now);
+        var time = TimeOnly.FromDateTime(now);
+        foreach (var p in profiles)
+        {
+            var mine = meds.Where(m => m.ProfileId == p.Id).ToList();
+            ReminderKey? next = null;
+            for (var d = 0; d <= NextIntakeHorizonDays && next is null && mine.Count > 0; d++)
+            {
+                var date = today.AddDays(d);
+                next = ReminderService.MomentsOn(mine, date)
+                    .Where(k => d > 0 || k.Time > time)
+                    .OrderBy(k => k.Time)
+                    .FirstOrDefault();
+            }
+            var items = next is null ? [] : ReminderService.DueAt(mine, next);
+            list.Add(new NextIntake(p, next is null ? null : next.Date.ToDateTime(next.Time), items.Count,
+                withNames ? items.Select(x => x.Medication.Name).ToList() : null));
+        }
+        return list;
+    }
+
+    /// <summary>ISO 8601 with the local offset, as Home Assistant expects for a timestamp sensor.</summary>
+    public static string? Iso(DateTime? local) => local is { } t
+        ? new DateTimeOffset(t, TimeZoneInfo.Local.GetUtcOffset(t)).ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture)
+        : null;
+
+    private static JsonObject NextAttributes(NextIntake n)
+    {
+        var json = new JsonObject
+        {
+            ["next"] = Iso(n.At),
+            ["profile"] = n.Profile.Name,
+            ["count"] = n.Count,
+        };
+        if (n.Medications is not null) json["medications"] = new JsonArray(n.Medications.Select(x => (JsonNode)x).ToArray());
+        return json;
+    }
+
     /// <summary>One summary per profile: lowest days of the medication with a daily/weekly use, and counts per colour.</summary>
     public static List<ProfileSummary> Summaries(IEnumerable<Profile> profiles, IReadOnlyCollection<MedicationRow> rows) =>
         profiles.Select(p =>
@@ -110,7 +179,8 @@ public static class SensorMessages
     // ---- Without MQTT: plain states through the REST API (lost at a Home Assistant restart until the next sync) ----
 
     /// <summary>The states to write when there is no MQTT broker; entity ids follow the MQTT naming (sensor.medstock_…).</summary>
-    public static List<StateSensor> StateSensors(IEnumerable<MedicationRow> meds, IEnumerable<ProfileSummary> summaries)
+    public static List<StateSensor> StateSensors(IEnumerable<MedicationRow> meds, IEnumerable<ProfileSummary> summaries,
+        IEnumerable<NextIntake>? nexts = null)
     {
         var list = new List<StateSensor>();
         var used = new HashSet<string>();
@@ -139,6 +209,15 @@ public static class SensorMessages
             list.Add(new StateSensor(Unique($"sensor.medstock_{Slug(SummaryName(s.Profile))}", s.Profile.Id),
                 s.MinDays?.ToString(CultureInfo.InvariantCulture) ?? "unknown", attrs));
         }
+        foreach (var n in nexts ?? [])
+        {
+            var attrs = NextAttributes(n);
+            attrs.Remove("next");
+            attrs["friendly_name"] = $"MedStock {NextName(n.Profile)}";
+            attrs["device_class"] = "timestamp";
+            attrs["icon"] = "mdi:clock-outline";
+            list.Add(new StateSensor(Unique($"sensor.medstock_{Slug(NextName(n.Profile))}", n.Profile.Id), Iso(n.At) ?? "unknown", attrs));
+        }
         return list;
     }
 
@@ -165,7 +244,11 @@ public static class SensorMessages
 
     public static string MedKey(int id) => id.ToString(CultureInfo.InvariantCulture);
     public static string ProfileKey(int id) => "p" + id.ToString(CultureInfo.InvariantCulture);
+    public static string NextKey(int id) => "n" + id.ToString(CultureInfo.InvariantCulture);
 }
+
+/// <summary>The next intake moment of a profile (null: none within the horizon), how many medications, and their names if allowed.</summary>
+public sealed record NextIntake(Profile Profile, DateTime? At, int Count, List<string>? Medications);
 
 public sealed record ProfileSummary(Profile Profile, int? MinDays, int Count, int Low, int Warning);
 
@@ -226,6 +309,8 @@ public sealed class MqttNetConnection : IMqttConnection
 public sealed class SensorStatus
 {
     public DateTime? LastPublishedAt { get; set; }
+    /// <summary>The earliest next intake moment published: the worker syncs again right after it (instead of within 15 min).</summary>
+    public DateTime? NextRefreshAt { get; set; }
     public int Count { get; set; }
     public string? Broker { get; set; }
     /// <summary>"mqtt" (discovery, survives HA restarts) or "states" (REST API, no broker).</summary>
@@ -255,7 +340,7 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
     public async Task SyncAsync(IMqttConnection mqtt, CancellationToken ct)
     {
         var global = await db.GlobalSettings.SingleAsync(ct);
-        bool any = global.SensorsEnabled || global.SummarySensorsEnabled;
+        bool any = global.SensorsEnabled || global.SummarySensorsEnabled || global.NextIntakeSensorsEnabled;
         var published = SensorMessages.ParseKeys(global.PublishedSensorIds);
         var publishedStates = SensorMessages.ParseKeys(global.PublishedStateEntities);
         if (!any && published.Count == 0 && publishedStates.Count == 0)
@@ -272,6 +357,11 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
             ? await db.Profiles.AsNoTracking().OrderBy(p => p.SortOrder).ThenBy(p => p.Id).ToListAsync(ct)
             : [];
         var summaries = SensorMessages.Summaries(profiles, rows);
+        var nexts = global.NextIntakeSensorsEnabled
+            ? SensorMessages.NextIntakes(await db.Profiles.AsNoTracking().OrderBy(p => p.SortOrder).ThenBy(p => p.Id).ToListAsync(ct),
+                rows.Select(r => r.Medication).ToList(), clock.Now, withNames: global.SensorsEnabled)
+            : [];
+        status.NextRefreshAt = nexts.Select(n => n.At).Where(t => t is not null).Min();
 
         if (!mqtt.IsConnected)
         {
@@ -289,21 +379,25 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
             }
         }
 
-        if (mqtt.IsConnected) await PublishMqttAsync(mqtt, global, published, publishedStates, meds, summaries, any, ct);
-        else await WriteStatesAsync(global, publishedStates, meds, summaries, ct);
+        if (mqtt.IsConnected) await PublishMqttAsync(mqtt, global, published, publishedStates, meds, summaries, nexts, any, ct);
+        else await WriteStatesAsync(global, publishedStates, meds, summaries, nexts, ct);
     }
 
     private async Task PublishMqttAsync(IMqttConnection mqtt, GlobalSettings global, HashSet<string> published, HashSet<string> publishedStates,
-        List<MedicationRow> meds, List<ProfileSummary> summaries, bool any, CancellationToken ct)
+        List<MedicationRow> meds, List<ProfileSummary> summaries, List<NextIntake> nexts, bool any, CancellationToken ct)
     {
         var current = meds.Select(r => SensorMessages.MedKey(r.Medication.Id))
-            .Concat(summaries.Select(s => SensorMessages.ProfileKey(s.Profile.Id))).ToHashSet();
+            .Concat(summaries.Select(s => SensorMessages.ProfileKey(s.Profile.Id)))
+            .Concat(nexts.Select(n => SensorMessages.NextKey(n.Profile.Id))).ToHashSet();
         var removed = published.Except(current).ToList();
         foreach (var key in removed)
         {
-            var messages = key.StartsWith('p')
-                ? SensorMessages.RemoveProfile(int.Parse(key[1..], CultureInfo.InvariantCulture))
-                : SensorMessages.Remove(int.Parse(key, CultureInfo.InvariantCulture));
+            var messages = key[0] switch
+            {
+                'p' => SensorMessages.RemoveProfile(int.Parse(key[1..], CultureInfo.InvariantCulture)),
+                'n' => SensorMessages.RemoveNext(int.Parse(key[1..], CultureInfo.InvariantCulture)),
+                _ => SensorMessages.Remove(int.Parse(key, CultureInfo.InvariantCulture)),
+            };
             foreach (var msg in messages) await mqtt.PublishAsync(msg, ct);
         }
 
@@ -321,6 +415,11 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
             {
                 await mqtt.PublishAsync(SensorMessages.ProfileConfig(s, version), ct);
                 await mqtt.PublishAsync(SensorMessages.ProfileState(s), ct);
+            }
+            foreach (var n in nexts)
+            {
+                await mqtt.PublishAsync(SensorMessages.NextConfig(n, version), ct);
+                await mqtt.PublishAsync(SensorMessages.NextState(n), ct);
             }
         }
         else
@@ -344,9 +443,9 @@ public sealed class SensorSync(MedStockDb db, IHaClient ha, IClock clock, Sensor
     }
 
     private async Task WriteStatesAsync(GlobalSettings global, HashSet<string> publishedStates,
-        List<MedicationRow> meds, List<ProfileSummary> summaries, CancellationToken ct)
+        List<MedicationRow> meds, List<ProfileSummary> summaries, List<NextIntake> nexts, CancellationToken ct)
     {
-        var sensors = SensorMessages.StateSensors(meds, summaries);
+        var sensors = SensorMessages.StateSensors(meds, summaries, nexts);
         var wanted = sensors.Select(s => s.EntityId).ToHashSet();
         var written = new HashSet<string>(publishedStates);
         int failed = 0, removed = 0;
@@ -396,7 +495,15 @@ public sealed class SensorWorker(IServiceScopeFactory scopes, SensorSignal signa
             }
             try
             {
-                if (await signal.WaitAsync(Interval, ct))
+                // Right after the next intake moment the "next intake" sensors move on: sync then instead of within 15 min.
+                var wait = Interval;
+                using (var scope = scopes.CreateScope())
+                {
+                    var next = scope.ServiceProvider.GetRequiredService<SensorStatus>().NextRefreshAt;
+                    var now = scope.ServiceProvider.GetRequiredService<IClock>().Now;
+                    if (next is { } at && at - now < Interval) wait = TimeSpan.FromSeconds(Math.Max(5, (at - now).TotalSeconds + 5));
+                }
+                if (await signal.WaitAsync(wait, ct))
                     await Task.Delay(TimeSpan.FromSeconds(2), ct); // coalesce bursts of changes
             }
             catch (OperationCanceledException) { return; }

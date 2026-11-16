@@ -162,7 +162,9 @@
             <p class="small muted">@L["Settings_Sensors_Privacy"]</p>
             <label class="inline"><input type="checkbox" name="summarySensorsEnabled" value="true" checked="@Model.Global.SummarySensorsEnabled" /> @L["Settings_SummarySensors"]</label>
             <p class="small muted">@L["Settings_SummarySensors_Help"]</p>
-            @if (Model.Global.SensorsEnabled || Model.Global.SummarySensorsEnabled)
+            <label class="inline"><input type="checkbox" name="nextIntakeSensorsEnabled" value="true" checked="@Model.Global.NextIntakeSensorsEnabled" /> @L["Settings_NextIntakeSensors"]</label>
+            <p class="small muted">@L["Settings_NextIntakeSensors_Help"]</p>
+            @if (Model.Global.SensorsEnabled || Model.Global.SummarySensorsEnabled || Model.Global.NextIntakeSensorsEnabled)
             {
                 @if (Model.Sensors.Problem == "connect-failed")
                 {

@@ -31,6 +31,9 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<DateTime?>("LastRunAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("NextIntakeSensorsEnabled")
+                        .HasColumnType("INTEGER");
+
                     b.Property<TimeOnly>("NotificationTime")
                         .HasColumnType("TEXT");
 

@@ -326,4 +326,6 @@
   <data name="Reason_Resume" xml:space="preserve"><value>Resumed</value></data>
   <data name="Reason_Intake" xml:space="preserve"><value>Taken</value></data>
   <data name="Today_Title" xml:space="preserve"><value>Still to take today</value></data>
+  <data name="Settings_NextIntakeSensors" xml:space="preserve"><value>Next intake sensor per profile</value></data>
+  <data name="Settings_NextIntakeSensors_Help" xml:space="preserve"><value>A timestamp sensor with the next intake moment (medication with a time), for your own automations. Medication names are only added when the sensor per medication is on.</value></data>
 </root>
