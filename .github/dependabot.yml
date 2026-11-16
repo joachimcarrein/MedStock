@@ -1,4 +1,6 @@
 # Weekly update pull requests for NuGet packages, GitHub Actions (pinned by SHA) and the Docker base images.
+# One PR per ecosystem (groups). Major .NET upgrades (Docker images and Microsoft.* packages, e.g. 10 -> 11)
+# are ignored: they need the TargetFramework changed together with the images, so they are done by hand.
 version: 2
 updates:
   - package-ecosystem: nuget
@@ -8,6 +10,9 @@ updates:
     groups:
       nuget:
         patterns: ["*"]
+    ignore:
+      - dependency-name: "Microsoft.*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -19,3 +24,9 @@ updates:
     directory: /medstock
     schedule:
       interval: weekly
+    groups:
+      docker:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
