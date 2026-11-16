@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2026.11.7
+
 - Intake times: per medication one or more intake moments (time + amount); the units per day are their sum. Weekly
   patterns get one time. The "Help me calculate" helper is gone: the moments replace it.
 - Every N days / every N weeks (e.g. an injection every two weeks), counted from a start date. Days remaining,
