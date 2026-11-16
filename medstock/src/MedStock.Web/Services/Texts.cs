@@ -25,6 +25,11 @@ public static class Texts
     public static string LongDate(DateOnly d, CultureInfo c) => d.ToString("d MMM yyyy", c);
 
     /// <summary>"1 box + 20 doses", "2 boxes", "20 doses".</summary>
+    /// <summary>Unit and package names per type (one, other) as JSON, for the recount preview in the browser.</summary>
+    public static string NamesJson(CultureInfo c) => System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetValues<MedicationType>().ToDictionary(t => t.ToString(),
+            t => new[] { Unit(t, 1, c), Unit(t, 2, c), Package(t, 1, c), Package(t, 2, c) }));
+
     public static string Quantity(MedicationType t, StockResult r, CultureInfo c)
     {
         string units = $"{r.RestUnits} {Unit(t, r.RestUnits, c)}";

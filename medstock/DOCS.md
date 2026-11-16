@@ -29,10 +29,10 @@ To update: **App store › ⋮ › Check for updates**, then **Update** on the a
    - **Type**: decides the words used ("2 bottles + 20 doses", "3 injections") and the icon.
    - **Units per package**: how many units one box, bottle or pack contains. A unit is what you count when you
      use it: one pill, one spray dose, one injection, one ml.
-   - **Usage** (see the examples below): **Every day**, **Weekly pattern** or **As needed**.
-   - **Current stock**: units left in the **open** package plus the number of **sealed** packages.
-   - **All of today's doses already taken**: tick it if today's doses are already used (ticked by default after
-     20:00); otherwise today's dose is subtracted from what you entered.
+   - **Usage** (see the examples below): **Daily**, **Weekly pattern** or **As needed**, with the intake times.
+   - **Current stock**: units left in the **open** package plus the number of **sealed** packages. Count what you
+     have now; MedStock subtracts the doses that still follow today and shows the result before you save
+     ("Will be recorded as 1 box + 38 pills. Already deducted for today: 1 pill (20:00).").
 3. **Set up your notifications** in **Settings › My notifications**: choose your phone(s) and tap **Save** once.
    Until you save, you receive nothing. **Send test notification** checks that it arrives.
 
@@ -40,15 +40,22 @@ To update: **App store › ⋮ › Check for updates**, then **Update** on the a
 
 | Medication | Type | Units per package | Usage | Stock entered |
 |---|---|---|---|---|
-| Nasal spray, 2 sprays in each nostril twice a day | Nasal spray | 140 (doses per bottle) | Every day: **8** | 100 left in the open bottle + 1 sealed |
-| Weekly injection on Saturday | Injection | 4 (pens per pack) | Weekly pattern: Saturday **1**, other days 0 | 3 left, 0 sealed |
-| Half a pill every other day | Pill | 28 | Every day: **0.25** | 20 + 0 |
+| Nasal spray, 2 sprays in each nostril twice a day | Nasal spray | 140 (doses per bottle) | Daily: 08:00 **4**, 20:00 **4** | 100 left in the open bottle + 1 sealed |
+| Blood pressure pill, morning and evening | Pill | 28 | Daily: 08:00 **1**, 20:00 **1** | 20 + 2 |
+| Weekly injection on Saturday | Injection | 4 (pens per pack) | Weekly pattern: Saturday **1**, time 09:00 | 3 left, 0 sealed |
+| Injection every two weeks | Injection | 2 | Weekly pattern: Saturday **1**, every **2** weeks, starting from the next injection day | 1 + 0 |
+| One pill every other day | Pill | 30 | Daily: **1**, every **2** days, starting from a day with a dose | 20 + 0 |
+| Half a pill every day | Pill | 28 | Daily: 08:00 **0.5** | 20 + 0 |
 | Painkiller when needed | Pill | 20 | As needed, minimum stock **10** | 6 + 1 |
 
-- **Every day**: type the number of units per day, or open **Help me calculate**: "3 times a day × 2 per time", or
-  fill in morning / noon / evening / night; MedStock adds it up. Decimals are fine (0.5 = one unit every two days);
-  both `0.5` and `0,5` are accepted.
-- **Weekly pattern**: units per weekday. **Same every day** copies the first value to all days.
+- **Daily**: one line per intake moment with a time and an amount; **+ Intake moment** adds a line. The units per day
+  are the sum. The time is optional, but with times a recount knows exactly which doses of today still follow (and
+  intake reminders can use them). Decimals are fine; both `0.5` and `0,5` are accepted.
+- **Weekly pattern**: units per weekday and one time (optional). **Same every day** copies the first value to all days.
+- **Every N days / weeks**: for medication that is not taken every day or every week. **Starting from** is a day with
+  a dose (for "every N weeks": any day of a week with a dose); MedStock counts the rhythm from there, also backwards.
+- **Doses without a time** count as still to take until 20:00 and as taken after that, when you recount or enter the
+  first stock. Change that time in **Settings › For everyone** (e.g. 08:00 if you take everything in the morning).
 - **As needed**: no fixed usage, so no "days remaining". The stock only goes down when you tap **−1** / **−n** on the
   detail screen. The **minimum stock** decides when it counts as low (0 = only when empty).
 
@@ -76,8 +83,8 @@ dose already counts as taken. More than ten years of stock shows as "> 10 years"
 ### Detail screen
 
 - **+1 box** (the word depends on the type) and **+ n**: you bought packages. Shows "Added: +1 box" for a few seconds.
-- **Recount**: correct the stock with what you actually have (open package + sealed packages, with the same
-  "already taken today" tick box).
+- **Recount**: correct the stock with what you actually have now (open package + sealed packages). The doses that
+  still follow today are subtracted; the line under the fields shows what will be recorded before you save.
 - **−1** / **− n** (as-needed medication only): you used some.
 - Icons next to the name: **✏ edit**, **⏸ pause / ▶ resume**, and the red **archive** icon (asks for confirmation).
 - **Photo**: take one, choose one from the gallery, or **search a picture by name** (see *Optional extras*).
@@ -350,7 +357,7 @@ All other settings are in the app itself (**Settings**).
 | "Home Assistant not reachable" in Settings | Home Assistant is restarting or busy; reload after a minute. Notifications are retried every minute. |
 | Sensors are missing right after a Home Assistant restart | Without the Mosquitto broker app they come back within 15 minutes. Install the broker to keep them across restarts. |
 | The medication is still red after buying | Use **+1** / **+ n** (or **Recount**) so MedStock knows; it calculates from the last count. |
-| The days look one day off | Days are rounded down and today's dose counts as taken. When you recount, use the "already taken today" tick box. |
+| The days look one day off | Days are rounded down and today's dose counts as taken. Check the intake times: a recount subtracts the doses that still follow today. |
 | "Session expired – tap to reload" | The Home Assistant session ended after inactivity; tap the banner. |
 | Picture search finds nothing | Try the brand name, the active substance, or the other source. |
 | Sharing does nothing at home | Over plain http the phone does not allow sharing or copying; the text is selected so you can copy it yourself, or use your https address. |

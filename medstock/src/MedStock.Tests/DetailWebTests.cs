@@ -68,17 +68,25 @@ public class DetailWebTests : IClassFixture<AddonWebFactory>
     }
 
     [Theory]
-    [InlineData(false, 232)] // 100 + 1 × 140 − today's 8
-    [InlineData(true, 240)]
-    public async Task Recount_applies_the_taken_today_checkbox(bool taken, decimal expected)
+    [InlineData(10, 232)] // 100 + 1 × 140 − today's 8 (no time: still to come until 20:00)
+    [InlineData(21, 240)]
+    public async Task Recount_subtracts_the_doses_still_to_come_today(int hour, decimal expected)
     {
         var id = NewMed();
         var (c, token) = await ClientAsync(id);
-        var fields = new List<(string, string)> { ("expectedSnapshotId", LatestId(id).ToString()), ("openUnits", "100"), ("sealedPackages", "1") };
-        if (taken) fields.Add(("takenToday", "true"));
-        var resp = await c.PostAsync($"/Medications/Details?id={id}&handler=Recount", Form(token, [.. fields]));
-        Assert.Equal(HttpStatusCode.Redirect, resp.StatusCode);
-        Assert.Equal(expected, Units(id));
+        var before = _f.Clock.Now;
+        _f.Clock.Now = before.Date.AddHours(hour);
+        try
+        {
+            var page = WebUtility.HtmlDecode(await c.GetStringAsync($"/Medications/Details?id={id}"));
+            Assert.Contains(hour < 20 ? "data-pending=\"[{\"t\":null,\"a\":8.0}]\"" : "data-pending=\"[]\"", page);
+            Assert.Contains("Wordt geregistreerd als {0}.", page);
+            var resp = await c.PostAsync($"/Medications/Details?id={id}&handler=Recount",
+                Form(token, ("expectedSnapshotId", LatestId(id).ToString()), ("openUnits", "100"), ("sealedPackages", "1")));
+            Assert.Equal(HttpStatusCode.Redirect, resp.StatusCode);
+            Assert.Equal(expected, Units(id));
+        }
+        finally { _f.Clock.Now = before; }
     }
 
     [Fact]

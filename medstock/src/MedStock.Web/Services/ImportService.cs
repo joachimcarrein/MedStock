@@ -82,6 +82,8 @@ public sealed class ImportService(MedStockDb db, IClock clock, SensorSignal sens
             g.CoverageDays = s.CoverageDays;
             g.DefaultAlertDays = s.DefaultAlertDays;
             g.NotificationTime = time;
+            if (TimeOnly.TryParseExact(s.UntimedTakenFrom, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var untimed))
+                g.UntimedTakenFrom = untimed;
             settingsApplied = true;
         }
 
@@ -116,6 +118,29 @@ public sealed class ImportService(MedStockDb db, IClock clock, SensorSignal sens
             endDate = end;
         }
 
+        static bool Time(string? v, out TimeOnly? t)
+        {
+            t = null;
+            if (string.IsNullOrEmpty(v)) return true;
+            if (!TimeOnly.TryParseExact(v, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var x)) return false;
+            t = x;
+            return true;
+        }
+        var moments = new List<DoseMoment>();
+        foreach (var x in e.Moments ?? [])
+        {
+            if (x is null || x.Amount < 0 || !Time(x.Time, out var t)) return false;
+            if (x.Amount > 0) moments.Add(new DoseMoment(t, x.Amount));
+        }
+        if (moments.Count > 24 || !Time(e.WeeklyTime, out var weeklyTime) || e.Every is < 1 or > 365) return false;
+        DateOnly? everyFrom = null;
+        if (!string.IsNullOrEmpty(e.EveryFrom))
+        {
+            if (!DateOnly.TryParseExact(e.EveryFrom, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var from)) return false;
+            everyFrom = from;
+        }
+        if (e.Every > 1 && everyFrom is null) return false;
+
         if (e.Stock is { } s)
         {
             if (!DateOnly.TryParseExact(s.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d) || s.TotalUnits < 0)
@@ -133,7 +158,12 @@ public sealed class ImportService(MedStockDb db, IClock clock, SensorSignal sens
             TakeAlongUnits = e.TakeAlongUnits,
             EndDate = endDate,
             OverTheCounter = e.OverTheCounter,
+            Moments = mode == UsageMode.PerDay ? moments : [],
+            WeeklyTime = mode == UsageMode.Weekly ? weeklyTime : null,
+            Every = mode == UsageMode.AsNeeded ? 1 : e.Every,
+            EveryFrom = mode == UsageMode.AsNeeded || e.Every == 1 ? null : everyFrom,
         };
+        if (mode == UsageMode.PerDay && moments.Count > 0) m.PerDay = moments.Sum(x => x.Amount); // the moments win
         return true;
     }
 }

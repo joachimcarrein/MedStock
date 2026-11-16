@@ -9,7 +9,7 @@ using Microsoft.Extensions.Localization;
 namespace MedStock.Web.Pages.Medications;
 
 /// <summary>One form for new and edit (§3.5).</summary>
-public class EditModel(MedStockDb db, MedicationService service, IClock clock, IStringLocalizer<SharedResource> l) : PageModel
+public class EditModel(MedStockDb db, MedicationService service, IStringLocalizer<SharedResource> l) : PageModel
 {
     public const string NewProfileValue = "new";
 
@@ -18,6 +18,7 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
     public GlobalSettings Global { get; private set; } = new();
     public bool IsNew => Input.Id == 0;
     public string? Conflict { get; private set; }
+    public string UnitNamesJson => Texts.NamesJson(System.Globalization.CultureInfo.CurrentUICulture);
 
     public async Task<IActionResult> OnGetAsync(int? id, int? profileId, string? barcode)
     {
@@ -28,7 +29,6 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
             Input = new MedicationInput
             {
                 Profile = (Profiles.FirstOrDefault(p => p.Id == profileId) ?? Profiles[0]).Id.ToString(),
-                TakenToday = MedicationService.DefaultTakenToday(clock.Now),
                 Barcode = Barcodes.Normalize(barcode),
             };
             return Page();
@@ -69,7 +69,7 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
             SetProfile(m);
             Input.ApplyTo(m);
             m.Barcode = Barcodes.Normalize(Input.Barcode);
-            id = await service.CreateAsync(m, Input.OpenUnits ?? 0, Input.SealedPackages ?? 0, Input.TakenToday);
+            id = await service.CreateAsync(m, Input.OpenUnits ?? 0, Input.SealedPackages ?? 0);
         }
         else
         {
@@ -116,7 +116,13 @@ public class EditModel(MedStockDb db, MedicationService service, IClock clock, I
         else if (nameValue.Length > 100) Err(nameof(Input.Name), "Val_MaxLength", 100);
         if (Input.Strength?.Trim().Length > 50) Err(nameof(Input.Strength), "Val_MaxLength", 50);
         if (Input.UnitsPerPackage is not > 0) Err(nameof(Input.UnitsPerPackage), "Val_Positive");
-        if (Input.PerDay < 0) Err(nameof(Input.PerDay), "Val_NonNegative");
+        for (var i = 0; i < Input.Moments.Count; i++)
+            if (Input.Moments[i].Amount < 0) Err($"{nameof(Input.Moments)}[{i}].{nameof(MomentInput.Amount)}", "Val_NonNegative");
+        if (Input.UsageMode != UsageMode.AsNeeded)
+        {
+            if (Input.Every is < 1 or > 365) Err(nameof(Input.Every), "Val_Range");
+            else if (Input.Every > 1 && Input.EveryFrom is null) Err(nameof(Input.EveryFrom), "Val_Required");
+        }
         if (Input.Weekly.Length != 7) Input.Weekly = [.. Input.Weekly.Concat(new decimal[7]).Take(7)];
         for (var i = 0; i < 7; i++)
             if (Input.Weekly[i] < 0) Err($"{nameof(Input.Weekly)}[{i}]", "Val_NonNegative");
@@ -156,22 +162,29 @@ public sealed class MedicationInput
     /// <summary>Only for a new medication created from a scan of an unknown code.</summary>
     public string? Barcode { get; set; }
     public UsageMode UsageMode { get; set; } = UsageMode.PerDay;
-    public decimal PerDay { get; set; }
+    /// <summary>Intake moments (PerDay mode); rows without an amount are ignored. Usage per day = their sum.</summary>
+    public List<MomentInput> Moments { get; set; } = [new()];
     /// <summary>Index 0 = Monday, regardless of the UI order.</summary>
     public decimal[] Weekly { get; set; } = new decimal[7];
+    public TimeOnly? WeeklyTime { get; set; }
+    /// <summary>Every N days (PerDay) or weeks (Weekly).</summary>
+    public int? Every { get; set; } = 1;
+    public DateOnly? EveryFrom { get; set; }
     public decimal MinStockUnits { get; set; }
     public int? AlertDays { get; set; }
     public int? CoverageDays { get; set; }
     public bool NotificationsEnabled { get; set; } = true;
     public decimal? OpenUnits { get; set; }
     public int? SealedPackages { get; set; }
-    public bool TakenToday { get; set; }
 
     public static MedicationInput From(Medication m, int latestSnapshotId) => new()
     {
         Id = m.Id, ExpectedSnapshotId = latestSnapshotId, Profile = m.ProfileId.ToString(), Name = m.Name,
         Strength = m.Strength, Type = m.Type, UnitsPerPackage = m.UnitsPerPackage, TakeAlongUnits = m.TakeAlongUnits, EndDate = m.EndDate, OverTheCounter = m.OverTheCounter, UsageMode = m.UsageMode,
-        PerDay = m.PerDay, Weekly = (decimal[])m.Weekly.Clone(), MinStockUnits = m.MinStockUnits, AlertDays = m.AlertDays,
+        Moments = DoseSchedule.MomentsOf(m) is { Count: > 0 } moments
+            ? moments.Select(x => new MomentInput { Time = x.Time, Amount = x.Amount }).ToList()
+            : [new()],
+        Weekly = (decimal[])m.Weekly.Clone(), WeeklyTime = m.WeeklyTime, Every = m.Every, EveryFrom = m.EveryFrom, MinStockUnits = m.MinStockUnits, AlertDays = m.AlertDays,
         CoverageDays = m.CoverageDays, NotificationsEnabled = m.NotificationsEnabled,
     };
 
@@ -186,11 +199,23 @@ public sealed class MedicationInput
         m.OverTheCounter = OverTheCounter;
         m.UsageMode = UsageMode;
         // Only the active mode's values are kept, so switching modes back and forth leaves no stale usage behind.
-        m.PerDay = UsageMode == UsageMode.PerDay ? PerDay : 0;
+        var moments = Moments.Where(x => x.Amount is > 0).Select(x => new DoseMoment(x.Time, x.Amount!.Value))
+            .OrderBy(x => x.Time ?? TimeOnly.MaxValue).ToList();
+        m.Moments = UsageMode == UsageMode.PerDay ? moments : [];
+        m.PerDay = UsageMode == UsageMode.PerDay ? moments.Sum(x => x.Amount) : 0;
         m.Weekly = UsageMode == UsageMode.Weekly ? (decimal[])Weekly.Clone() : new decimal[7];
+        m.WeeklyTime = UsageMode == UsageMode.Weekly ? WeeklyTime : null;
+        m.Every = UsageMode == UsageMode.AsNeeded ? 1 : Math.Max(1, Every ?? 1);
+        m.EveryFrom = m.Every > 1 ? EveryFrom : null;
         m.MinStockUnits = MinStockUnits;
         m.AlertDays = AlertDays;
         m.CoverageDays = CoverageDays;
         m.NotificationsEnabled = NotificationsEnabled;
     }
+}
+
+public sealed class MomentInput
+{
+    public TimeOnly? Time { get; set; }
+    public decimal? Amount { get; set; }
 }

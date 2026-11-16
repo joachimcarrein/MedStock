@@ -89,7 +89,7 @@ public class NotificationServiceTests
         await e.RunAsync();
         Assert.Single(e.F.Ha.Sent);
 
-        await e.Do(s => s.RecountAsync(e.MedId, e.LatestSnapshot, 13, 0, true)); // 13 days: still level 14
+        await e.Do(s => s.RecountAsync(e.MedId, e.LatestSnapshot, 14, 0)); // 10:00, today's dose still follows: 13 days, still level 14
         await e.RunAsync();
         Assert.Single(e.F.Ha.Sent);
 
@@ -98,7 +98,7 @@ public class NotificationServiceTests
         Assert.Single(e.F.Ha.Sent);
         Assert.Empty(e.F.WithDb(db => db.NotificationLogs.Where(l => l.MedicationId == e.MedId).ToList()));
 
-        await e.Do(s => s.RecountAsync(e.MedId, e.LatestSnapshot, 12, 0, true)); // back under 14
+        await e.Do(s => s.RecountAsync(e.MedId, e.LatestSnapshot, 13, 0)); // 12 days: back under 14
         await e.RunAsync();
         Assert.Equal(2, e.F.Ha.Sent.Count);
     }

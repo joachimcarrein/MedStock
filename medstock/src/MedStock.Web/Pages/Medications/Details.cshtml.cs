@@ -3,6 +3,7 @@ using MedStock.Web.Domain;
 using MedStock.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace MedStock.Web.Pages.Medications;
@@ -13,9 +14,9 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
 {
     public MedicationRow Row { get; private set; } = null!;
     public long PhotoVersion { get; private set; }
-    /// <summary>Usage today with the current settings: the recount checkbox is only shown when this is &gt; 0.</summary>
-    public decimal UsageToday { get; private set; }
-    public bool DefaultTakenToday => MedicationService.DefaultTakenToday(clock.Now);
+    /// <summary>Today's doses still to come: a recount subtracts them (shown before saving).</summary>
+    public List<DoseMoment> PendingToday { get; private set; } = [];
+    public TimeOnly UntimedTakenFrom { get; private set; }
     public string? Error { get; private set; }
 
     /// <summary>Confirmation after a redirect: "added", "taken", "recounted", "paused", "resumed".</summary>
@@ -34,10 +35,10 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
             ? Invalid(id, l["Val_AtLeastOne"])
             : Run(id, () => service.IntakeAsync(id, units.Value), "taken", units);
 
-    public Task<IActionResult> OnPostRecountAsync(int id, int expectedSnapshotId, decimal? openUnits, int? sealedPackages, bool takenToday) =>
+    public Task<IActionResult> OnPostRecountAsync(int id, int expectedSnapshotId, decimal? openUnits, int? sealedPackages) =>
         openUnits is < 0 || sealedPackages is < 0
             ? Invalid(id, l["Val_NonNegative"])
-            : Run(id, () => service.RecountAsync(id, expectedSnapshotId, openUnits ?? 0, sealedPackages ?? 0, takenToday), "recounted");
+            : Run(id, () => service.RecountAsync(id, expectedSnapshotId, openUnits ?? 0, sealedPackages ?? 0), "recounted");
 
     public Task<IActionResult> OnPostPauseAsync(int id, int expectedSnapshotId, bool paused) =>
         Run(id, () => service.SetPausedAsync(id, expectedSnapshotId, paused), paused ? "paused" : "resumed");
@@ -88,7 +89,8 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
         if (row is null) return false;
         Row = row;
         PhotoVersion = PhotoModel.Version(paths, id);
-        UsageToday = MedicationService.UsageOn(row.Medication, clock.Today);
+        UntimedTakenFrom = await db.GlobalSettings.AsNoTracking().Select(g => g.UntimedTakenFrom).SingleAsync();
+        PendingToday = DoseSchedule.PendingToday(row.Medication, clock.Now, UntimedTakenFrom);
         return true;
     }
 

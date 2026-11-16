@@ -93,18 +93,9 @@
   <data name="Med_Type" xml:space="preserve"><value>Type</value></data>
   <data name="Med_UnitsPerPackage" xml:space="preserve"><value>Units per package</value></data>
   <data name="Med_Usage" xml:space="preserve"><value>Usage</value></data>
-  <data name="Mode_PerDay" xml:space="preserve"><value>Every day</value></data>
+  <data name="Mode_PerDay" xml:space="preserve"><value>Daily</value></data>
   <data name="Mode_Weekly" xml:space="preserve"><value>Weekly pattern</value></data>
   <data name="Mode_AsNeeded" xml:space="preserve"><value>As needed</value></data>
-  <data name="Med_PerDay" xml:space="preserve"><value>Units per day</value></data>
-  <data name="Helper_Title" xml:space="preserve"><value>Help me calculate</value></data>
-  <data name="Helper_TimesPerDay" xml:space="preserve"><value>times a day</value></data>
-  <data name="Helper_PerTime" xml:space="preserve"><value>per time</value></data>
-  <data name="Helper_Apply" xml:space="preserve"><value>Apply</value></data>
-  <data name="Daypart_Morning" xml:space="preserve"><value>Morning</value></data>
-  <data name="Daypart_Noon" xml:space="preserve"><value>Noon</value></data>
-  <data name="Daypart_Evening" xml:space="preserve"><value>Evening</value></data>
-  <data name="Daypart_Night" xml:space="preserve"><value>Night</value></data>
   <data name="Weekly_SameEveryDay" xml:space="preserve"><value>Same every day</value></data>
   <data name="Med_MinStock" xml:space="preserve"><value>Minimum stock in units (0 = only when empty)</value></data>
   <data name="Med_AlertDays" xml:space="preserve"><value>Alert threshold in days (empty = {0})</value></data>
@@ -113,7 +104,6 @@
   <data name="Med_InitialStock" xml:space="preserve"><value>Current stock</value></data>
   <data name="Stock_OpenUnits" xml:space="preserve"><value>Units in the open package</value></data>
   <data name="Stock_SealedPackages" xml:space="preserve"><value>Sealed packages</value></data>
-  <data name="Stock_TakenToday" xml:space="preserve"><value>All of today's doses already taken</value></data>
   <data name="Usage_FromTomorrow" xml:space="preserve"><value>A change in usage applies from tomorrow.</value></data>
   <data name="Conflict" xml:space="preserve"><value>Someone else just changed this; check and try again.</value></data>
   <data name="Val_Required" xml:space="preserve"><value>Required</value></data>
@@ -291,4 +281,21 @@
   <data name="Search_Placeholder" xml:space="preserve"><value>Search medication</value></data>
   <data name="Search_Clear" xml:space="preserve"><value>Clear search</value></data>
   <data name="Search_NoMatch" xml:space="preserve"><value>No medication matches your search.</value></data>
+  <data name="Moments_Help" xml:space="preserve"><value>When and how much: one line per intake moment. The time is optional.</value></data>
+  <data name="Moment_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Moment_Amount" xml:space="preserve"><value>Amount</value></data>
+  <data name="Moment_Add" xml:space="preserve"><value>+ Intake moment</value></data>
+  <data name="Moment_Remove" xml:space="preserve"><value>Remove intake moment</value></data>
+  <data name="Weekly_Time" xml:space="preserve"><value>Time (optional)</value></data>
+  <data name="Every_Before" xml:space="preserve"><value>Every</value></data>
+  <data name="Every_Days" xml:space="preserve"><value>day(s)</value></data>
+  <data name="Every_Weeks" xml:space="preserve"><value>week(s)</value></data>
+  <data name="Every_From" xml:space="preserve"><value>Starting from</value></data>
+  <data name="Every_From_Help" xml:space="preserve"><value>A day with a dose (e.g. the next or the last one); the rhythm is counted from there.</value></data>
+  <data name="Recount_Result" xml:space="preserve"><value>Will be recorded as {0}.</value></data>
+  <data name="Recount_Deducted" xml:space="preserve"><value>Already deducted for today: {0} ({1}).</value></data>
+  <data name="Recount_NoTime" xml:space="preserve"><value>no time</value></data>
+  <data name="Recount_UntimedHint" xml:space="preserve"><value>A dose without a time counts as still to take until {0}.</value></data>
+  <data name="Settings_UntimedTakenFrom" xml:space="preserve"><value>Doses without a time count as taken from</value></data>
+  <data name="Settings_UntimedTakenFrom_Help" xml:space="preserve"><value>For recounts: before this time a dose without a time is still subtracted for today.</value></data>
 </root>

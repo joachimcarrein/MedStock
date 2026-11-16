@@ -38,16 +38,18 @@ public class ImportTests
                 db.Medications.Add(new Medication
                 {
                     Profile = p, Name = "Nasalix", Strength = "50 µg", Type = MedicationType.NasalSpray, UnitsPerPackage = 140, PerDay = 8,
+                    Moments = [new(new TimeOnly(8, 0), 4), new(new TimeOnly(20, 0), 4)],
                     Barcode = "5410000000001",
                     Snapshots = [new Snapshot { Date = T.D("2026-11-07"), TotalUnits = 240 }],
                 });
                 db.Medications.Add(new Medication
                 {
                     Profile = p, Name = "Weekject", Type = MedicationType.Injection, UnitsPerPackage = 4, UsageMode = UsageMode.Weekly,
-                    Weekly = T.Saturday, Archived = true, Snapshots = [new Snapshot { Date = T.D("2026-11-09"), TotalUnits = 3 }],
+                    Weekly = T.Saturday, WeeklyTime = new TimeOnly(9, 0), Every = 2, EveryFrom = T.D("2026-11-21"), Archived = true, Snapshots = [new Snapshot { Date = T.D("2026-11-09"), TotalUnits = 3 }],
                 });
                 var g = db.GlobalSettings.Single();
                 g.CoverageDays = 120;
+                g.UntimedTakenFrom = new TimeOnly(8, 0);
                 return db.SaveChanges();
             });
             export = await source.Client("exp", ingressPath: null).GetByteArrayAsync("/Settings/Export");
@@ -76,8 +78,15 @@ public class ImportTests
             Assert.Equal(T.D("2026-11-07"), s.Date); // exported stock becomes the first count
             Assert.Equal(240m, s.TotalUnits);
             Assert.Equal(SnapshotReason.Initial, s.Reason);
-            Assert.True(db.Medications.Single(m => m.Name == "Weekject").Archived);
+            Assert.Equal([new(new TimeOnly(8, 0), 4m), new(new TimeOnly(20, 0), 4m)], nasalix.Moments);
+            Assert.Equal(8m, nasalix.PerDay);
+            var weekject = db.Medications.Single(m => m.Name == "Weekject");
+            Assert.True(weekject.Archived);
+            Assert.Equal(new TimeOnly(9, 0), weekject.WeeklyTime);
+            Assert.Equal(2, weekject.Every);
+            Assert.Equal(T.D("2026-11-21"), weekject.EveryFrom);
             Assert.Equal(120, db.GlobalSettings.Single().CoverageDays);
+            Assert.Equal(new TimeOnly(8, 0), db.GlobalSettings.Single().UntimedTakenFrom);
             return 0;
         });
 

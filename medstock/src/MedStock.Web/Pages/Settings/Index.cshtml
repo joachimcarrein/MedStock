@@ -122,6 +122,11 @@
         <label>@L["Settings_DefaultAlertDays"] <input type="number" name="defaultAlertDays" min="0" max="3650" inputmode="numeric" value="@Model.Global.DefaultAlertDays" required /></label>
         <label>@L["Settings_NotificationTime"] <input type="time" name="notificationTime" value="@Model.Global.NotificationTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)" required /></label>
         <label>
+            @L["Settings_UntimedTakenFrom"]
+            <input type="time" name="untimedTakenFrom" value="@Model.Global.UntimedTakenFrom.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)" required />
+            <small class="muted">@L["Settings_UntimedTakenFrom_Help"]</small>
+        </label>
+        <label>
             @L["Settings_Todo"]
             <select name="todoEntityId">
                 <option value="">@L["Settings_Todo_None"]</option>

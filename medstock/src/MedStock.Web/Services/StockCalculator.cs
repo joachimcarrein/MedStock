@@ -15,10 +15,16 @@ public sealed record StockInput(
     decimal UnitsPerPackage,
     DateOnly SnapshotDate,
     decimal SnapshotUnits,
-    DateOnly? EndDate = null)
+    DateOnly? EndDate = null,
+    int Every = 1,
+    DateOnly? EveryFrom = null)
 {
     public static StockInput From(Medication m, Snapshot s) =>
-        new(m.UsageMode, m.PerDay, m.Weekly, m.Paused, m.MinStockUnits, m.UnitsPerPackage, s.Date, s.TotalUnits, m.EndDate);
+        new(m.UsageMode, m.PerDay, m.Weekly, m.Paused, m.MinStockUnits, m.UnitsPerPackage, s.Date, s.TotalUnits, m.EndDate,
+            m.Every, m.EveryFrom);
+
+    /// <summary>"Every N days/weeks" with a known anchor; otherwise every day / every week.</summary>
+    public bool HasRhythm => Every > 1 && EveryFrom is not null;
 }
 
 public sealed record StockResult(
@@ -46,12 +52,28 @@ public static class StockCalculator
     public static int WeekdayIndex(DateOnly d) => ((int)d.DayOfWeek + 6) % 7;
 
     public static decimal Usage(StockInput i, DateOnly d) =>
-        i.Paused || d > i.EndDate ? 0m : i.Mode switch
+        i.Paused || d > i.EndDate || !InRhythm(i, d) ? 0m : i.Mode switch
         {
             UsageMode.PerDay => i.PerDay,
             UsageMode.Weekly => i.Weekly.Length == 7 ? i.Weekly[WeekdayIndex(d)] : 0m,
             _ => 0m,
         };
+
+    /// <summary>
+    /// Every N days: d is a dose day when it is a multiple of N days away from the anchor. Every N weeks: d's week (Monday to
+    /// Sunday) is a multiple of N weeks away from the anchor's week. Works before the anchor too.
+    /// </summary>
+    public static bool InRhythm(StockInput i, DateOnly d)
+    {
+        if (!i.HasRhythm) return true;
+        var from = i.EveryFrom!.Value;
+        int diff = i.Mode == UsageMode.Weekly
+            ? (Monday(d).DayNumber - Monday(from).DayNumber) / 7
+            : d.DayNumber - from.DayNumber;
+        return ((diff % i.Every) + i.Every) % i.Every == 0;
+    }
+
+    private static DateOnly Monday(DateOnly d) => d.AddDays(-WeekdayIndex(d));
 
     /// <summary>Σ usage(d) for d in (from, to]. Zero for an empty or negative interval.</summary>
     public static decimal UsageBetween(StockInput i, DateOnly from, DateOnly to)
@@ -59,6 +81,12 @@ public static class StockCalculator
         if (i.EndDate is { } end && to > end) to = end; // a course uses nothing after its last day
         int days = to.DayNumber - from.DayNumber;
         if (days <= 0 || i.Paused) return 0m;
+        if (i.HasRhythm)
+        {
+            decimal sum = 0m;
+            for (var d = from.AddDays(1); d <= to; d = d.AddDays(1)) sum += Usage(i, d);
+            return sum;
+        }
         switch (i.Mode)
         {
             case UsageMode.PerDay:
@@ -99,7 +127,7 @@ public static class StockCalculator
 
         if (HasRegularUsage(i))
         {
-            if (i.Mode == UsageMode.PerDay)
+            if (i.Mode == UsageMode.PerDay && !i.HasRhythm)
             {
                 decimal raw = Math.Floor(remaining / i.PerDay);
                 if (raw >= CapDays) { cap = true; days = CapDays; }
@@ -144,6 +172,7 @@ public static class StockCalculator
         return new StockResult(remaining, days, lastDose, state, cap, packages, rest);
     }
 
+    /// <summary>Day by day: weekly patterns and "every N days" (the last dose day is not simply remaining / per day).</summary>
     private static (int? days, DateOnly? lastDose, bool cap) SimulateWeekly(StockInput i, DateOnly today, decimal remaining)
     {
         var start = (today > i.SnapshotDate ? today : i.SnapshotDate).AddDays(1);

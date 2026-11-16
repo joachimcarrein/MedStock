@@ -4,6 +4,9 @@ public enum MedicationType { Pill, Capsule, NasalSpray, Inhaler, Drops, Injectio
 
 public enum UsageMode { PerDay, Weekly, AsNeeded }
 
+/// <summary>One intake moment of a daily schedule: an optional time of day and the amount taken then.</summary>
+public sealed record DoseMoment(TimeOnly? Time, decimal Amount);
+
 public enum SnapshotReason { Initial, Purchase, Recount, DoseChange, Pause, Resume, Intake }
 
 public class User
@@ -55,9 +58,21 @@ public class Medication
     public MedicationType Type { get; set; }
     public decimal UnitsPerPackage { get; set; } = 1;
     public UsageMode UsageMode { get; set; }
+    /// <summary>Usage on a dose day (PerDay mode): the sum of <see cref="Moments"/>.</summary>
     public decimal PerDay { get; set; }
+    /// <summary>
+    /// Intake moments of a day (PerDay mode). Empty = one moment of <see cref="PerDay"/> without a time (medication saved
+    /// before moments existed).
+    /// </summary>
+    public List<DoseMoment> Moments { get; set; } = [];
     /// <summary>Usage per weekday, index 0 = Monday. Always 7 values.</summary>
     public decimal[] Weekly { get; set; } = new decimal[7];
+    /// <summary>Time of the weekly doses; null = no time.</summary>
+    public TimeOnly? WeeklyTime { get; set; }
+    /// <summary>Every N days (PerDay) or every N weeks (Weekly); 1 = every day / every week.</summary>
+    public int Every { get; set; } = 1;
+    /// <summary>A day of the rhythm when <see cref="Every"/> &gt; 1: a dose day (PerDay) or a day in a dose week (Weekly).</summary>
+    public DateOnly? EveryFrom { get; set; }
     public decimal MinStockUnits { get; set; }
     public int? AlertDays { get; set; }
     public int? CoverageDays { get; set; }
@@ -102,6 +117,8 @@ public class GlobalSettings
     public int CoverageDays { get; set; } = 90;
     public int DefaultAlertDays { get; set; } = 14;
     public TimeOnly NotificationTime { get; set; } = new(9, 0);
+    /// <summary>A dose without a time counts as taken from this time of day (recount and initial stock).</summary>
+    public TimeOnly UntimedTakenFrom { get; set; } = new(20, 0);
     public DateTime? LastRunAt { get; set; }
     public string WrittenByVersion { get; set; } = "";
     /// <summary>Opt-in: publish a "days remaining" sensor per medication to Home Assistant via MQTT discovery.</summary>

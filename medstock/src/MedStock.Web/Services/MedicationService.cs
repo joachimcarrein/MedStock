@@ -21,31 +21,32 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
     private static readonly SemaphoreSlim Gate = new(1, 1);
     public const long MaxPhotoBytes = 8_000_000;
 
-    /// <summary>The recount/initial checkbox "all of today's doses already taken" defaults to on from 20:00.</summary>
-    public static bool DefaultTakenToday(DateTime now) => now.Hour >= 20;
-
     /// <summary>Usage on <paramref name="day"/> with the medication's current settings (0 when paused or as needed).</summary>
     public static decimal UsageOn(Medication m, DateOnly day) =>
         StockCalculator.Usage(StockInput.From(m, new Snapshot { Date = day, TotalUnits = 0 }), day);
 
-    /// <summary>Counted stock (open + sealed packages), minus today's usage unless today's doses were already taken.</summary>
-    public static decimal CountedUnits(Medication m, decimal openUnits, int sealedPackages, bool takenToday, DateOnly today)
+    /// <summary>Counted stock (open + sealed packages) minus the doses that still follow today (§3.1: end of the day).</summary>
+    public static decimal CountedUnits(Medication m, decimal openUnits, int sealedPackages, DateTime now, TimeOnly untimedFrom)
     {
         var total = openUnits + sealedPackages * m.UnitsPerPackage;
-        return takenToday ? total : Math.Max(0, total - UsageOn(m, today));
+        return Math.Max(0, total - DoseSchedule.PendingToday(m, now, untimedFrom).Sum(x => x.Amount));
     }
+
+    private Task<TimeOnly> UntimedFromAsync() =>
+        db.GlobalSettings.AsNoTracking().Select(g => g.UntimedTakenFrom).SingleAsync();
 
     public Task<Snapshot?> LatestSnapshotAsync(int medicationId) =>
         db.Snapshots.AsNoTracking().Where(s => s.MedicationId == medicationId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
 
-    public async Task<int> CreateAsync(Medication m, decimal openUnits, int sealedPackages, bool takenToday)
+    public async Task<int> CreateAsync(Medication m, decimal openUnits, int sealedPackages)
     {
+        var untimedFrom = await UntimedFromAsync();
         await Gate.WaitAsync();
         try
         {
-            var today = clock.Today;
+            var now = clock.Now;
             m.CreatedAt = DateTime.UtcNow;
-            m.Snapshots.Add(NewSnapshot(0, today, CountedUnits(m, openUnits, sealedPackages, takenToday, today), SnapshotReason.Initial));
+            m.Snapshots.Add(NewSnapshot(0, DateOnly.FromDateTime(now), CountedUnits(m, openUnits, sealedPackages, now, untimedFrom), SnapshotReason.Initial));
             db.Medications.Add(m);
             await db.SaveChangesAsync();
             sensors.Request();
@@ -69,7 +70,8 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
             var before = StockInput.From(m, latest) with { Weekly = (decimal[])m.Weekly.Clone() };
             apply(m);
             var usageChanged = before.Mode != m.UsageMode || before.PerDay != m.PerDay || before.MinStockUnits != m.MinStockUnits
-                               || !before.Weekly.SequenceEqual(m.Weekly) || before.EndDate != m.EndDate;
+                               || !before.Weekly.SequenceEqual(m.Weekly) || before.EndDate != m.EndDate
+                               || before.Every != m.Every || before.EveryFrom != m.EveryFrom; // times alone change no usage
             if (usageChanged)
             {
                 if (latest.Id != expectedSnapshotId) throw new StaleSnapshotException();
@@ -88,14 +90,16 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
     public Task IntakeAsync(int id, int units) => RelativeAsync(id, SnapshotReason.Intake,
         (_, remaining) => Math.Max(0, remaining - units), units);
 
-    public async Task RecountAsync(int id, int expectedSnapshotId, decimal openUnits, int sealedPackages, bool takenToday)
+    public async Task RecountAsync(int id, int expectedSnapshotId, decimal openUnits, int sealedPackages)
     {
+        var untimedFrom = await UntimedFromAsync();
         await Gate.WaitAsync();
         try
         {
             var (m, latest) = await LoadAsync(id);
             if (latest.Id != expectedSnapshotId) throw new StaleSnapshotException();
-            db.Snapshots.Add(NewSnapshot(m.Id, clock.Today, CountedUnits(m, openUnits, sealedPackages, takenToday, clock.Today), SnapshotReason.Recount));
+            var now = clock.Now;
+            db.Snapshots.Add(NewSnapshot(m.Id, DateOnly.FromDateTime(now), CountedUnits(m, openUnits, sealedPackages, now, untimedFrom), SnapshotReason.Recount));
             await db.SaveChangesAsync();
             sensors.Request();
             log.LogInformation("Medication {MedicationId} recounted", id);
