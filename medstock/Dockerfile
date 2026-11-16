@@ -7,7 +7,7 @@ COPY src/ .
 RUN dotnet publish MedStock.Web/MedStock.Web.csproj -c Release -o /app --no-restore
 
 # Ubuntu-based runtime: includes ICU (nl/en cultures) and tzdata (TZ from the Supervisor).
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
+FROM mcr.microsoft.com/dotnet/aspnet:11.0
 LABEL org.opencontainers.image.title="MedStock"       org.opencontainers.image.description="Household medication stock tracker for Home Assistant"       org.opencontainers.image.source="https://github.com/joachimcarrein/MedStock"       org.opencontainers.image.licenses="MIT"
 WORKDIR /app
 COPY --from=build /app .
