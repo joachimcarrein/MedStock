@@ -160,4 +160,37 @@ public class ScheduleTests : IClassFixture<AddonWebFactory>
             return 0;
         });
     }
+
+    [Fact]
+    public async Task Overview_lists_the_intake_moments_still_to_come_today()
+    {
+        using var f = new AddonWebFactory();
+        f.Clock.Now = new DateTime(2026, 11, 17, 10, 0, 0);
+        f.WithDb(db =>
+        {
+            var p = new Profile { Name = "Husband" };
+            db.Medications.Add(new Medication
+            {
+                Profile = p, Name = "Bisoprolol", Type = MedicationType.Pill, UnitsPerPackage = 28, PerDay = 2,
+                Moments = [new(new TimeOnly(8, 0), 1), new(new TimeOnly(20, 0), 1)],
+                Snapshots = [new Snapshot { Date = Today, TotalUnits = 50 }],
+            });
+            db.Medications.Add(new Medication
+            {
+                Profile = p, Name = "Untimed", Type = MedicationType.Pill, UnitsPerPackage = 28, PerDay = 1,
+                Snapshots = [new Snapshot { Date = Today, TotalUnits = 50 }],
+            });
+            return db.SaveChanges();
+        });
+        var c = f.Client(ingressPath: null);
+        c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("nl-BE");
+        var html = WebUtility.HtmlDecode(await c.GetStringAsync("/"));
+        Assert.Contains("Vandaag nog te nemen", html);
+        Assert.Contains("<strong>20:00</strong>", html);
+        Assert.DoesNotContain("<strong>08:00</strong>", html); // already past
+        Assert.Contains("1 pil", html);
+
+        f.Clock.Now = new DateTime(2026, 11, 17, 20, 30, 0);
+        Assert.DoesNotContain("Vandaag nog te nemen", await c.GetStringAsync("/"));
+    }
 }
