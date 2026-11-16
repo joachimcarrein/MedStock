@@ -19,8 +19,8 @@ public class MedicationServiceTests : IClassFixture<AddonWebFactory>
         return await f(scope.ServiceProvider.GetRequiredService<MedicationService>());
     }
 
-    private async Task<int> NewMedAsync(decimal perDay = 8, decimal upp = 140, decimal open = 100, int sealedPackages = 1, bool taken = true,
-        UsageMode mode = UsageMode.PerDay, decimal[]? weekly = null)
+    private async Task<int> NewMedAsync(decimal perDay = 8, decimal upp = 140, decimal open = 100, int sealedPackages = 1,
+        UsageMode mode = UsageMode.PerDay, decimal[]? weekly = null, List<DoseMoment>? moments = null, int hour = 21)
     {
         var profileId = _f.WithDb(db =>
         {
@@ -28,23 +28,55 @@ public class MedicationServiceTests : IClassFixture<AddonWebFactory>
             db.SaveChanges();
             return p.Id;
         });
-        return await Svc(s => s.CreateAsync(new Medication
+        // Created at 21:00 by default: today's untimed doses count as taken (counted stock = end of the day).
+        return await At(hour, () => Svc(s => s.CreateAsync(new Medication
         {
             ProfileId = profileId, Name = "Med", UnitsPerPackage = upp, UsageMode = mode, PerDay = perDay, Weekly = weekly ?? new decimal[7],
-        }, open, sealedPackages, taken));
+            Moments = moments ?? [],
+        }, open, sealedPackages)));
     }
 
     private Snapshot Latest(int id) => _f.WithDb(db => db.Snapshots.Where(s => s.MedicationId == id).OrderByDescending(s => s.Id).First());
 
-    [Fact]
-    public async Task Initial_snapshot_uses_the_taken_today_checkbox()
+    private async Task<T> At<T>(int hour, Func<Task<T>> f)
     {
-        var taken = await NewMedAsync(taken: true);
-        Assert.Equal(240m, Latest(taken).TotalUnits);
-        Assert.Equal(SnapshotReason.Initial, Latest(taken).Reason);
-        Assert.Equal(new DateOnly(2026, 11, 17), Latest(taken).Date);
-        var notTaken = await NewMedAsync(taken: false);
-        Assert.Equal(232m, Latest(notTaken).TotalUnits);
+        var before = _f.Clock.Now;
+        _f.Clock.Now = before.Date.AddHours(hour);
+        try { return await f(); }
+        finally { _f.Clock.Now = before; }
+    }
+
+    [Theory]
+    [InlineData(10, 232)] // no time: still to take until 20:00 → today's 8 subtracted
+    [InlineData(21, 240)] // after 20:00: taken
+    public async Task Initial_snapshot_subtracts_the_doses_still_to_come_today(int hour, decimal expected)
+    {
+        var id = await NewMedAsync(hour: hour);
+        Assert.Equal(expected, Latest(id).TotalUnits);
+        Assert.Equal(SnapshotReason.Initial, Latest(id).Reason);
+        Assert.Equal(new DateOnly(2026, 11, 17), Latest(id).Date);
+    }
+
+    [Theory]
+    [InlineData(7, 232)]  // before 08:00: both doses (4 + 4) still follow
+    [InlineData(14, 236)] // morning dose taken, evening dose (4) still follows
+    [InlineData(21, 240)] // both taken
+    public async Task Initial_snapshot_follows_the_intake_times(int hour, decimal expected)
+    {
+        var id = await NewMedAsync(hour: hour, moments: [new(new TimeOnly(8, 0), 4), new(new TimeOnly(20, 0), 4)]);
+        Assert.Equal(expected, Latest(id).TotalUnits);
+    }
+
+    [Fact]
+    public async Task Untimed_cut_off_comes_from_the_settings()
+    {
+        _f.WithDb(db => { db.GlobalSettings.Single().UntimedTakenFrom = new TimeOnly(8, 0); db.SaveChanges(); return 0; });
+        try
+        {
+            var id = await NewMedAsync(hour: 10);
+            Assert.Equal(240m, Latest(id).TotalUnits); // after 08:00 an untimed dose counts as taken
+        }
+        finally { _f.WithDb(db => { db.GlobalSettings.Single().UntimedTakenFrom = new TimeOnly(20, 0); db.SaveChanges(); return 0; }); }
     }
 
     [Fact]
@@ -64,8 +96,8 @@ public class MedicationServiceTests : IClassFixture<AddonWebFactory>
         var id = await NewMedAsync();
         var seen = Latest(id).Id;
         await Svc(async s => { await s.PurchaseAsync(id, 1); return 0; });
-        await Assert.ThrowsAsync<StaleSnapshotException>(() => Svc(async s => { await s.RecountAsync(id, seen, 50, 0, true); return 0; }));
-        await Svc(async s => { await s.RecountAsync(id, Latest(id).Id, 50, 0, true); return 0; });
+        await Assert.ThrowsAsync<StaleSnapshotException>(() => Svc(async s => { await s.RecountAsync(id, seen, 50, 0); return 0; }));
+        await At(21, () => Svc(async s => { await s.RecountAsync(id, Latest(id).Id, 50, 0); return 0; }));
         Assert.Equal(50m, Latest(id).TotalUnits);
         Assert.Equal(SnapshotReason.Recount, Latest(id).Reason);
     }
@@ -164,8 +196,8 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
     private static (string, string)[] NasalixFields(string profile) =>
     [
         ("Input.Profile", profile), ("Input.Name", "Nasalix"), ("Input.Strength", "50 µg"), ("Input.Type", "NasalSpray"),
-        ("Input.UnitsPerPackage", "140"), ("Input.UsageMode", "PerDay"), ("Input.PerDay", "8"),
-        ("Input.MinStockUnits", "0"), ("Input.OpenUnits", "100"), ("Input.SealedPackages", "1"), ("Input.TakenToday", "true"),
+        ("Input.UnitsPerPackage", "140"), ("Input.UsageMode", "PerDay"), ("Input.Moments[0].Time", "08:00"), ("Input.Moments[0].Amount", "8"),
+        ("Input.MinStockUnits", "0"), ("Input.OpenUnits", "100"), ("Input.SealedPackages", "1"),
         ("Input.NotificationsEnabled", "true"),
     ];
 
@@ -232,7 +264,7 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
         await EnsureProfileAsync(c, "Existing");
         var token = await TokenAsync(c, "/Medications/Edit");
         var fields = NasalixFields(Web.Pages.Medications.EditModel.NewProfileValue)
-            .Where(f => f.Item1 != "Input.PerDay").Append(("Input.PerDay", "0,5")).Append(("Input.NewProfileName", "Brand new")).ToArray();
+            .Where(f => f.Item1 != "Input.Moments[0].Amount").Append(("Input.Moments[0].Amount", "0,5")).Append(("Input.NewProfileName", "Brand new")).ToArray();
         var resp = await c.PostAsync("/Medications/Edit", Form(token, fields));
         Assert.Equal(HttpStatusCode.Redirect, resp.StatusCode);
         var med = _f.WithDb(db => db.Medications.Include(m => m.Profile).Single(m => m.Profile!.Name == "Brand new"));
@@ -273,8 +305,8 @@ public class MedicationWebTests : IClassFixture<AddonWebFactory>
             await scope.ServiceProvider.GetRequiredService<MedicationService>().PurchaseAsync(id, 1);
 
         token = TokenRx.Match(html).Groups[1].Value;
-        var fields = NasalixFields(profileId.ToString()).Where(f => f.Item1 != "Input.PerDay")
-            .Append(("Input.PerDay", "4")).Append(("Input.Id", id.ToString())).Append(("Input.ExpectedSnapshotId", expected)).ToArray();
+        var fields = NasalixFields(profileId.ToString()).Where(f => f.Item1 != "Input.Moments[0].Amount")
+            .Append(("Input.Moments[0].Amount", "4")).Append(("Input.Id", id.ToString())).Append(("Input.ExpectedSnapshotId", expected)).ToArray();
         var resp = await c.PostAsync("/Medications/Edit", Form(token, fields));
         Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
         Assert.Contains("Someone else just changed this", await resp.Content.ReadAsStringAsync());

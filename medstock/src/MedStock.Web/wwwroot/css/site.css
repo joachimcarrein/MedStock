@@ -136,7 +136,14 @@ label.inline input { margin: 0; flex: none; }
 .scanner .grid-2 > label, .scanner .grid-2 > button, .scanner .scan-close {
   display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: 3.125rem; margin: 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-.dayparts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; font-size: 0.8rem; }
+/* Intake moments: time, amount, remove. */
+.moments { display: grid; gap: 0.4rem; margin-bottom: 0.5rem; }
+.moment { display: grid; grid-template-columns: 1fr 1fr 3rem; gap: 0.4rem; align-items: center; }
+.moment input, .moment button { margin: 0; }
+.moment button { height: 100%; padding: 0; }
+.rhythm { margin-top: 0.75rem; }
+.rhythm .inline-form input { width: 5rem; flex: none; }
+.recount-note { margin: 0.25rem 0 0.75rem; }
 .helper summary, .advanced summary { font-size: 0.9rem; }
 .scan-tools { display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem; }
 .scan-tools button { width: auto; margin: 0; }

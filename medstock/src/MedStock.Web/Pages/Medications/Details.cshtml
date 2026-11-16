@@ -104,16 +104,17 @@
 
     <details class="recount" open="@(Model.Error is not null && Request.Query["handler"] == "Recount")">
         <summary role="button" class="secondary">@L["Action_Recount"]</summary>
-        <form method="post" asp-page-handler="Recount" asp-route-id="@m.Id" hx-disabled-elt="find button">
+        <form method="post" asp-page-handler="Recount" asp-route-id="@m.Id" hx-disabled-elt="find button" data-recount
+              data-type="@m.Type" data-upp="@m.UnitsPerPackage.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+              data-pending="@System.Text.Json.JsonSerializer.Serialize(Model.PendingToday.Select(x => new { t = x.Time?.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture), a = x.Amount }))"
+              data-names="@Texts.NamesJson(ui)" data-result="@L["Recount_Result"]" data-deducted="@L["Recount_Deducted"]"
+              data-no-time="@L["Recount_NoTime"]" data-untimed-hint="@L["Recount_UntimedHint", Model.UntimedTakenFrom.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)]">
             <input type="hidden" name="expectedSnapshotId" value="@r.Snapshot.Id" />
             <div class="grid-2">
                 <label>@L["Stock_OpenUnits"] <input type="number" name="openUnits" min="0" step="any" inputmode="decimal" /></label>
                 <label>@L["Stock_SealedPackages"] <input type="number" name="sealedPackages" min="0" step="1" inputmode="numeric" /></label>
             </div>
-            @if (Model.UsageToday > 0)
-            {
-                <label class="inline"><input type="checkbox" name="takenToday" value="true" checked="@Model.DefaultTakenToday" /> @L["Stock_TakenToday"]</label>
-            }
+            <p class="small muted recount-note" data-recount-note aria-live="polite" hidden></p>
             <button type="submit">@L["Save"]</button>
         </form>
     </details>
@@ -157,6 +158,7 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/recount.js" asp-append-version="true"></script>
     <script src="~/js/photo.js" asp-append-version="true"></script>
     <script src="~/lib/zxing/zxing-reader.js" asp-append-version="true"></script>
     <script src="~/js/scan.js" asp-append-version="true"></script>

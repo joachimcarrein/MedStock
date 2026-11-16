@@ -15,7 +15,7 @@ namespace MedStock.Web.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.15");
 
             modelBuilder.Entity("MedStock.Web.Domain.GlobalSettings", b =>
                 {
@@ -48,6 +48,11 @@ namespace MedStock.Web.Data.Migrations
 
                     b.Property<string>("TodoEntityId")
                         .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly>("UntimedTakenFrom")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new TimeOnly(20, 0, 0));
 
                     b.Property<string>("WrittenByVersion")
                         .IsRequired()
@@ -83,11 +88,25 @@ namespace MedStock.Web.Data.Migrations
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Every")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateOnly?>("EveryFrom")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("HasPhoto")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("MinStockUnits")
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("Moments")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("'[]'");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -133,6 +152,9 @@ namespace MedStock.Web.Data.Migrations
 
                     b.PrimitiveCollection<string>("Weekly")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly?>("WeeklyTime")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

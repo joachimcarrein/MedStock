@@ -47,7 +47,8 @@ public class ExportModel(MedStockDb db, IClock clock, ILogger<ExportModel> log) 
 
         return new ExportDocument(
             FormatVersion, DbInitializer.AppVersion, now,
-            new ExportGlobal(global.CoverageDays, global.DefaultAlertDays, global.NotificationTime.ToString("HH:mm", CultureInfo.InvariantCulture)),
+            new ExportGlobal(global.CoverageDays, global.DefaultAlertDays, global.NotificationTime.ToString("HH:mm", CultureInfo.InvariantCulture),
+                global.UntimedTakenFrom.ToString("HH:mm", CultureInfo.InvariantCulture)),
             profiles.Select(p => new ExportProfile(p.Id, p.Name, p.Color, p.SortOrder, p.CoverageDays)).ToList(),
             meds.Select(m => new ExportMedication(
                 m.Id, m.ProfileId, m.Name, m.Strength, m.Type.ToString(), m.UnitsPerPackage, m.UsageMode.ToString(), m.PerDay,
@@ -55,21 +56,31 @@ public class ExportModel(MedStockDb db, IClock clock, ILogger<ExportModel> log) 
                 snapshots.TryGetValue(m.Id, out var s)
                     ? new ExportStock(s.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TotalUnits)
                     : null,
-                m.Barcode, m.TakeAlongUnits, m.EndDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), m.OverTheCounter)).ToList());
+                m.Barcode, m.TakeAlongUnits, m.EndDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), m.OverTheCounter,
+                m.Moments.Count > 0 ? m.Moments.Select(x => new ExportMoment(x.Time?.ToString("HH:mm", CultureInfo.InvariantCulture), x.Amount)).ToList() : null,
+                m.WeeklyTime?.ToString("HH:mm", CultureInfo.InvariantCulture), m.Every,
+                m.EveryFrom?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))).ToList());
     }
 }
 
 public sealed record ExportDocument(int Format, string AppVersion, DateTime ExportedAt, ExportGlobal Settings,
     List<ExportProfile> Profiles, List<ExportMedication> Medications);
 
-public sealed record ExportGlobal(int CoverageDays, int DefaultAlertDays, string NotificationTime);
+public sealed record ExportGlobal(int CoverageDays, int DefaultAlertDays, string NotificationTime, string? UntimedTakenFrom = null);
 
 public sealed record ExportProfile(int Id, string Name, string Color, int SortOrder, int? CoverageDays);
 
-/// <summary>Weekly: units per weekday, Monday first. Stock: total units at the END of that date.</summary>
+/// <summary>
+/// Weekly: units per weekday, Monday first. Stock: total units at the END of that date. Moments: intake moments of a dose day
+/// (PerDay; PerDay is their sum). Every: every N days (PerDay) or weeks (Weekly), counted from EveryFrom.
+/// </summary>
 public sealed record ExportMedication(int Id, int ProfileId, string Name, string? Strength, string Type, decimal UnitsPerPackage,
     string UsageMode, decimal PerDay, decimal[] Weekly, decimal MinStockUnits, int? AlertDays, int? CoverageDays,
     bool NotificationsEnabled, bool Paused, bool Archived, ExportStock? Stock, string? Barcode = null,
-    decimal? TakeAlongUnits = null, string? EndDate = null, bool OverTheCounter = false);
+    decimal? TakeAlongUnits = null, string? EndDate = null, bool OverTheCounter = false, List<ExportMoment>? Moments = null,
+    string? WeeklyTime = null, int Every = 1, string? EveryFrom = null);
+
+/// <summary>Time "HH:mm" or null (no time).</summary>
+public sealed record ExportMoment(string? Time, decimal Amount);
 
 public sealed record ExportStock(string Date, decimal TotalUnits);

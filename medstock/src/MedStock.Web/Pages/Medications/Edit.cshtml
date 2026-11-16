@@ -7,7 +7,7 @@
     var ui = CultureInfo.CurrentUICulture;
     var title = Model.IsNew ? L["Med_New"].Value : L["Med_Edit"].Value;
     var back = Model.IsNew ? Url.Content("~/") : Url.Page("/Medications/Details", new { id = Model.Input.Id });
-    string Num(decimal? d) => d?.ToString(inv) ?? "";
+    string Num(decimal? d) => d?.ToString("G29", inv) ?? ""; // G29: no trailing zeros ("2", not "2.0")
     var first = (int)ui.DateTimeFormat.FirstDayOfWeek; // 0 = Sunday
     var dayOrder = Enumerable.Range(0, 7).Select(k => ((first + k) % 7 + 6) % 7).ToArray(); // storage index, Monday = 0
     string DayName(int storageIndex) => ui.DateTimeFormat.AbbreviatedDayNames[(storageIndex + 1) % 7];
@@ -19,7 +19,9 @@
     <p class="error" role="alert">@Model.Conflict</p>
 }
 
-<form method="post" class="med-form" novalidate>
+<form method="post" class="med-form" novalidate data-recount data-untimed-from="@Model.Global.UntimedTakenFrom.ToString("HH:mm", inv)"
+      data-names="@Model.UnitNamesJson" data-result="@L["Recount_Result"]" data-deducted="@L["Recount_Deducted"]"
+      data-no-time="@L["Recount_NoTime"]" data-untimed-hint="@L["Recount_UntimedHint", Model.Global.UntimedTakenFrom.ToString("HH:mm", inv)]">
     <input type="hidden" asp-for="Input.Id" />
     <input type="hidden" asp-for="Input.ExpectedSnapshotId" />
 
@@ -88,26 +90,21 @@
         }
 
         <div class="mode-perday">
-            <label>
-                @L["Med_PerDay"]
-                <input name="Input.PerDay" id="perday" value="@Num(Model.Input.PerDay)" type="number" step="any" min="0" inputmode="decimal" />
-                <span asp-validation-for="Input.PerDay" class="error small"></span>
-            </label>
-            <details class="helper">
-                <summary>@L["Helper_Title"]</summary>
-                <div class="inline-form">
-                    <input type="number" step="any" min="0" inputmode="decimal" id="h-times" aria-label="@L["Helper_TimesPerDay"]" />
-                    <span>@L["Helper_TimesPerDay"] ×</span>
-                    <input type="number" step="any" min="0" inputmode="decimal" id="h-per" aria-label="@L["Helper_PerTime"]" />
-                    <span>@L["Helper_PerTime"]</span>
-                </div>
-                <div class="dayparts">
-                    @foreach (var part in new[] { "Morning", "Noon", "Evening", "Night" })
-                    {
-                        <label>@L["Daypart_" + part] <input type="number" step="any" min="0" inputmode="decimal" class="h-part" /></label>
-                    }
-                </div>
-            </details>
+            <p class="small muted">@L["Moments_Help"]</p>
+            <div class="moments" data-moments>
+                @for (var k = 0; k < Model.Input.Moments.Count; k++)
+                {
+                    var mo = Model.Input.Moments[k];
+                    <div class="moment" data-moment>
+                        <input type="time" name="Input.Moments[@k].Time" value="@mo.Time?.ToString("HH:mm", inv)" aria-label="@L["Moment_Time"]" />
+                        <input type="number" name="Input.Moments[@k].Amount" value="@Num(mo.Amount)" step="any" min="0" inputmode="decimal"
+                               placeholder="@L["Moment_Amount"]" aria-label="@L["Moment_Amount"]" />
+                        <button type="button" class="secondary outline" data-moment-remove aria-label="@L["Moment_Remove"]" title="@L["Moment_Remove"]">✕</button>
+                    </div>
+                    <span asp-validation-for="Input.Moments[k].Amount" class="error small"></span>
+                }
+            </div>
+            <button type="button" class="secondary outline" data-moment-add>@L["Moment_Add"]</button>
         </div>
 
         <div class="mode-weekly">
@@ -125,6 +122,25 @@
                 <span asp-validation-for="Input.Weekly[i]" class="error small"></span>
             }
             <button type="button" class="secondary" id="same-every-day">@L["Weekly_SameEveryDay"]</button>
+            <label>
+                @L["Weekly_Time"]
+                <input type="time" name="Input.WeeklyTime" value="@Model.Input.WeeklyTime?.ToString("HH:mm", inv)" />
+            </label>
+        </div>
+
+        <div class="rhythm mode-regular">
+            <label class="inline-form">
+                <span>@L["Every_Before"]</span>
+                <input name="Input.Every" value="@Model.Input.Every" type="number" min="1" max="365" step="1" inputmode="numeric" aria-label="@L["Every_Before"]" />
+                <span class="mode-perday">@L["Every_Days"]</span><span class="mode-weekly">@L["Every_Weeks"]</span>
+            </label>
+            <span asp-validation-for="Input.Every" class="error small"></span>
+            <label class="every-from" hidden="@(Model.Input.Every is not > 1 && Model.ViewData.ModelState["Input.EveryFrom"]?.Errors.Count is not > 0)">
+                @L["Every_From"]
+                <input type="date" name="Input.EveryFrom" value="@Model.Input.EveryFrom?.ToString("yyyy-MM-dd", inv)" />
+                <small class="muted">@L["Every_From_Help"]</small>
+                <span asp-validation-for="Input.EveryFrom" class="error small"></span>
+            </label>
         </div>
 
         <div class="mode-asneeded">
@@ -152,7 +168,7 @@
                     <span asp-validation-for="Input.SealedPackages" class="error small"></span>
                 </label>
             </div>
-            <label class="inline mode-regular"><input type="checkbox" asp-for="Input.TakenToday" /> @L["Stock_TakenToday"]</label>
+            <p class="small muted recount-note mode-regular" data-recount-note aria-live="polite" hidden></p>
         </fieldset>
     }
 
@@ -183,4 +199,5 @@
 
 @section Scripts {
     <script src="~/js/edit.js" asp-append-version="true"></script>
+    <script src="~/js/recount.js" asp-append-version="true"></script>
 }

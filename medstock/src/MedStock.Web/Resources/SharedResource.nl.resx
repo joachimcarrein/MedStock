@@ -93,18 +93,9 @@
   <data name="Med_Type" xml:space="preserve"><value>Type</value></data>
   <data name="Med_UnitsPerPackage" xml:space="preserve"><value>Eenheden per verpakking</value></data>
   <data name="Med_Usage" xml:space="preserve"><value>Verbruik</value></data>
-  <data name="Mode_PerDay" xml:space="preserve"><value>Elke dag</value></data>
+  <data name="Mode_PerDay" xml:space="preserve"><value>Dagelijks</value></data>
   <data name="Mode_Weekly" xml:space="preserve"><value>Weekpatroon</value></data>
   <data name="Mode_AsNeeded" xml:space="preserve"><value>Zo nodig</value></data>
-  <data name="Med_PerDay" xml:space="preserve"><value>Eenheden per dag</value></data>
-  <data name="Helper_Title" xml:space="preserve"><value>Help mij rekenen</value></data>
-  <data name="Helper_TimesPerDay" xml:space="preserve"><value>keer per dag</value></data>
-  <data name="Helper_PerTime" xml:space="preserve"><value>per keer</value></data>
-  <data name="Helper_Apply" xml:space="preserve"><value>Toepassen</value></data>
-  <data name="Daypart_Morning" xml:space="preserve"><value>Ochtend</value></data>
-  <data name="Daypart_Noon" xml:space="preserve"><value>Middag</value></data>
-  <data name="Daypart_Evening" xml:space="preserve"><value>Avond</value></data>
-  <data name="Daypart_Night" xml:space="preserve"><value>Nacht</value></data>
   <data name="Weekly_SameEveryDay" xml:space="preserve"><value>Elke dag gelijk</value></data>
   <data name="Med_MinStock" xml:space="preserve"><value>Minimumvoorraad in eenheden (0 = enkel bij leeg)</value></data>
   <data name="Med_AlertDays" xml:space="preserve"><value>Meldingsdrempel in dagen (leeg = {0})</value></data>
@@ -113,7 +104,6 @@
   <data name="Med_InitialStock" xml:space="preserve"><value>Huidige voorraad</value></data>
   <data name="Stock_OpenUnits" xml:space="preserve"><value>Eenheden in de open verpakking</value></data>
   <data name="Stock_SealedPackages" xml:space="preserve"><value>Gesloten verpakkingen</value></data>
-  <data name="Stock_TakenToday" xml:space="preserve"><value>Alle dosissen van vandaag al genomen</value></data>
   <data name="Usage_FromTomorrow" xml:space="preserve"><value>Een wijziging van het verbruik geldt vanaf morgen.</value></data>
   <data name="Conflict" xml:space="preserve"><value>Iemand anders heeft net iets gewijzigd; controleer en probeer opnieuw.</value></data>
   <data name="Val_Required" xml:space="preserve"><value>Verplicht</value></data>
@@ -291,4 +281,21 @@
   <data name="Search_Placeholder" xml:space="preserve"><value>Zoek medicatie</value></data>
   <data name="Search_Clear" xml:space="preserve"><value>Zoekterm wissen</value></data>
   <data name="Search_NoMatch" xml:space="preserve"><value>Geen medicatie gevonden.</value></data>
+  <data name="Moments_Help" xml:space="preserve"><value>Wanneer en hoeveel: één regel per innamemoment. Het uur is optioneel.</value></data>
+  <data name="Moment_Time" xml:space="preserve"><value>Uur</value></data>
+  <data name="Moment_Amount" xml:space="preserve"><value>Aantal</value></data>
+  <data name="Moment_Add" xml:space="preserve"><value>+ Innamemoment</value></data>
+  <data name="Moment_Remove" xml:space="preserve"><value>Innamemoment verwijderen</value></data>
+  <data name="Weekly_Time" xml:space="preserve"><value>Uur (optioneel)</value></data>
+  <data name="Every_Before" xml:space="preserve"><value>Om de</value></data>
+  <data name="Every_Days" xml:space="preserve"><value>dag(en)</value></data>
+  <data name="Every_Weeks" xml:space="preserve"><value>week/weken</value></data>
+  <data name="Every_From" xml:space="preserve"><value>Vanaf</value></data>
+  <data name="Every_From_Help" xml:space="preserve"><value>Een dag met een dosis (bv. de volgende of de laatste); daarvan wordt het ritme geteld.</value></data>
+  <data name="Recount_Result" xml:space="preserve"><value>Wordt geregistreerd als {0}.</value></data>
+  <data name="Recount_Deducted" xml:space="preserve"><value>Al afgetrokken voor vandaag: {0} ({1}).</value></data>
+  <data name="Recount_NoTime" xml:space="preserve"><value>zonder uur</value></data>
+  <data name="Recount_UntimedHint" xml:space="preserve"><value>Een dosis zonder uur telt tot {0} als nog te nemen.</value></data>
+  <data name="Settings_UntimedTakenFrom" xml:space="preserve"><value>Doses zonder uur gelden als genomen vanaf</value></data>
+  <data name="Settings_UntimedTakenFrom_Help" xml:space="preserve"><value>Bij hertellen: vóór dit uur wordt een dosis zonder uur nog afgetrokken voor vandaag.</value></data>
 </root>

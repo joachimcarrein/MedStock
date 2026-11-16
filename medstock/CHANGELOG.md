@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- Intake times: per medication one or more intake moments (time + amount); the units per day are their sum. Weekly
+  patterns get one time. The "Help me calculate" helper is gone: the moments replace it.
+- Every N days / every N weeks (e.g. an injection every two weeks), counted from a start date. Days remaining,
+  prescription, trip planner, notifications and sensors all follow the rhythm.
+- Recount and first stock without the "already taken today" tick box: count what you have now; MedStock subtracts
+  the doses that still follow today (by their time) and shows what will be recorded before you save.
+- New setting (Settings › For everyone): doses without a time count as taken from 20:00; change it if you prefer another time.
+
+**What happens to your existing medication:** nothing changes in the stock or the days remaining. Daily medication
+gets one intake moment with its current amount, without a time; a weekly pattern stays as it is, without a time.
+Until you add times, a recount treats today's doses as still to take before 20:00 and as taken after it (the same
+as the tick box did by default). **Worth doing once:** open each medication, tap edit and fill in the intake times
+(e.g. 08:00 1 and 20:00 1 instead of 2 per day). Medication you entered as a fraction to mean "every other day"
+(0.5 per day) still counts down correctly; change it to 1 every 2 days if you want the intake days to be exact.
+
 ## 2026.11.6
 
 - Overview: search box that filters the cards while you type (within the chosen profile), with ✕ to clear it.

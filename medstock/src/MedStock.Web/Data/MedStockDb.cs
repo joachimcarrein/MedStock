@@ -1,5 +1,7 @@
 using MedStock.Web.Domain;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MedStock.Web.Data;
 
@@ -38,6 +40,12 @@ public class MedStockDb(DbContextOptions<MedStockDb> options) : DbContext(option
             e.Property(x => x.Type).HasConversion<string>().HasMaxLength(20);
             e.Property(x => x.UsageMode).HasConversion<string>().HasMaxLength(20);
             e.Property(x => x.NotificationsEnabled).HasDefaultValue(true);
+            e.Property(x => x.Every).HasDefaultValue(1);
+            e.Property(x => x.Moments).HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<DoseMoment>>(v, (JsonSerializerOptions?)null) ?? new List<DoseMoment>(),
+                new ValueComparer<List<DoseMoment>>((a, b) => a!.SequenceEqual(b!), v => v.Aggregate(0, (h, x) => HashCode.Combine(h, x)), v => v.ToList()))
+                .HasDefaultValueSql("'[]'");
             e.HasOne(x => x.Profile).WithMany(p => p.Medications).HasForeignKey(x => x.ProfileId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(x => x.Snapshots).WithOne().HasForeignKey(s => s.MedicationId).OnDelete(DeleteBehavior.Cascade);
         });
@@ -55,6 +63,7 @@ public class MedStockDb(DbContextOptions<MedStockDb> options) : DbContext(option
         {
             e.Property(x => x.Id).ValueGeneratedNever();
             e.Property(x => x.WrittenByVersion).HasMaxLength(50);
+            e.Property(x => x.UntimedTakenFrom).HasDefaultValue(new TimeOnly(20, 0));
         });
     }
 }
