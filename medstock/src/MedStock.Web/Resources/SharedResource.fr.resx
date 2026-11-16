@@ -313,4 +313,16 @@
   <data name="Med_Reminder_Never" xml:space="preserve"><value>Jamais</value></data>
   <data name="Med_Reminder_NoTime" xml:space="preserve"><value>Les rappels ont besoin d'une heure de prise : définissez-en une via modifier.</value></data>
   <data name="Flash_Reminder" xml:space="preserve"><value>Choix de rappel enregistré</value></data>
+  <data name="Undo" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Undo_Nothing" xml:space="preserve"><value>Il n'y a rien à annuler.</value></data>
+  <data name="Flash_Undone" xml:space="preserve"><value>Annulé</value></data>
+  <data name="History_Title" xml:space="preserve"><value>Dernières modifications</value></data>
+  <data name="History_ViaNotification" xml:space="preserve"><value>via une notification</value></data>
+  <data name="Reason_Initial" xml:space="preserve"><value>Stock initial</value></data>
+  <data name="Reason_Purchase" xml:space="preserve"><value>Acheté</value></data>
+  <data name="Reason_Recount" xml:space="preserve"><value>Recomptage</value></data>
+  <data name="Reason_DoseChange" xml:space="preserve"><value>Utilisation modifiée</value></data>
+  <data name="Reason_Pause" xml:space="preserve"><value>En pause</value></data>
+  <data name="Reason_Resume" xml:space="preserve"><value>Repris</value></data>
+  <data name="Reason_Intake" xml:space="preserve"><value>Pris</value></data>
 </root>

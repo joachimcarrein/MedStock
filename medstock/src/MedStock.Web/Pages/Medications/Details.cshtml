@@ -15,7 +15,16 @@
 <div id="detail">
     @if (done is not null)
     {
-        <p class="flash ok" role="status">✓ @done</p>
+        <div class="flash ok flash-undo" role="status">
+            <span>✓ @done</span>
+            @if (Model.CanUndo && Model.Done is "added" or "taken" or "recounted")
+            {
+                <form method="post" asp-page-handler="Undo" asp-route-id="@m.Id" hx-disabled-elt="find button">
+                    <input type="hidden" name="snapshotId" value="@Model.History[0].Snapshot.Id" />
+                    <button type="submit" class="secondary outline">@L["Undo"]</button>
+                </form>
+            }
+        </div>
     }
     @if (Model.Error is not null)
     {
@@ -141,6 +150,41 @@
     }
 
     <p class="small muted">@L["Detail_LastCount", Texts.LongDate(r.Snapshot.Date, ui)]</p>
+
+    @if (Model.History.Count > 0)
+    {
+        <details class="history">
+            <summary>@L["History_Title"]</summary>
+            <ul>
+                @for (var i = 0; i < Model.History.Count; i++)
+                {
+                    var h = Model.History[i];
+                    var s = h.Snapshot;
+                    string? amount = h.Delta is { } d && d != 0
+                        ? (d > 0 ? "+" : "−") + Math.Abs(d).ToString("G29", ui) + " " + Texts.Unit(m.Type, Math.Abs(d), ui)
+                        : s.Reason is MedStock.Web.Domain.SnapshotReason.Recount or MedStock.Web.Domain.SnapshotReason.Initial
+                            ? "→ " + Texts.UnitsCount(m.Type, s.TotalUnits, ui)
+                            : null;
+                    <li>
+                        <span>
+                            <span class="muted">@Texts.ShortDate(s.Date, ui)</span> · @L["Reason_" + s.Reason]@(amount is null ? "" : " " + amount)
+                            @if (h.By is not null)
+                            {
+                                <span class="muted"> · @h.By</span>
+                            }
+                        </span>
+                        @if (i == 0 && Model.CanUndo)
+                        {
+                            <form method="post" asp-page-handler="Undo" asp-route-id="@m.Id" hx-disabled-elt="find button">
+                                <input type="hidden" name="snapshotId" value="@s.Id" />
+                                <button type="submit" class="secondary outline">@L["Undo"]</button>
+                            </form>
+                        }
+                    </li>
+                }
+            </ul>
+        </details>
+    }
 
     <section class="photo" data-upload-url="@Url.Page("/Medications/Photo", new { id = m.Id })" data-detail-url="@Url.Page("/Medications/Details", new { id = m.Id })">
         <h2>@L["Photo"]</h2>

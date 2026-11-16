@@ -107,6 +107,32 @@ public sealed class MedicationService(MedStockDb db, IClock clock, CurrentUser u
         finally { Gate.Release(); }
     }
 
+    /// <summary>Snapshot reasons that "undo" can take back: removing the snapshot restores the stock before it.</summary>
+    public static bool IsUndoable(SnapshotReason r) => r is SnapshotReason.Purchase or SnapshotReason.Intake or SnapshotReason.Recount;
+
+    /// <summary>
+    /// Takes back the latest purchase, intake or recount by removing its snapshot: the stock is calculated from the previous
+    /// one again. Only the latest snapshot, and only when it is still <paramref name="snapshotId"/> (else stale).
+    /// </summary>
+    public async Task<SnapshotReason> UndoAsync(int id, int snapshotId)
+    {
+        await Gate.WaitAsync();
+        try
+        {
+            var latest = await db.Snapshots.Where(s => s.MedicationId == id).OrderByDescending(s => s.Id).Take(2).ToListAsync();
+            if (latest.Count == 0) throw new KeyNotFoundException();
+            if (latest[0].Id != snapshotId) throw new StaleSnapshotException();
+            if (latest.Count < 2 || !IsUndoable(latest[0].Reason)) throw new InvalidOperationException("Nothing to undo.");
+            var reason = latest[0].Reason;
+            db.Snapshots.Remove(latest[0]);
+            await db.SaveChangesAsync();
+            sensors.Request();
+            log.LogInformation("Medication {MedicationId}: {Reason} undone", id, reason);
+            return reason;
+        }
+        finally { Gate.Release(); }
+    }
+
     public async Task SetPausedAsync(int id, int expectedSnapshotId, bool paused)
     {
         await Gate.WaitAsync();

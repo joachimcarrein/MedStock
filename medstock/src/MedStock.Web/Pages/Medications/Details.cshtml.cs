@@ -18,6 +18,11 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
     /// <summary>Today's doses still to come: a recount subtracts them (shown before saving).</summary>
     public List<DoseMoment> PendingToday { get; private set; } = [];
     public TimeOnly UntimedTakenFrom { get; private set; }
+    /// <summary>The latest changes (newest first) with the change in units and who made them.</summary>
+    public List<HistoryEntry> History { get; private set; } = [];
+    /// <summary>The latest snapshot can be taken back (purchase, intake or recount, with an earlier one before it).</summary>
+    public bool CanUndo => History.Count > 1 && MedicationService.IsUndoable(History[0].Snapshot.Reason);
+
     /// <summary>The current user's own reminder choice for this medication: null = follow the profile choice in Settings.</summary>
     public bool? ReminderOverride { get; private set; }
     /// <summary>Whether the current user gets reminders for this profile (Settings).</summary>
@@ -62,6 +67,21 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
             db.MedicationReminders.Add(new MedicationReminder { UserId = user.Id, MedicationId = id, Enabled = reminder == "on" });
         await db.SaveChangesAsync();
         return RedirectToPage(new { id, done = "reminder" });
+    }
+
+    public async Task<IActionResult> OnPostUndoAsync(int id, int snapshotId)
+    {
+        try { await service.UndoAsync(id, snapshotId); }
+        catch (InvalidOperationException) { return await Invalid(id, l["Undo_Nothing"]); }
+        catch (KeyNotFoundException) { return NotFound(); }
+        catch (StaleSnapshotException)
+        {
+            if (!await LoadAsync(id)) return NotFound();
+            Error = l["Conflict"];
+            Response.StatusCode = StatusCodes.Status409Conflict;
+            return Page();
+        }
+        return RedirectToPage(new { id, done = "undone" });
     }
 
     public Task<IActionResult> OnPostPauseAsync(int id, int expectedSnapshotId, bool paused) =>
@@ -115,11 +135,36 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
         PhotoVersion = PhotoModel.Version(paths, id);
         UntimedTakenFrom = await db.GlobalSettings.AsNoTracking().Select(g => g.UntimedTakenFrom).SingleAsync();
         PendingToday = DoseSchedule.PendingToday(row.Medication, clock.Now, UntimedTakenFrom);
+        History = await LoadHistoryAsync(row.Medication);
         ReminderOverride = await db.MedicationReminders.AsNoTracking().Where(r => r.UserId == user.Id && r.MedicationId == id)
             .Select(r => (bool?)r.Enabled).FirstOrDefaultAsync();
         ReminderProfileOn = await db.UserSettings.AsNoTracking().Where(s => s.UserId == user.Id)
             .Select(s => s.ReminderProfileIds).FirstOrDefaultAsync() is { } ids && ids.Contains(row.Medication.ProfileId);
         return true;
+    }
+
+    private async Task<List<HistoryEntry>> LoadHistoryAsync(Medication m)
+    {
+        const int shown = 6;
+        var snaps = await db.Snapshots.AsNoTracking().Where(s => s.MedicationId == m.Id).OrderByDescending(s => s.Id).Take(shown + 1).ToListAsync();
+        var userIds = snaps.Select(s => s.CreatedByUserId).Where(x => x is not null).Distinct().ToList();
+        var names = await db.Users.AsNoTracking().Where(u => userIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id, u => u.DisplayName);
+        var list = new List<HistoryEntry>();
+        for (var i = 0; i < Math.Min(shown, snaps.Count); i++)
+        {
+            var s = snaps[i];
+            decimal? delta = null;
+            if (i + 1 < snaps.Count && s.Reason is SnapshotReason.Purchase or SnapshotReason.Intake)
+                delta = s.TotalUnits - StockCalculator.Remaining(StockInput.From(m, snaps[i + 1]), s.Date);
+            var by = s.CreatedByUserId switch
+            {
+                null => null,
+                NotificationActionHandler.FallbackUserId => l["History_ViaNotification"].Value,
+                var uid => names.TryGetValue(uid, out var n) ? n : null,
+            };
+            list.Add(new HistoryEntry(s, delta, by));
+        }
+        return list;
     }
 
     public string? DoneMessage(System.Globalization.CultureInfo c)
@@ -138,7 +183,11 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
             "barcode" => l["Flash_Barcode"],
             "barcode-removed" => l["Flash_BarcodeRemoved"],
             "reminder" => l["Flash_Reminder"],
+            "undone" => l["Flash_Undone"],
             _ => null,
         })?.Value;
     }
 }
+
+/// <summary>One line of "latest changes": the snapshot, units added or taken (purchase, intake) and who did it.</summary>
+public sealed record HistoryEntry(Snapshot Snapshot, decimal? Delta, string? By);

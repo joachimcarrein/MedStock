@@ -86,6 +86,9 @@ dose already counts as taken. More than ten years of stock shows as "> 10 years"
 - **Recount**: correct the stock with what you actually have now (open package + sealed packages). The doses that
   still follow today are subtracted; the line under the fields shows what will be recorded before you save.
 - **−1** / **− n** (as-needed medication only): you used some.
+- **Undo**: a mis-tap on +1, −1 or a recount (also "+1" from a notification) is taken back with **Undo**, in the
+  confirmation right after the action or on the newest line of **Latest changes** (the last changes with the date,
+  the amount and who did it). Only the newest change can be undone; changes to the usage are corrected with edit.
 - Icons next to the name: **✏ edit**, **⏸ pause / ▶ resume**, and the red **archive** icon (asks for confirmation).
 - **Photo**: take one, choose one from the gallery, or **search a picture by name** (see *Optional extras*).
 - **Barcode**: tap **Scan** to link the code on the box (see *Scanning a box* below), or type it.
