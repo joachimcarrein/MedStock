@@ -1,6 +1,7 @@
 # Weekly update pull requests for NuGet packages, GitHub Actions (pinned by SHA) and the Docker base images.
-# One PR per ecosystem (groups). Major .NET upgrades (Docker images and Microsoft.* packages, e.g. 10 -> 11)
-# are ignored: they need the TargetFramework changed together with the images, so they are done by hand.
+# One PR per ecosystem (groups). .NET 11 (STS) is skipped for the Docker images and Microsoft.* packages:
+# the app stays on .NET 10 LTS until .NET 12 LTS, which Dependabot will propose again. Merge that together
+# with a TargetFramework change to net12.0 (an aspnet 12 image cannot run a net10.0 app).
 version: 2
 updates:
   - package-ecosystem: nuget
@@ -12,7 +13,7 @@ updates:
         patterns: ["*"]
     ignore:
       - dependency-name: "Microsoft.*"
-        update-types: ["version-update:semver-major"]
+        versions: [">= 11.0, < 12.0"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -29,4 +30,4 @@ updates:
         patterns: ["*"]
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        versions: [">= 11.0, < 12.0"]
