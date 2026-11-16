@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Overview: "Still to take today" lists today's remaining intake moments (within the profile filter).
+
 - Detail: **Undo** for the last purchase, intake or recount (also +1 from a notification), and a list of the latest changes with who made them.
 
 ## 2026.11.7

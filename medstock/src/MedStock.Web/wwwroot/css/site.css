@@ -262,3 +262,11 @@ button.image-hit img { width: 100%; height: 100%; object-fit: cover; display: bl
 .history li { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
   padding: 0.35rem 0; border-bottom: 1px solid var(--pico-muted-border-color, #ddd); font-size: 0.9rem; }
 .history summary { font-size: 0.9rem; }
+
+/* Overview: today's intake moments still to come. */
+.today { margin-bottom: 0.9rem; padding: 0.6rem 0.8rem; border-radius: var(--pico-border-radius, 0.25rem);
+  background: var(--pico-card-sectioning-background-color, #f6f8fa); }
+.today h2 { font-size: 0.95rem; margin: 0 0 0.35rem; }
+.today ul { list-style: none; padding: 0; margin: 0; }
+.today li { list-style: none; display: grid; grid-template-columns: 3.2rem 1fr; gap: 0.4rem; margin: 0.15rem 0; font-size: 0.92rem; }
+.today a { text-decoration: none; }

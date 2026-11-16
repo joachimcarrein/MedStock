@@ -1,3 +1,4 @@
+using System.Globalization;
 using MedStock.Web.Domain;
 using MedStock.Web.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,23 +21,29 @@ public static class DemoData
         await db.SaveChangesAsync();
 
         void Add(Profile p, string name, string? strength, MedicationType type, decimal upp, UsageMode mode,
-            decimal perDay, decimal[]? weekly, decimal units, int daysAgo, decimal min = 0)
+            decimal perDay, decimal[]? weekly, decimal units, int daysAgo, decimal min = 0, string? times = null)
         {
+            // times: "08:00=2 20:00=2" (daily moments) or "19:30" (weekly time)
+            var moments = mode == UsageMode.PerDay && times is not null
+                ? times.Split(' ').Select(t => t.Split('=')).Select(t => new DoseMoment(TimeOnly.Parse(t[0], CultureInfo.InvariantCulture), decimal.Parse(t[1], CultureInfo.InvariantCulture))).ToList()
+                : [];
             var m = new Medication
             {
                 ProfileId = p.Id, Name = name, Strength = strength, Type = type, UnitsPerPackage = upp, UsageMode = mode,
-                PerDay = perDay, Weekly = weekly ?? new decimal[7], MinStockUnits = min, CreatedAt = DateTime.UtcNow,
+                PerDay = moments.Count > 0 ? moments.Sum(x => x.Amount) : perDay, Moments = moments,
+                WeeklyTime = mode == UsageMode.Weekly && times is not null ? TimeOnly.Parse(times, CultureInfo.InvariantCulture) : null,
+                Weekly = weekly ?? new decimal[7], MinStockUnits = min, CreatedAt = DateTime.UtcNow,
             };
             m.Snapshots.Add(new Snapshot { Date = today.AddDays(-daysAgo), TotalUnits = units, Reason = SnapshotReason.Initial, CreatedAt = DateTime.UtcNow, CreatedByUserId = "demo" });
             db.Medications.Add(m);
         }
 
-        Add(husband, "Nasal spray", "50 µg", MedicationType.NasalSpray, 140, UsageMode.PerDay, 4, null, 240, 10);
-        Add(husband, "Weekly injection", "0.5 mg", MedicationType.Injection, 4, UsageMode.Weekly, 0, [0, 0, 0, 0, 0, 1, 0], 3, 2);
-        Add(husband, "Vitamin D", "25 µg", MedicationType.Capsule, 90, UsageMode.PerDay, 1, null, 200, 5);
-        Add(wife, "Blood pressure", "5 mg", MedicationType.Pill, 28, UsageMode.PerDay, 1, null, 20, 3);
+        Add(husband, "Nasal spray", "50 µg", MedicationType.NasalSpray, 140, UsageMode.PerDay, 4, null, 240, 10, times: "08:00=2 20:00=2");
+        Add(husband, "Weekly injection", "0.5 mg", MedicationType.Injection, 4, UsageMode.Weekly, 0, [0, 0, 0, 0, 0, 1, 0], 3, 2, times: "19:30");
+        Add(husband, "Vitamin D", "25 µg", MedicationType.Capsule, 90, UsageMode.PerDay, 1, null, 200, 5, times: "08:00=1");
+        Add(wife, "Blood pressure", "5 mg", MedicationType.Pill, 28, UsageMode.PerDay, 1, null, 20, 3, times: "20:00=1");
         Add(wife, "Paracetamol", "500 mg", MedicationType.Pill, 20, UsageMode.AsNeeded, 0, null, 6, 0, min: 10);
-        Add(wife, "Inhaler", null, MedicationType.Inhaler, 200, UsageMode.PerDay, 2, null, 30, 0);
+        Add(wife, "Inhaler", null, MedicationType.Inhaler, 200, UsageMode.PerDay, 2, null, 30, 0, times: "08:00=1 20:00=1");
         await db.SaveChangesAsync();
     }
 }

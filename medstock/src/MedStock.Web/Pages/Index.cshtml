@@ -38,6 +38,31 @@ else
         </div>
     }
 
+    @if (Model.Today.Count > 0)
+    {
+        <section class="today" aria-labelledby="today-title">
+            <h2 id="today-title">@L["Today_Title"]</h2>
+            <ul>
+                @foreach (var t in Model.Today)
+                {
+                    <li>
+                        <strong>@t.Time.ToString("HH:mm", CultureInfo.InvariantCulture)</strong>
+                        <span>
+                            @for (var i = 0; i < t.Items.Count; i++)
+                            {
+                                var (row, amount) = t.Items[i];
+                                var med = row.Medication;
+                                @if (i > 0) { <text> · </text> }
+                                <a href="@Url.Page("/Medications/Details", new { id = med.Id })">@if (Model.Filter is null && Model.Profiles.Count > 1) {<span class="profile-dot" style="background:@row.Profile.Color" title="@row.Profile.Name"></span>}@med.Name</a>
+                                <span class="muted">@amount.ToString("G29", ui) @Texts.Unit(med.Type, amount, ui)</span>
+                            }
+                        </span>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     @if (Model.Rows.Count == 0)
     {
         <p class="empty-state muted">@L["Empty_NoMedication"]</p>

@@ -63,6 +63,10 @@ To update: **App store › ⋮ › Check for updates**, then **Update** on the a
 
 ### Overview
 
+**Still to take today** (at the top, when there is something left): the intake moments of today that are still to
+come, with the medication and the amount, for the profile you filtered on. Medication without an intake time is not
+listed. Tap a name to open it.
+
 All medication, the most urgent first, with the stock ("1 bottle + 20 doses"), a badge and the date of the last dose.
 The chips at the top filter by profile; your choice is remembered per Home Assistant user.
 

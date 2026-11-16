@@ -325,4 +325,5 @@
   <data name="Reason_Pause" xml:space="preserve"><value>En pause</value></data>
   <data name="Reason_Resume" xml:space="preserve"><value>Repris</value></data>
   <data name="Reason_Intake" xml:space="preserve"><value>Pris</value></data>
+  <data name="Today_Title" xml:space="preserve"><value>Encore à prendre aujourd'hui</value></data>
 </root>
