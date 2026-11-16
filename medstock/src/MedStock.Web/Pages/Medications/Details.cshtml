@@ -120,6 +120,26 @@
     </details>
 
 
+    @if (m.UsageMode != MedStock.Web.Domain.UsageMode.AsNeeded)
+    {
+        var current = Model.ReminderOverride switch { true => "on", false => "off", _ => "auto" };
+        <form method="post" asp-page-handler="Reminder" asp-route-id="@m.Id" class="reminder-form">
+            <label>
+                @L["Med_Reminder"]
+                <select name="reminder" onchange="this.form.requestSubmit()">
+                    <option value="auto" selected="@(current == "auto")">@L["Med_Reminder_Auto", Model.ReminderProfileOn ? L["Reminder_On"] : L["Reminder_Off"]]</option>
+                    <option value="on" selected="@(current == "on")">@L["Med_Reminder_Always"]</option>
+                    <option value="off" selected="@(current == "off")">@L["Med_Reminder_Never"]</option>
+                </select>
+            </label>
+            @if (!Model.HasIntakeTime)
+            {
+                <p class="small muted">@L["Med_Reminder_NoTime"]</p>
+            }
+            <noscript><button type="submit" class="secondary">@L["Save"]</button></noscript>
+        </form>
+    }
+
     <p class="small muted">@L["Detail_LastCount", Texts.LongDate(r.Snapshot.Date, ui)]</p>
 
     <section class="photo" data-upload-url="@Url.Page("/Medications/Photo", new { id = m.Id })" data-detail-url="@Url.Page("/Medications/Details", new { id = m.Id })">

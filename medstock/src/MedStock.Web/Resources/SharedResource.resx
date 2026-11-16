@@ -298,4 +298,19 @@
   <data name="Recount_UntimedHint" xml:space="preserve"><value>A dose without a time counts as still to take until {0}.</value></data>
   <data name="Settings_UntimedTakenFrom" xml:space="preserve"><value>Doses without a time count as taken from</value></data>
   <data name="Settings_UntimedTakenFrom_Help" xml:space="preserve"><value>For recounts: before this time a dose without a time is still subtracted for today.</value></data>
+  <data name="Settings_Reminders" xml:space="preserve"><value>Intake reminders for</value></data>
+  <data name="Settings_Reminders_Help" xml:space="preserve"><value>A notification at each intake time, with Taken and Later (30 min, 1 h, 2 h). Only for medication with an intake time; per medication you can make an exception on its detail screen.</value></data>
+  <data name="Reminder_Title" xml:space="preserve"><value>Time for medication</value></data>
+  <data name="Reminder_Taken" xml:space="preserve"><value>Taken</value></data>
+  <data name="Reminder_Snooze30" xml:space="preserve"><value>30 min</value></data>
+  <data name="Reminder_Snooze60" xml:space="preserve"><value>1 h</value></data>
+  <data name="Reminder_Snooze120" xml:space="preserve"><value>2 h</value></data>
+  <data name="Med_Reminder" xml:space="preserve"><value>Intake reminder for me</value></data>
+  <data name="Med_Reminder_Auto" xml:space="preserve"><value>As in my settings ({0})</value></data>
+  <data name="Reminder_On" xml:space="preserve"><value>on</value></data>
+  <data name="Reminder_Off" xml:space="preserve"><value>off</value></data>
+  <data name="Med_Reminder_Always" xml:space="preserve"><value>Always</value></data>
+  <data name="Med_Reminder_Never" xml:space="preserve"><value>Never</value></data>
+  <data name="Med_Reminder_NoTime" xml:space="preserve"><value>Reminders need an intake time: set one with edit.</value></data>
+  <data name="Flash_Reminder" xml:space="preserve"><value>Reminder choice saved</value></data>
 </root>

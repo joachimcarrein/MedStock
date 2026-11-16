@@ -36,6 +36,38 @@ public class UserSettings
     public string? LastCulture { get; set; }
     /// <summary>Notifications say "a medication of &lt;profile&gt;" instead of its name (lock screens, shared devices).</summary>
     public bool DiscreetNotifications { get; set; }
+    /// <summary>Profiles for which this user gets intake reminders (none by default; separate from stock alerts).</summary>
+    public List<int> ReminderProfileIds { get; set; } = [];
+}
+
+/// <summary>A user's own exception for one medication: reminders always (true) or never (false), whatever the profile choice.</summary>
+public class MedicationReminder
+{
+    public string UserId { get; set; } = "";
+    public int MedicationId { get; set; }
+    public bool Enabled { get; set; }
+}
+
+/// <summary>An intake reminder already handled for a user: profile, day and moment (once per moment).</summary>
+public class ReminderLog
+{
+    public int Id { get; set; }
+    public string UserId { get; set; } = "";
+    public int ProfileId { get; set; }
+    public DateOnly Date { get; set; }
+    public TimeOnly Time { get; set; }
+    public DateTime SentAt { get; set; }
+}
+
+/// <summary>"Remind me later": the same reminder again for this user at <see cref="DueAt"/> (local time).</summary>
+public class SnoozedReminder
+{
+    public int Id { get; set; }
+    public string UserId { get; set; } = "";
+    public int ProfileId { get; set; }
+    public DateOnly Date { get; set; }
+    public TimeOnly Time { get; set; }
+    public DateTime DueAt { get; set; }
 }
 
 public class Profile

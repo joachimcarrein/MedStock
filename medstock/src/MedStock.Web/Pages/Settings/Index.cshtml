@@ -87,6 +87,18 @@
             }
         }
 
+        <fieldset>
+            <legend>@L["Settings_Reminders"]</legend>
+            @foreach (var p in Model.Profiles)
+            {
+                <label class="inline">
+                    <input type="checkbox" name="reminderProfiles" value="@p.Id" checked="@Model.Mine.ReminderProfileIds.Contains(p.Id)" />
+                    <span><span class="profile-dot" style="background:@p.Color"></span>@p.Name</span>
+                </label>
+            }
+            <p class="small muted">@L["Settings_Reminders_Help"]</p>
+        </fieldset>
+
         <label class="inline"><input type="checkbox" name="discreetNotifications" value="true" checked="@Model.Mine.DiscreetNotifications" /> @L["Settings_Discreet"]</label>
         <p class="small muted">@L["Settings_Discreet_Help"]</p>
 

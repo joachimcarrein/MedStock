@@ -46,7 +46,8 @@ public class IndexModel(
 
     public Task OnGetAsync() => LoadAsync();
 
-    public async Task<IActionResult> OnPostUserAsync(bool notificationsEnabled, string[] services, int[] profiles, string? language, bool discreetNotifications)
+    public async Task<IActionResult> OnPostUserAsync(bool notificationsEnabled, string[] services, int[] profiles, string? language, bool discreetNotifications,
+        int[] reminderProfiles)
     {
         var s = await db.UserSettings.FirstAsync(x => x.UserId == user.Id);
         s.NotificationsEnabled = notificationsEnabled;
@@ -57,6 +58,7 @@ public class IndexModel(
         s.NotifyProfileIds = chosen.Count == known.Count ? [] : chosen; // all ticked = "all", so new profiles are included
         s.Language = MedStock.Web.Middleware.LocalizationSetup.UiCultures.Any(c => c.Name == language) ? language : null;
         s.DiscreetNotifications = discreetNotifications;
+        s.ReminderProfileIds = reminderProfiles.Where(known.Contains).Distinct().ToList();
         s.DevicesInitialized = true;
         await db.SaveChangesAsync();
         cache.Remove(LocalizationSetup.LanguageCacheKey(user.Id));

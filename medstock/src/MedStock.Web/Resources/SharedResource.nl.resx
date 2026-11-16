@@ -298,4 +298,19 @@
   <data name="Recount_UntimedHint" xml:space="preserve"><value>Een dosis zonder uur telt tot {0} als nog te nemen.</value></data>
   <data name="Settings_UntimedTakenFrom" xml:space="preserve"><value>Doses zonder uur gelden als genomen vanaf</value></data>
   <data name="Settings_UntimedTakenFrom_Help" xml:space="preserve"><value>Bij hertellen: vóór dit uur wordt een dosis zonder uur nog afgetrokken voor vandaag.</value></data>
+  <data name="Settings_Reminders" xml:space="preserve"><value>Innameherinneringen voor</value></data>
+  <data name="Settings_Reminders_Help" xml:space="preserve"><value>Een melding op elk innamemoment, met Genomen en Later (30 min, 1 u, 2 u). Enkel voor medicatie met een innameuur; per medicatie kun je een uitzondering maken op het detailscherm.</value></data>
+  <data name="Reminder_Title" xml:space="preserve"><value>Tijd voor medicatie</value></data>
+  <data name="Reminder_Taken" xml:space="preserve"><value>Genomen</value></data>
+  <data name="Reminder_Snooze30" xml:space="preserve"><value>30 min</value></data>
+  <data name="Reminder_Snooze60" xml:space="preserve"><value>1 u</value></data>
+  <data name="Reminder_Snooze120" xml:space="preserve"><value>2 u</value></data>
+  <data name="Med_Reminder" xml:space="preserve"><value>Innameherinnering voor mij</value></data>
+  <data name="Med_Reminder_Auto" xml:space="preserve"><value>Zoals in mijn instellingen ({0})</value></data>
+  <data name="Reminder_On" xml:space="preserve"><value>aan</value></data>
+  <data name="Reminder_Off" xml:space="preserve"><value>uit</value></data>
+  <data name="Med_Reminder_Always" xml:space="preserve"><value>Altijd</value></data>
+  <data name="Med_Reminder_Never" xml:space="preserve"><value>Nooit</value></data>
+  <data name="Med_Reminder_NoTime" xml:space="preserve"><value>Herinneringen hebben een innameuur nodig: stel er een in via bewerken.</value></data>
+  <data name="Flash_Reminder" xml:space="preserve"><value>Keuze voor herinneringen opgeslagen</value></data>
 </root>

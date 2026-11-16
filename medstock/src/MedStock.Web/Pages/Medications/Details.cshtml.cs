@@ -9,7 +9,8 @@ using Microsoft.Extensions.Localization;
 namespace MedStock.Web.Pages.Medications;
 
 /// <summary>Detail with the stock actions (§3.4). Every action posts, redirects back (PRG) and shows a short confirmation.</summary>
-public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, MedicationService service, IStringLocalizer<SharedResource> l)
+public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, MedicationService service, MedStock.Web.Middleware.CurrentUser user,
+    IStringLocalizer<SharedResource> l)
     : PageModel
 {
     public MedicationRow Row { get; private set; } = null!;
@@ -17,6 +18,17 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
     /// <summary>Today's doses still to come: a recount subtracts them (shown before saving).</summary>
     public List<DoseMoment> PendingToday { get; private set; } = [];
     public TimeOnly UntimedTakenFrom { get; private set; }
+    /// <summary>The current user's own reminder choice for this medication: null = follow the profile choice in Settings.</summary>
+    public bool? ReminderOverride { get; private set; }
+    /// <summary>Whether the current user gets reminders for this profile (Settings).</summary>
+    public bool ReminderProfileOn { get; private set; }
+    /// <summary>Reminders need a time: a daily moment with a time or a weekly time.</summary>
+    public bool HasIntakeTime => Row.Medication.UsageMode switch
+    {
+        UsageMode.PerDay => DoseSchedule.MomentsOf(Row.Medication).Any(x => x.Time is not null),
+        UsageMode.Weekly => Row.Medication.WeeklyTime is not null,
+        _ => false,
+    };
     public string? Error { get; private set; }
 
     /// <summary>Confirmation after a redirect: "added", "taken", "recounted", "paused", "resumed".</summary>
@@ -39,6 +51,18 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
         openUnits is < 0 || sealedPackages is < 0
             ? Invalid(id, l["Val_NonNegative"])
             : Run(id, () => service.RecountAsync(id, expectedSnapshotId, openUnits ?? 0, sealedPackages ?? 0), "recounted");
+
+    /// <summary>The current user's reminder choice for this medication: "auto" (profile choice), "on" or "off".</summary>
+    public async Task<IActionResult> OnPostReminderAsync(int id, string? reminder)
+    {
+        if (!await db.Medications.AnyAsync(m => m.Id == id && !m.Archived)) return NotFound();
+        var existing = await db.MedicationReminders.FirstOrDefaultAsync(r => r.UserId == user.Id && r.MedicationId == id);
+        if (existing is not null) db.MedicationReminders.Remove(existing);
+        if (reminder is "on" or "off")
+            db.MedicationReminders.Add(new MedicationReminder { UserId = user.Id, MedicationId = id, Enabled = reminder == "on" });
+        await db.SaveChangesAsync();
+        return RedirectToPage(new { id, done = "reminder" });
+    }
 
     public Task<IActionResult> OnPostPauseAsync(int id, int expectedSnapshotId, bool paused) =>
         Run(id, () => service.SetPausedAsync(id, expectedSnapshotId, paused), paused ? "paused" : "resumed");
@@ -91,6 +115,10 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
         PhotoVersion = PhotoModel.Version(paths, id);
         UntimedTakenFrom = await db.GlobalSettings.AsNoTracking().Select(g => g.UntimedTakenFrom).SingleAsync();
         PendingToday = DoseSchedule.PendingToday(row.Medication, clock.Now, UntimedTakenFrom);
+        ReminderOverride = await db.MedicationReminders.AsNoTracking().Where(r => r.UserId == user.Id && r.MedicationId == id)
+            .Select(r => (bool?)r.Enabled).FirstOrDefaultAsync();
+        ReminderProfileOn = await db.UserSettings.AsNoTracking().Where(s => s.UserId == user.Id)
+            .Select(s => s.ReminderProfileIds).FirstOrDefaultAsync() is { } ids && ids.Contains(row.Medication.ProfileId);
         return true;
     }
 
@@ -109,6 +137,7 @@ public class DetailsModel(MedStockDb db, IClock clock, AppPaths paths, Medicatio
             "linked" => l["Flash_Linked"],
             "barcode" => l["Flash_Barcode"],
             "barcode-removed" => l["Flash_BarcodeRemoved"],
+            "reminder" => l["Flash_Reminder"],
             _ => null,
         })?.Value;
     }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MedStock.Web.Services;
 
-/// <summary>The "+1 package" button in a notification (Companion app actionable notification).</summary>
+/// <summary>The "+1 package" button in a stock notification (Companion app actionable notification).</summary>
 public static class NotificationActions
 {
     public const string PurchasePrefix = "MEDSTOCK_PURCHASE_";
@@ -29,13 +29,29 @@ public static class NotificationActions
 }
 
 /// <summary>Handles one tapped notification action. Scoped: one per event.</summary>
-public sealed class NotificationActionHandler(MedStockDb db, MedicationService service, CurrentUser user, ILogger<NotificationActionHandler> log)
+public sealed class NotificationActionHandler(MedStockDb db, MedicationService service, ReminderService reminders, CurrentUser user,
+    ILogger<NotificationActionHandler> log)
 {
     public const string FallbackUserId = "notification";
 
-    /// <summary>Returns true when the action was a MedStock purchase that was booked.</summary>
+    /// <summary>Whether the action is one of MedStock's (purchase, reminder taken or later).</summary>
+    public static bool IsOurs(string? action) =>
+        NotificationActions.TryParsePurchase(action, out _) || ReminderActions.TryParseTaken(action, out _)
+        || ReminderActions.TryParseSnooze(action, out _, out _);
+
+    /// <summary>Returns true when the action was handled (a purchase booked, a reminder closed or postponed).</summary>
     public async Task<bool> HandleAsync(string? action, string? haUserId, CancellationToken ct = default)
     {
+        if (ReminderActions.TryParseTaken(action, out var taken))
+        {
+            await reminders.TakenAsync(taken, ct);
+            return true;
+        }
+        if (ReminderActions.TryParseSnooze(action, out var minutes, out var later))
+        {
+            await reminders.SnoozeAsync(later, minutes, haUserId, ct);
+            return true;
+        }
         if (!NotificationActions.TryParsePurchase(action, out var id)) return false;
         var m = await db.Medications.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
         if (m is null || m.Archived)
@@ -112,7 +128,7 @@ public sealed class HaEventListener(IServiceScopeFactory scopes, IConfiguration 
             if ((string?)msg["type"] != "event") continue;
             var ev = msg["event"];
             var action = (string?)ev?["data"]?["action"];
-            if (!NotificationActions.TryParsePurchase(action, out _) || IsRepeat(action!)) continue;
+            if (!NotificationActionHandler.IsOurs(action) || IsRepeat(action!)) continue;
             try
             {
                 using var scope = scopes.CreateScope();

@@ -18,6 +18,9 @@ public interface IHaClient
     Task<NotifyOutcome> NotifyAsync(string service, string title, string message, string? deepLink, string? tag,
         IReadOnlyList<NotifyAction>? actions = null, CancellationToken ct = default);
 
+    /// <summary>Removes the notification with this tag from the device (Companion app "clear_notification").</summary>
+    Task<NotifyOutcome> ClearNotificationAsync(string service, string tag, CancellationToken ct = default);
+
     /// <summary>The full add-on slug including the repository prefix (e.g. "a1b2c3d4_medstock").</summary>
     Task<string?> GetSelfSlugAsync(CancellationToken ct = default);
 
@@ -86,6 +89,23 @@ public sealed class HaClient(HttpClient http, ILogger<HaClient> logger) : IHaCli
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             logger.LogWarning("Notification transport error: {Error}", ex.GetType().Name);
+            return NotifyOutcome.TransportError;
+        }
+    }
+
+    public async Task<NotifyOutcome> ClearNotificationAsync(string service, string tag, CancellationToken ct = default)
+    {
+        var name = service.StartsWith("notify.", StringComparison.Ordinal) ? service["notify.".Length..] : service;
+        var body = new JsonObject { ["message"] = "clear_notification", ["data"] = new JsonObject { ["tag"] = tag } };
+        try
+        {
+            using var resp = await http.PostAsJsonAsync(CoreBase + "services/notify/" + Uri.EscapeDataString(name), body, ct);
+            if (resp.IsSuccessStatusCode) return NotifyOutcome.Ok;
+            return resp.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound ? NotifyOutcome.UnknownService : NotifyOutcome.TransportError;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            logger.LogWarning("Clear notification transport error: {Error}", ex.GetType().Name);
             return NotifyOutcome.TransportError;
         }
     }
@@ -229,6 +249,16 @@ public sealed class FakeHaClient(ILogger<FakeHaClient> logger) : IHaClient
             SentActions.Add(actions);
         }
         logger.LogInformation("[FakeHa] {Service}: {Title} - {Message} ({Link}, {Tag})", service, title, message, deepLink, tag);
+        return Task.FromResult(NotifyOutcome.Ok);
+    }
+
+    public List<(string Service, string Tag)> Cleared { get; } = [];
+
+    public Task<NotifyOutcome> ClearNotificationAsync(string service, string tag, CancellationToken ct = default)
+    {
+        if (Unavailable) return Task.FromResult(NotifyOutcome.TransportError);
+        lock (Cleared) Cleared.Add((service, tag));
+        logger.LogInformation("[FakeHa] {Service}: clear {Tag}", service, tag);
         return Task.FromResult(NotifyOutcome.Ok);
     }
 
