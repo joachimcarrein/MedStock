@@ -182,7 +182,10 @@ public sealed class NotificationService(MedStockDb db, IHaClient ha, IClock cloc
         new(u.Language ?? u.LastCulture ?? "en");
 }
 
-/// <summary>Checks every minute whether the daily run is due (§3.8). Never throws; never calls HA during host startup.</summary>
+/// <summary>
+/// Every minute: the daily stock check when it is due (§3.8), then the intake reminders. Never throws; never calls HA during
+/// host startup.
+/// </summary>
 public sealed class NotificationWorker(IServiceScopeFactory scopes, ILogger<NotificationWorker> log) : BackgroundService
 {
     public static readonly TimeSpan Interval = TimeSpan.FromMinutes(1);
@@ -201,6 +204,16 @@ public sealed class NotificationWorker(IServiceScopeFactory scopes, ILogger<Noti
             catch (Exception ex)
             {
                 log.LogError("Notification tick failed: {Error}", ex.GetType().Name);
+            }
+            try
+            {
+                using var scope = scopes.CreateScope();
+                await scope.ServiceProvider.GetRequiredService<ReminderService>().RunAsync(ct);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
+            catch (Exception ex)
+            {
+                log.LogError("Reminder tick failed: {Error}", ex.GetType().Name);
             }
         }
     }

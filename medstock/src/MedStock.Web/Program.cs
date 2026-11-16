@@ -43,6 +43,7 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton<NotificationState>();
 builder.Services.AddHostedService<NotificationWorker>();
 builder.Services.AddScoped<NotificationActionHandler>();
+builder.Services.AddScoped<ReminderService>();
 if (addonMode) builder.Services.AddHostedService<HaEventListener>();
 builder.Services.AddSingleton<SensorSignal>();
 builder.Services.AddSingleton<SensorStatus>();

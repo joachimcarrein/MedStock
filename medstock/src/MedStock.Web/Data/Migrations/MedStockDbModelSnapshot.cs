@@ -164,6 +164,24 @@ namespace MedStock.Web.Data.Migrations
                     b.ToTable("Medications");
                 });
 
+            modelBuilder.Entity("MedStock.Web.Domain.MedicationReminder", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MedicationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "MedicationId");
+
+                    b.HasIndex("MedicationId");
+
+                    b.ToTable("MedicationReminders");
+                });
+
             modelBuilder.Entity("MedStock.Web.Domain.NotificationLog", b =>
                 {
                     b.Property<int>("Id")
@@ -214,6 +232,36 @@ namespace MedStock.Web.Data.Migrations
                     b.ToTable("Profiles");
                 });
 
+            modelBuilder.Entity("MedStock.Web.Domain.ReminderLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ProfileId", "Date", "Time")
+                        .IsUnique();
+
+                    b.ToTable("ReminderLogs");
+                });
+
             modelBuilder.Entity("MedStock.Web.Domain.Snapshot", b =>
                 {
                     b.Property<int>("Id")
@@ -245,6 +293,35 @@ namespace MedStock.Web.Data.Migrations
                     b.HasIndex("MedicationId", "Id");
 
                     b.ToTable("Snapshots");
+                });
+
+            modelBuilder.Entity("MedStock.Web.Domain.SnoozedReminder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DueAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueAt");
+
+                    b.ToTable("SnoozedReminders");
                 });
 
             modelBuilder.Entity("MedStock.Web.Domain.User", b =>
@@ -301,6 +378,10 @@ namespace MedStock.Web.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.PrimitiveCollection<string>("ReminderProfileIds")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.PrimitiveCollection<string>("StaleNotifyServices")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -319,6 +400,15 @@ namespace MedStock.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("MedStock.Web.Domain.MedicationReminder", b =>
+                {
+                    b.HasOne("MedStock.Web.Domain.Medication", null)
+                        .WithMany()
+                        .HasForeignKey("MedicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MedStock.Web.Domain.NotificationLog", b =>

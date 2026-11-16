@@ -14,6 +14,9 @@ public class MedStockDb(DbContextOptions<MedStockDb> options) : DbContext(option
     public DbSet<Snapshot> Snapshots => Set<Snapshot>();
     public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();
     public DbSet<GlobalSettings> GlobalSettings => Set<GlobalSettings>();
+    public DbSet<MedicationReminder> MedicationReminders => Set<MedicationReminder>();
+    public DbSet<ReminderLog> ReminderLogs => Set<ReminderLog>();
+    public DbSet<SnoozedReminder> SnoozedReminders => Set<SnoozedReminder>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -59,6 +62,13 @@ public class MedStockDb(DbContextOptions<MedStockDb> options) : DbContext(option
             e.HasIndex(x => new { x.MedicationId, x.Level }).IsUnique();
             e.HasOne<Medication>().WithMany().HasForeignKey(x => x.MedicationId).OnDelete(DeleteBehavior.Cascade);
         });
+        b.Entity<MedicationReminder>(e =>
+        {
+            e.HasKey(x => new { x.UserId, x.MedicationId });
+            e.HasOne<Medication>().WithMany().HasForeignKey(x => x.MedicationId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<ReminderLog>(e => e.HasIndex(x => new { x.UserId, x.ProfileId, x.Date, x.Time }).IsUnique());
+        b.Entity<SnoozedReminder>(e => e.HasIndex(x => x.DueAt));
         b.Entity<GlobalSettings>(e =>
         {
             e.Property(x => x.Id).ValueGeneratedNever();

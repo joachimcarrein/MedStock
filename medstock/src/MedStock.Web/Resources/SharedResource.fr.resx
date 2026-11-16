@@ -298,4 +298,19 @@
   <data name="Recount_UntimedHint" xml:space="preserve"><value>Une dose sans heure compte comme encore à prendre jusqu'à {0}.</value></data>
   <data name="Settings_UntimedTakenFrom" xml:space="preserve"><value>Les doses sans heure comptent comme prises à partir de</value></data>
   <data name="Settings_UntimedTakenFrom_Help" xml:space="preserve"><value>Lors d'un recomptage : avant cette heure, une dose sans heure est encore déduite pour aujourd'hui.</value></data>
+  <data name="Settings_Reminders" xml:space="preserve"><value>Rappels de prise pour</value></data>
+  <data name="Settings_Reminders_Help" xml:space="preserve"><value>Une notification à chaque heure de prise, avec Pris et Plus tard (30 min, 1 h, 2 h). Uniquement pour les médicaments avec une heure de prise ; par médicament, vous pouvez faire une exception sur son écran de détail.</value></data>
+  <data name="Reminder_Title" xml:space="preserve"><value>C'est l'heure du médicament</value></data>
+  <data name="Reminder_Taken" xml:space="preserve"><value>Pris</value></data>
+  <data name="Reminder_Snooze30" xml:space="preserve"><value>30 min</value></data>
+  <data name="Reminder_Snooze60" xml:space="preserve"><value>1 h</value></data>
+  <data name="Reminder_Snooze120" xml:space="preserve"><value>2 h</value></data>
+  <data name="Med_Reminder" xml:space="preserve"><value>Rappel de prise pour moi</value></data>
+  <data name="Med_Reminder_Auto" xml:space="preserve"><value>Comme dans mes réglages ({0})</value></data>
+  <data name="Reminder_On" xml:space="preserve"><value>activé</value></data>
+  <data name="Reminder_Off" xml:space="preserve"><value>désactivé</value></data>
+  <data name="Med_Reminder_Always" xml:space="preserve"><value>Toujours</value></data>
+  <data name="Med_Reminder_Never" xml:space="preserve"><value>Jamais</value></data>
+  <data name="Med_Reminder_NoTime" xml:space="preserve"><value>Les rappels ont besoin d'une heure de prise : définissez-en une via modifier.</value></data>
+  <data name="Flash_Reminder" xml:space="preserve"><value>Choix de rappel enregistré</value></data>
 </root>

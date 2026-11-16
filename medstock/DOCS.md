@@ -171,6 +171,24 @@ deleted when it has no medication left, archived included.
 - **Send test notification** sends a test to your own saved devices. **Run the daily check now** (Settings › For
   everyone) runs the real check immediately and lists what it did; it never sends the same step twice.
 
+### Intake reminders
+
+Separate from the stock notifications above: a notification at the moment a medication should be taken.
+
+- **Who receives them**: in **Settings › My notifications › Intake reminders for**, tick the profiles you want
+  reminders for (none by default). They go to the same devices as your other notifications.
+- **Exception per medication**: on the detail screen, **Intake reminder for me**: *As in my settings*, *Always* or
+  *Never*. So you can switch reminders off for a profile and still get them for one medication, or the other way
+  round. The choice is per user.
+- **When**: at each intake time (Daily: the time of each intake moment; Weekly pattern: its time), on the days the
+  medication is due (every N days/weeks, course end date and pause are respected). Medication without a time gets no
+  reminder. If MedStock was not running at that moment, the reminder is still sent up to 30 minutes late, never later.
+- **One per moment**: medication of the same profile at the same time comes in one notification, e.g.
+  "08:00 Husband: Bisoprolol 5 mg (1 pill), Vitamin D (1 capsule)". With **discreet notifications**: "08:00 Husband".
+- **Buttons**: **Taken** closes the reminder on every device it went to. **30 min**, **1 h** and **2 h** send it again
+  later, only to you (and you can postpone it again). Android shows at most three buttons, so 2 h is missing there.
+- Reminders never change the stock: it keeps going down by itself.
+
 ## Optional extras
 
 All off by default.

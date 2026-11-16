@@ -9,6 +9,9 @@
 - Recount and first stock without the "already taken today" tick box: count what you have now; MedStock subtracts
   the doses that still follow today (by their time) and shows what will be recorded before you save.
 - New setting (Settings › For everyone): doses without a time count as taken from 20:00; change it if you prefer another time.
+- Intake reminders (separate from the stock notifications): choose the profiles in Settings › My notifications; per
+  medication an exception for yourself (always / never) on the detail screen. One notification per profile per intake
+  time, with Taken (closes it on every device) and Later (30 min, 1 h, 2 h). Discreet notifications leave out the names.
 
 **What happens to your existing medication:** nothing changes in the stock or the days remaining. Daily medication
 gets one intake moment with its current amount, without a time; a weekly pattern stays as it is, without a time.
